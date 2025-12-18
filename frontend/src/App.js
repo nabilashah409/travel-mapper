@@ -6,14 +6,14 @@ import './App.css';
 
 function App() {
   return (
-    <div className="App">
+    <>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<RouteBuilder />} />
         </Routes>
       </BrowserRouter>
-      <Toaster position="top-right" theme="dark" />
-    </div>
+      <Toaster position="top-right" theme="dark" richColors />
+    </>
   );
 }
 
