@@ -248,9 +248,29 @@ const RouteBuilderNew = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex">
+    <div className="h-screen w-screen flex flex-col md:flex-row">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center"
+      >
+        {isSidebarOpen ? <X className="w-6 h-6" /> : <Search className="w-6 h-6" />}
+      </button>
+
       {/* Left Sidebar */}
-      <div className="w-96 bg-white shadow-lg flex flex-col overflow-y-auto">
+      <div className={`
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:translate-x-0
+        fixed md:relative
+        w-full md:w-96 
+        h-full
+        bg-white 
+        shadow-lg 
+        flex flex-col 
+        overflow-y-auto
+        transition-transform duration-300 ease-in-out
+        z-40
+      `}>
         <div className="p-8">
           {/* Title */}
           <h1 
