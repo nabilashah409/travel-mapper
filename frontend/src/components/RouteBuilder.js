@@ -273,6 +273,7 @@ const RouteBuilder = () => {
     // Reset and start from beginning
     setAnimationProgress(0);
     setIsAnimating(true);
+    setIsPlaying(true);
     
     // Set initial position to first point of first path
     if (routePaths[0] && routePaths[0][0]) {
