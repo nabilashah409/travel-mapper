@@ -619,26 +619,38 @@ const RouteBuilder = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glassmorphism rounded-xl px-6 py-4 flex items-center gap-4"
+            className="fun-panel px-6 py-4 flex items-center gap-4"
           >
             {!isAnimating ? (
               <Button
                 onClick={startAnimation}
                 size="icon"
                 disabled={routePaths.length === 0}
-                style={{ backgroundColor: getTransportColor(), color: '#020617' }}
+                className="w-12 h-12"
+                style={{ 
+                  backgroundColor: getTransportColor(), 
+                  color: '#ffffff',
+                  borderRadius: '12px',
+                  boxShadow: `0 6px 16px ${getTransportColor()}60`
+                }}
                 data-testid="play-animation-btn"
               >
-                <Play className="w-5 h-5" />
+                <Play className="w-6 h-6" />
               </Button>
             ) : (
               <Button
                 onClick={pauseAnimation}
                 size="icon"
-                style={{ backgroundColor: getTransportColor(), color: '#020617' }}
+                className="w-12 h-12"
+                style={{ 
+                  backgroundColor: '#ef4444', 
+                  color: '#ffffff',
+                  borderRadius: '12px',
+                  boxShadow: '0 6px 16px rgba(239, 68, 68, 0.6)'
+                }}
                 data-testid="pause-animation-btn"
               >
-                <Pause className="w-5 h-5" />
+                <Pause className="w-6 h-6" />
               </Button>
             )}
             
@@ -646,33 +658,45 @@ const RouteBuilder = () => {
               onClick={downloadAnimation}
               size="icon"
               disabled={routePaths.length === 0 || isRecording}
-              variant="outline"
-              style={{ borderColor: getTransportColor(), color: getTransportColor() }}
+              className="w-12 h-12"
+              style={{ 
+                backgroundColor: '#10b981',
+                color: '#ffffff',
+                borderRadius: '12px',
+                boxShadow: '0 6px 16px rgba(16, 185, 129, 0.6)'
+              }}
               data-testid="download-animation-btn"
             >
-              {isRecording ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+              {isRecording ? <Loader2 className="w-6 h-6 animate-spin" /> : <Download className="w-6 h-6" />}
             </Button>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'JetBrains Mono, monospace' }}>Speed:</span>
+              <span className="text-xs font-bold" style={{ color: '#7c3aed', fontFamily: 'Fredoka, sans-serif' }}>Speed:</span>
               <select
                 value={animationSpeed}
                 onChange={(e) => setAnimationSpeed(Number(e.target.value))}
-                className="text-xs px-2 py-1 rounded"
-                style={{ backgroundColor: '#0f172a', borderColor: 'rgba(255,255,255,0.1)', color: '#f8fafc', fontFamily: 'JetBrains Mono, monospace' }}
+                className="text-sm px-3 py-2 rounded-lg font-bold"
+                style={{ 
+                  backgroundColor: '#fef3c7', 
+                  borderColor: '#f59e0b', 
+                  color: '#92400e', 
+                  fontFamily: 'Fredoka, sans-serif',
+                  border: '2px solid',
+                  borderRadius: '10px'
+                }}
                 data-testid="animation-speed-select"
               >
-                <option value="0.5">0.5x</option>
-                <option value="1">1x</option>
-                <option value="2">2x</option>
-                <option value="3">3x</option>
+                <option value="0.5">🐢 0.5x</option>
+                <option value="1">🚶 1x</option>
+                <option value="2">🏃 2x</option>
+                <option value="3">🚀 3x</option>
               </select>
             </div>
 
             {animationProgress > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'JetBrains Mono, monospace' }}>
-                  {Math.round(animationProgress)}%
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#dbeafe' }}>
+                <span className="text-sm font-bold" style={{ color: '#1e40af', fontFamily: 'Fredoka, sans-serif' }}>
+                  {Math.round(animationProgress)}% ✨
                 </span>
               </div>
             )}
