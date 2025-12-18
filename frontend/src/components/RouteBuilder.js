@@ -381,6 +381,7 @@ const RouteBuilder = () => {
 
   const pauseAnimation = () => {
     setIsAnimating(false);
+    setIsPlaying(false);
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
