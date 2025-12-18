@@ -690,40 +690,77 @@ const RouteBuilder = () => {
 
         {!isPlaying && (
 
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="fun-panel px-6 py-4 flex items-center gap-4"
-          >
-            {transportModes.map((mode) => {
-              const Icon = mode.icon;
-              const isSelected = selectedTransport === mode.id;
-              return (
-                <button
-                  key={mode.id}
-                  onClick={() => setSelectedTransport(mode.id)}
-                  className="flex flex-col items-center gap-2 transition-all duration-300 hover:scale-110"
-                  style={{
-                    backgroundColor: isSelected ? mode.color : mode.bgColor,
-                    color: isSelected ? '#ffffff' : mode.color,
-                    padding: '12px 16px',
-                    borderRadius: '16px',
-                    border: `3px solid ${isSelected ? mode.color : 'transparent'}`,
-                    boxShadow: isSelected ? `0 6px 20px ${mode.color}50` : 'none',
-                    fontWeight: 'bold'
-                  }}
-                  data-testid={`transport-${mode.id}`}
-                >
-                  <Icon className="w-7 h-7" />
-                  <span className="text-xs" style={{ fontFamily: 'Fredoka, sans-serif' }}>{mode.label}</span>
-                </button>
-              );
-            })}
-          </motion.div>
-        </div>
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="fun-panel px-6 py-4 flex items-center gap-4"
+            >
+              {transportModes.map((mode) => {
+                const Icon = mode.icon;
+                const isSelected = selectedTransport === mode.id;
+                return (
+                  <button
+                    key={mode.id}
+                    onClick={() => setSelectedTransport(mode.id)}
+                    className="flex flex-col items-center gap-2 transition-all duration-300 hover:scale-110"
+                    style={{
+                      backgroundColor: isSelected ? mode.color : mode.bgColor,
+                      color: isSelected ? '#ffffff' : mode.color,
+                      padding: '12px 16px',
+                      borderRadius: '16px',
+                      border: `3px solid ${isSelected ? mode.color : 'transparent'}`,
+                      boxShadow: isSelected ? `0 6px 20px ${mode.color}50` : 'none',
+                      fontWeight: 'bold'
+                    }}
+                    data-testid={`transport-${mode.id}`}
+                  >
+                    <Icon className="w-7 h-7" />
+                    <span className="text-xs" style={{ fontFamily: 'Fredoka, sans-serif' }}>{mode.label}</span>
+                  </button>
+                );
+              })}
+            </motion.div>
+          </div>
+        )}
 
-        <div className="absolute bottom-8 right-8 pointer-events-auto">
+        {/* Bottom Controls - Only show during playback */}
+        {isPlaying && (
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-auto">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={pauseAnimation}
+                className="w-16 h-16 rounded-full flex items-center justify-center font-bold shadow-xl"
+                style={{
+                  backgroundColor: '#ff6b35',
+                  color: '#ffffff',
+                  fontFamily: 'Fredoka, sans-serif'
+                }}
+                data-testid="pause-animation-btn-playing"
+              >
+                <Pause className="w-8 h-8" />
+              </button>
+              
+              <button
+                onClick={downloadAnimation}
+                disabled={isRecording}
+                className="px-6 py-3 rounded-full flex items-center gap-2 font-bold shadow-lg"
+                style={{
+                  backgroundColor: '#ffffff',
+                  color: '#1f2937',
+                  fontFamily: 'Fredoka, sans-serif'
+                }}
+                data-testid="video-btn"
+              >
+                {isRecording ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+                <span>Video</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!isPlaying && (
+          <div className="absolute bottom-8 right-8 pointer-events-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
