@@ -187,14 +187,15 @@ const RouteBuilder = () => {
 
   const createCurvedPath = (start, end) => {
     const points = [];
-    const numPoints = 100;
-    const arcHeight = 0.2;
+    const numPoints = 200; // Increased for smoother animation
+    const arcHeight = 0.15; // Slightly reduced for more realistic arc
 
     for (let i = 0; i <= numPoints; i++) {
       const t = i / numPoints;
       const lat = start.lat + (end.lat - start.lat) * t;
       const lng = start.lng + (end.lng - start.lng) * t;
       
+      // Create a smooth arc using sine function
       const offsetLat = Math.sin(t * Math.PI) * arcHeight * Math.abs(end.lat - start.lat);
       
       points.push({
