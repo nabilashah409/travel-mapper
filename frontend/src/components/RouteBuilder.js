@@ -586,7 +586,7 @@ const RouteBuilder = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glassmorphism rounded-full px-6 py-3 flex items-center gap-6"
+            className="fun-panel px-6 py-4 flex items-center gap-4"
           >
             {transportModes.map((mode) => {
               const Icon = mode.icon;
@@ -595,15 +595,20 @@ const RouteBuilder = () => {
                 <button
                   key={mode.id}
                   onClick={() => setSelectedTransport(mode.id)}
-                  className="flex flex-col items-center gap-1 transition-all duration-300 hover:scale-110"
+                  className="flex flex-col items-center gap-2 transition-all duration-300 hover:scale-110"
                   style={{
-                    color: isSelected ? mode.color : '#94a3b8',
-                    filter: isSelected ? `drop-shadow(0 0 8px ${mode.color}80)` : 'none',
+                    backgroundColor: isSelected ? mode.color : mode.bgColor,
+                    color: isSelected ? '#ffffff' : mode.color,
+                    padding: '12px 16px',
+                    borderRadius: '16px',
+                    border: `3px solid ${isSelected ? mode.color : 'transparent'}`,
+                    boxShadow: isSelected ? `0 6px 20px ${mode.color}50` : 'none',
+                    fontWeight: 'bold'
                   }}
                   data-testid={`transport-${mode.id}`}
                 >
-                  <Icon className="w-6 h-6" />
-                  <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>{mode.label}</span>
+                  <Icon className="w-7 h-7" />
+                  <span className="text-xs" style={{ fontFamily: 'Fredoka, sans-serif' }}>{mode.label}</span>
                 </button>
               );
             })}
