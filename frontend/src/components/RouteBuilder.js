@@ -163,11 +163,30 @@ const RouteBuilder = () => {
           });
 
           if (result.routes[0]) {
-            const path = result.routes[0].overview_path.map(point => ({
-              lat: point.lat(),
-              lng: point.lng(),
-            }));
-            paths.push(path);
+            // Get detailed path from all steps for smoother animation
+            let detailedPath = [];
+            result.routes[0].legs.forEach(leg => {
+              leg.steps.forEach(step => {
+                const stepPath = step.path || step.lat_lngs || [];
+                stepPath.forEach(point => {
+                  detailedPath.push({
+                    lat: point.lat(),
+                    lng: point.lng(),
+                  });
+                });
+              });
+            });
+            
+            // If detailed path is available, use it; otherwise use overview
+            if (detailedPath.length > 0) {
+              paths.push(detailedPath);
+            } else {
+              const path = result.routes[0].overview_path.map(point => ({
+                lat: point.lat(),
+                lng: point.lng(),
+              }));
+              paths.push(path);
+            }
           }
         } catch (error) {
           console.error('Error calculating route:', error);
