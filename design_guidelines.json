@@ -1,0 +1,110 @@
+{
+  "identity": {
+    "name": "E1: The Anti-AI Designer",
+    "mission": "Create a cinematic, flight-tracker style travel animation app that breaks generic SaaS conventions.",
+    "principles": [
+      "Fusion: Flight Tracker Tech x Cinematic Travel Vlog",
+      "Emotion: Wanderlust & Precision",
+      "Content: The Map is the Hero",
+      "Contrast: Neon paths against deep dark maps"
+    ]
+  },
+  "typography": {
+    "headings": {
+      "family": "Chivo, sans-serif",
+      "usage": "Main headers, destination names",
+      "weights": ["900", "700"],
+      "letterSpacing": "tracking-tight"
+    },
+    "body": {
+      "family": "Inter, sans-serif",
+      "usage": "General UI text, instructions",
+      "weights": ["400", "500"]
+    },
+    "mono": {
+      "family": "JetBrains Mono, monospace",
+      "usage": "Coordinates, speed metrics, time, flight numbers",
+      "weights": ["400"]
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#020617",
+      "surface": "#0f172a",
+      "surface_highlight": "#1e293b",
+      "text_primary": "#f8fafc",
+      "text_secondary": "#94a3b8",
+      "primary": "#06b6d4",
+      "secondary": "#f59e0b",
+      "accent_flight": "#06b6d4",
+      "accent_road": "#f59e0b",
+      "accent_train": "#10b981",
+      "accent_walk": "#ec4899",
+      "border": "rgba(255,255,255,0.1)"
+    },
+    "gradients": {
+      "hero_glow": "radial-gradient(circle at center, rgba(6,182,212,0.15) 0%, rgba(2,6,23,0) 70%)",
+      "glass": "linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.8) 100%)"
+    }
+  },
+  "layout": {
+    "grid_system": "The Control Room Grid",
+    "structure": {
+      "base": "h-screen w-screen overflow-hidden bg-background relative",
+      "map_layer": "absolute inset-0 z-0",
+      "ui_layer": "relative z-10 pointer-events-none",
+      "panels": "pointer-events-auto"
+    },
+    "spacing": {
+      "container_padding": "p-6 md:p-8",
+      "panel_gap": "gap-4"
+    }
+  },
+  "components": {
+    "transport_dock": {
+      "description": "A floating bottom bar containing transport icons. Active state glows.",
+      "style": "glassmorphism rounded-full px-6 py-3 border border-white/10 flex gap-6 shadow-2xl backdrop-blur-xl bg-black/40",
+      "interaction": "Hover: scale-110 & glow. Active: Text-primary & neon border."
+    },
+    "route_timeline": {
+      "description": "Vertical list of destinations on the left. Connected by a dashed line.",
+      "style": "glassmorphism rounded-xl p-6 border border-white/10 w-80 backdrop-blur-md bg-black/50",
+      "item_style": "flex items-center gap-4 py-3 border-l-2 border-white/10 pl-4 hover:border-primary transition-colors"
+    },
+    "animation_controls": {
+      "description": "Player controls (Play, Pause, Speed, Export) at bottom center.",
+      "style": "glassmorphism rounded-xl px-6 py-4 border border-white/10 flex items-center gap-6 backdrop-blur-xl bg-black/60"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-black/60 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]",
+    "neon_glow": "drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]",
+    "map_style": "Dark mode Google Maps style (remove POIs, dark water, slate land)",
+    "icons": "Lucide React (Plane, Car, Train, Footprints, Truck, Helicopter)"
+  },
+  "motion": {
+    "transitions": "transition-all duration-300 ease-out",
+    "panel_entrance": "initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}",
+    "hover_lift": "hover:-translate-y-1 hover:shadow-lg"
+  },
+  "image_urls": {
+    "hero_bg": "https://images.unsplash.com/photo-1706397327527-1d787912bf09",
+    "road_texture": "https://images.unsplash.com/photo-1765728611549-3d111095ddd9"
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'lucide-react', 'framer-motion', '@react-google-maps/api' (or similar).",
+    "2. MAP: Implement a custom dark map style JSON for Google Maps to match the 'Slate 950' background.",
+    "3. LAYOUT: Use a Z-stack layout. Map is absolute bottom. UI floats on top.",
+    "4. ANIMATION: Use the Google Maps API 'Polyline' with 'Symbol' animation for the moving vehicle. Do NOT use CSS animation for the map path itself, use the Map API's native animation capabilities for performance.",
+    "5. EXPORT: Use 'canvas-record' or 'MediaRecorder' to capture the canvas stream.",
+    "6. ICONS: Use Lucide icons for the transport modes. Do not use emojis.",
+    "7. FONT: Import 'Chivo' and 'JetBrains Mono' from Google Fonts."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Do not use gradients for text.",
+    "Use 'sonner' for toasts.",
+    "Ensure all interactive elements have 'data-testid'.",
+    "Use 'backdrop-blur-xl' for all floating panels.",
+    "Never use pure black (#000000), use #020617."
+  ]
+}
