@@ -87,7 +87,10 @@ const RouteBuilder = () => {
         if (!autocompleteRefs.current[dest.id]) {
           const input = document.getElementById(`destination-input-${dest.id}`);
           if (input) {
-            const autocomplete = new window.google.maps.places.Autocomplete(input);
+            const autocomplete = new window.google.maps.places.Autocomplete(input, {
+              fields: ['formatted_address', 'geometry', 'name']
+            });
+            
             autocomplete.addListener('place_changed', () => {
               const place = autocomplete.getPlace();
               if (place.geometry) {
@@ -101,8 +104,10 @@ const RouteBuilder = () => {
                   },
                 };
                 setDestinations(newDestinations);
+                toast.success(`Added: ${place.formatted_address || place.name}`);
               }
             });
+            
             autocompleteRefs.current[dest.id] = autocomplete;
           }
         }
