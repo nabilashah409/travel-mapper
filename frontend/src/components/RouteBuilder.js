@@ -126,6 +126,15 @@ const RouteBuilder = () => {
       return;
     }
 
+    // Clear previous animation state
+    setIsAnimating(false);
+    setAnimationProgress(0);
+    setCurrentMarkerPosition(null);
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+
     const paths = [];
     
     for (let i = 0; i < validDestinations.length - 1; i++) {
@@ -163,7 +172,6 @@ const RouteBuilder = () => {
     }
 
     setRoutePaths(paths);
-    setAnimationProgress(0);
     
     if (mapRef.current && validDestinations.length > 0) {
       const bounds = new window.google.maps.LatLngBounds();
