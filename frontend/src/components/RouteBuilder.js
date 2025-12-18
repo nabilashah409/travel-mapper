@@ -338,6 +338,9 @@ const RouteBuilder = () => {
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: '#06b6d4' }} />
           <p className="text-lg" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>Loading Maps...</p>
+          <p className="text-sm mt-2" style={{ color: '#64748b', fontFamily: 'Inter, sans-serif' }}>
+            If this takes too long, please check your Google Maps API configuration
+          </p>
         </div>
       </div>
     );
