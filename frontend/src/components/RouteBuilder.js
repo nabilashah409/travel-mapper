@@ -47,7 +47,7 @@ const transportModes = [
   { id: 'train', icon: Train, label: 'Train', color: '#10b981' },
   { id: 'walk', icon: Footprints, label: 'Walk', color: '#ec4899' },
   { id: 'truck', icon: Truck, label: 'Truck', color: '#8b5cf6' },
-  { id: 'helicopter', icon: Helicopter, label: 'Helicopter', color: '#06b6d4' },
+  { id: 'helicopter', icon: PlaneTakeoff, label: 'Helicopter', color: '#06b6d4' },
 ];
 
 const RouteBuilder = () => {
