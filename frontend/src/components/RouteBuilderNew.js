@@ -33,6 +33,8 @@ const RouteBuilderNew = () => {
   const [currentMarkerPosition, setCurrentMarkerPosition] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [markerRotation, setMarkerRotation] = useState(0);
   
   const animationRef = useRef(null);
   const mapRef = useRef(null);
