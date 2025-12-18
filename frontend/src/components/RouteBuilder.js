@@ -192,8 +192,8 @@ const RouteBuilder = () => {
 
   const createCurvedPath = (start, end) => {
     const points = [];
-    const numPoints = 200; // Increased for smoother animation
-    const arcHeight = 0.15; // Slightly reduced for more realistic arc
+    const numPoints = 500; // Much more points for ultra-smooth animation
+    const arcHeight = 0.1; // Realistic flight arc
 
     for (let i = 0; i <= numPoints; i++) {
       const t = i / numPoints;
