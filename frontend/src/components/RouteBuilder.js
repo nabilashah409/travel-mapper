@@ -42,12 +42,12 @@ const adventureMapStyles = [
 ];
 
 const transportModes = [
-  { id: 'flight', icon: Plane, label: 'Flight', color: '#06b6d4' },
-  { id: 'car', icon: Car, label: 'Car', color: '#f59e0b' },
-  { id: 'train', icon: Train, label: 'Train', color: '#10b981' },
-  { id: 'walk', icon: Footprints, label: 'Walk', color: '#ec4899' },
-  { id: 'truck', icon: Truck, label: 'Truck', color: '#8b5cf6' },
-  { id: 'helicopter', icon: PlaneTakeoff, label: 'Helicopter', color: '#06b6d4' },
+  { id: 'flight', icon: Plane, label: 'Flight', color: '#3b82f6', bgColor: '#dbeafe' },
+  { id: 'car', icon: Car, label: 'Car', color: '#f59e0b', bgColor: '#fef3c7' },
+  { id: 'train', icon: Train, label: 'Train', color: '#8b5cf6', bgColor: '#ede9fe' },
+  { id: 'walk', icon: Footprints, label: 'Walk', color: '#ec4899', bgColor: '#fce7f3' },
+  { id: 'truck', icon: Truck, label: 'Truck', color: '#10b981', bgColor: '#d1fae5' },
+  { id: 'helicopter', icon: PlaneTakeoff, label: 'Helicopter', color: '#06b6d4', bgColor: '#cffafe' },
 ];
 
 const RouteBuilder = () => {
