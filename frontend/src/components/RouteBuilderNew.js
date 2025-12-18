@@ -494,26 +494,26 @@ const RouteBuilderNew = () => {
           {/* Animated Marker */}
           {currentMarkerPosition && (
             <Marker
+              key={`animated-${selectedTransport}-${markerRotation}`}
               position={currentMarkerPosition}
               icon={L.divIcon({
                 className: 'animated-marker',
                 html: `<div style="
-                  width: 40px;
-                  height: 40px;
+                  width: 48px;
+                  height: 48px;
                   border-radius: 50%;
                   background: white;
                   border: 3px solid #ff6b35;
                   display: flex;
                   align-items: center;
                   justify-content: center;
-                  box-shadow: 0 4px 12px rgba(255,107,53,0.4);
+                  box-shadow: 0 4px 16px rgba(255,107,53,0.5);
+                  transform: rotate(${markerRotation}deg);
                 ">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff6b35">
-                    <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-                  </svg>
+                  ${getTransportIcon()}
                 </div>`,
-                iconSize: [40, 40],
-                iconAnchor: [20, 20],
+                iconSize: [48, 48],
+                iconAnchor: [24, 24],
               })}
             />
           )}
