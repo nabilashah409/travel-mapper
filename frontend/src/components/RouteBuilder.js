@@ -505,20 +505,29 @@ const RouteBuilder = () => {
                     className="flex items-center gap-2"
                   >
                     <div 
-                      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" 
-                      style={{ backgroundColor: getTransportColor(), color: '#020617', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px', fontWeight: 'bold' }}
+                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg" 
+                      style={{ 
+                        backgroundColor: getTransportColor(), 
+                        color: '#ffffff', 
+                        fontFamily: 'Fredoka, sans-serif', 
+                        fontSize: '16px', 
+                        fontWeight: 'bold',
+                        boxShadow: `0 4px 12px ${getTransportColor()}50`
+                      }}
                     >
                       {index + 1}
                     </div>
                     <Input
                       id={`destination-input-${dest.id}`}
-                      placeholder="Enter location..."
-                      className="flex-1"
+                      placeholder="Where to? 🌍"
+                      className="flex-1 font-medium"
                       style={{ 
-                        backgroundColor: '#0f172a', 
-                        borderColor: dest.coordinates ? getTransportColor() : 'rgba(255,255,255,0.1)', 
-                        color: '#f8fafc',
-                        borderWidth: dest.coordinates ? '2px' : '1px'
+                        backgroundColor: '#ffffff', 
+                        borderColor: dest.coordinates ? getTransportColor() : '#d1d5db', 
+                        color: '#1f2937',
+                        borderWidth: dest.coordinates ? '3px' : '2px',
+                        borderRadius: '12px',
+                        fontFamily: 'Quicksand, sans-serif'
                       }}
                       data-testid={`destination-input-${index}`}
                     />
