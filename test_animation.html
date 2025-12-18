@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Animation - Journey Mapper</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: #f8fafc;
+        }
+        .container {
+            padding: 20px;
+        }
+        button {
+            background: #06b6d4;
+            color: #020617;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #0891b2;
+        }
+        #info {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaHTL53gqM-xV5JfJWAgNRWqb-vUILVfg&libraries=places,geometry"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Google Maps API Test</h1>
+        <div id="info">
+            <p id="status">Loading...</p>
+        </div>
+        <div id="map" style="width: 100%; height: 500px; border-radius: 8px;"></div>
+        <div>
+            <button onclick="testPlacesAPI()">Test Places API</button>
+            <button onclick="testDirectionsAPI()">Test Directions API</button>
+            <button onclick="testGeometryAPI()">Test Geometry API</button>
+        </div>
+        <div id="results" style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;"></div>
+    </div>
+
+    <script>
+        let map;
+        let statusEl = document.getElementById('status');
+        let resultsEl = document.getElementById('results');
+
+        function initMap() {
+            try {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: 41.4993, lng: -81.6944 },
+                    zoom: 6,
+                    styles: [
+                        { elementType: 'geometry', stylers: [{ color: '#0f172a' }] },
+                        { elementType: 'labels.text.fill', stylers: [{ color: '#94a3b8' }] },
+                        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#020617' }] }
+                    ]
+                });
+                statusEl.innerHTML = '✓ Map loaded successfully!<br>API Status: <strong style="color: #10b981">WORKING</strong>';
+                statusEl.style.color = '#10b981';
+            } catch (error) {
+                statusEl.innerHTML = '✗ Map failed to load<br>Error: ' + error.message;
+                statusEl.style.color = '#ef4444';
+            }
+        }
+
+        function testPlacesAPI() {
+            resultsEl.innerHTML = 'Testing Places API...';
+            try {
+                const service = new google.maps.places.PlacesService(map);
+                service.findPlaceFromQuery({
+                    query: 'Cleveland, OH',
+                    fields: ['name', 'geometry']
+                }, (results, status) => {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        resultsEl.innerHTML = `✓ Places API Working<br>Found: ${results[0].name}<br>Location: ${results[0].geometry.location.lat()}, ${results[0].geometry.location.lng()}`;
+                        resultsEl.style.color = '#10b981';
+                    } else {
+                        resultsEl.innerHTML = '✗ Places API Error: ' + status;
+                        resultsEl.style.color = '#ef4444';
+                    }
+                });
+            } catch (error) {
+                resultsEl.innerHTML = '✗ Places API Exception: ' + error.message;
+                resultsEl.style.color = '#ef4444';
+            }
+        }
+
+        function testDirectionsAPI() {
+            resultsEl.innerHTML = 'Testing Directions API...';
+            try {
+                const directionsService = new google.maps.DirectionsService();
+                directionsService.route({
+                    origin: { lat: 41.4993, lng: -81.6944 }, // Cleveland
+                    destination: { lat: 40.7128, lng: -74.0060 }, // New York
+                    travelMode: google.maps.TravelMode.DRIVING
+                }, (result, status) => {
+                    if (status === 'OK') {
+                        resultsEl.innerHTML = `✓ Directions API Working<br>Route distance: ${result.routes[0].legs[0].distance.text}<br>Duration: ${result.routes[0].legs[0].duration.text}`;
+                        resultsEl.style.color = '#10b981';
+                        
+                        // Draw route on map
+                        const directionsRenderer = new google.maps.DirectionsRenderer({
+                            map: map,
+                            directions: result
+                        });
+                    } else {
+                        resultsEl.innerHTML = '✗ Directions API Error: ' + status;
+                        resultsEl.style.color = '#ef4444';
+                    }
+                });
+            } catch (error) {
+                resultsEl.innerHTML = '✗ Directions API Exception: ' + error.message;
+                resultsEl.style.color = '#ef4444';
+            }
+        }
+
+        function testGeometryAPI() {
+            resultsEl.innerHTML = 'Testing Geometry API...';
+            try {
+                const cleveland = new google.maps.LatLng(41.4993, -81.6944);
+                const newyork = new google.maps.LatLng(40.7128, -74.0060);
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(cleveland, newyork);
+                const distanceKm = (distance / 1000).toFixed(2);
+                const distanceMiles = (distance / 1609.34).toFixed(2);
+                
+                resultsEl.innerHTML = `✓ Geometry API Working<br>Distance: ${distanceKm} km (${distanceMiles} miles)`;
+                resultsEl.style.color = '#10b981';
+            } catch (error) {
+                resultsEl.innerHTML = '✗ Geometry API Exception: ' + error.message;
+                resultsEl.style.color = '#ef4444';
+            }
+        }
+
+        // Initialize map when page loads
+        window.onload = initMap;
+    </script>
+</body>
+</html>
