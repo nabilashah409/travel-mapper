@@ -397,12 +397,15 @@ const RouteBuilder = () => {
 
   if (!isLoaded) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#020617' }}>
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: '#06b6d4' }} />
-          <p className="text-lg" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>Loading Maps...</p>
-          <p className="text-sm mt-2" style={{ color: '#64748b', fontFamily: 'Inter, sans-serif' }}>
-            If this takes too long, please check your Google Maps API configuration
+      <div className="h-screen w-screen flex items-center justify-center adventure-gradient">
+        <div className="text-center fun-panel p-8">
+          <div className="text-6xl mb-4">🗺️</div>
+          <Loader2 className="w-16 h-16 animate-spin mx-auto mb-4" style={{ color: '#667eea' }} />
+          <p className="text-2xl font-bold mb-2" style={{ color: '#667eea', fontFamily: 'Fredoka, sans-serif' }}>
+            Loading Adventure Map...
+          </p>
+          <p className="text-sm" style={{ color: '#7c3aed', fontFamily: 'Quicksand, sans-serif' }}>
+            Get ready for an awesome journey! ✨
           </p>
         </div>
       </div>
