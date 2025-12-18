@@ -409,7 +409,7 @@ const RouteBuilder = () => {
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative" style={{ backgroundColor: '#020617' }}>
+    <div className="h-screen w-screen overflow-hidden relative adventure-gradient">
       <div className="absolute inset-0 z-0 google-map-container">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
@@ -418,7 +418,7 @@ const RouteBuilder = () => {
           onLoad={onLoad}
           onUnmount={onUnmount}
           options={{
-            styles: darkMapStyles,
+            styles: adventureMapStyles,
             disableDefaultUI: true,
             zoomControl: true,
           }}
