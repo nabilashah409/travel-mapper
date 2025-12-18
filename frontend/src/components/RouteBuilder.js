@@ -504,9 +504,9 @@ const RouteBuilder = () => {
               key={index}
               path={path}
               options={{
-                strokeColor: getTransportColor(),
-                strokeOpacity: 0.8,
-                strokeWeight: 3,
+                strokeColor: '#ff6b35',
+                strokeOpacity: 1,
+                strokeWeight: 4,
               }}
             />
           ))}
