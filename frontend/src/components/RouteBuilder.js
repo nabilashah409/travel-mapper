@@ -219,6 +219,12 @@ const RouteBuilder = () => {
     // Set initial position to first point of first path
     if (routePaths[0] && routePaths[0][0]) {
       setCurrentMarkerPosition(routePaths[0][0]);
+      
+      // Zoom to starting point
+      if (mapRef.current) {
+        mapRef.current.panTo(routePaths[0][0]);
+        mapRef.current.setZoom(10);
+      }
     }
     
     // Start animation loop
