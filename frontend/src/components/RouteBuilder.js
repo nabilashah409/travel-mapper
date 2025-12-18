@@ -225,9 +225,21 @@ const RouteBuilder = () => {
     animateMarker(startTime);
   };
 
+  const calculateHeading = (from, to) => {
+    const lat1 = from.lat * Math.PI / 180;
+    const lat2 = to.lat * Math.PI / 180;
+    const dLng = (to.lng - from.lng) * Math.PI / 180;
+    
+    const y = Math.sin(dLng) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+    const heading = Math.atan2(y, x) * 180 / Math.PI;
+    
+    return (heading + 360) % 360;
+  };
+
   const animateMarker = (startTime) => {
     const totalPoints = routePaths.reduce((sum, path) => sum + path.length, 0);
-    const animationDuration = (totalPoints / animationSpeed) * 16; // milliseconds
+    const animationDuration = (totalPoints / animationSpeed) * 20; // Increased for smoother animation
     
     const animate = () => {
       const currentTime = Date.now();
@@ -244,16 +256,33 @@ const RouteBuilder = () => {
         return;
       }
 
-      // Find current position in the path
+      // Find current position in the path with interpolation for smoothness
       let currentPoint = 0;
       
       for (let i = 0; i < routePaths.length; i++) {
         if (currentPoint + routePaths[i].length > progress) {
-          const pointInPath = Math.min(
-            Math.floor(progress - currentPoint), 
-            routePaths[i].length - 1
-          );
-          setCurrentMarkerPosition(routePaths[i][pointInPath]);
+          const pointInPath = progress - currentPoint;
+          const floorIndex = Math.floor(pointInPath);
+          const ceilIndex = Math.min(floorIndex + 1, routePaths[i].length - 1);
+          const fraction = pointInPath - floorIndex;
+          
+          // Interpolate between points for smoother animation
+          const p1 = routePaths[i][floorIndex];
+          const p2 = routePaths[i][ceilIndex];
+          
+          const interpolatedPosition = {
+            lat: p1.lat + (p2.lat - p1.lat) * fraction,
+            lng: p1.lng + (p2.lng - p1.lng) * fraction
+          };
+          
+          setCurrentMarkerPosition(interpolatedPosition);
+          
+          // Calculate heading for rotation
+          if (floorIndex < routePaths[i].length - 1) {
+            const heading = calculateHeading(p1, p2);
+            setMarkerRotation(heading);
+          }
+          
           break;
         }
         currentPoint += routePaths[i].length;
