@@ -248,20 +248,29 @@ const RouteBuilderNew = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col md:flex-row">
+    <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden">
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center"
+        className="md:hidden fixed top-4 left-4 z-[100] w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center"
       >
         {isSidebarOpen ? <X className="w-6 h-6" /> : <Search className="w-6 h-6" />}
       </button>
+
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-[60]"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
       {/* Left Sidebar */}
       <div className={`
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0
         fixed md:relative
+        top-0 left-0
         w-full md:w-96 
         h-full
         bg-white 
@@ -269,7 +278,7 @@ const RouteBuilderNew = () => {
         flex flex-col 
         overflow-y-auto
         transition-transform duration-300 ease-in-out
-        z-40
+        z-[80] md:z-auto
       `}>
         <div className="p-8">
           {/* Title */}
