@@ -444,16 +444,10 @@ const RouteBuilder = () => {
             <Marker
               position={currentMarkerPosition}
               icon={{
-                path: selectedTransport === 'flight' || selectedTransport === 'helicopter' 
-                  ? 'M12 2 L2 22 L12 18 L22 22 Z' // Plane shape
-                  : window.google.maps.SymbolPath.CIRCLE,
-                scale: selectedTransport === 'flight' || selectedTransport === 'helicopter' ? 0.8 : 8,
-                fillColor: getTransportColor(),
-                fillOpacity: 1,
-                strokeColor: '#f8fafc',
-                strokeWeight: 2,
-                rotation: 0,
-                anchor: new window.google.maps.Point(12, 12),
+                url: getTransportIconUrl(),
+                scaledSize: new window.google.maps.Size(40, 40),
+                anchor: new window.google.maps.Point(20, 20),
+                rotation: markerRotation
               }}
               zIndex={1000}
             />
