@@ -125,8 +125,41 @@ const RouteBuilder = () => {
     }
   };
 
+  const geocodeAddress = async (address) => {
+    const geocoder = new window.google.maps.Geocoder();
+    return new Promise((resolve, reject) => {
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+          resolve({
+            lat: results[0].geometry.location.lat(),
+            lng: results[0].geometry.location.lng(),
+          });
+        } else {
+          reject(status);
+        }
+      });
+    });
+  };
+
   const calculateRoute = async () => {
-    const validDestinations = destinations.filter(d => d.coordinates);
+    // First, try to geocode any destinations without coordinates
+    const destinationsWithCoords = await Promise.all(
+      destinations.map(async (dest) => {
+        if (!dest.coordinates && dest.location) {
+          try {
+            const coords = await geocodeAddress(dest.location);
+            return { ...dest, coordinates: coords };
+          } catch (error) {
+            return dest;
+          }
+        }
+        return dest;
+      })
+    );
+    
+    setDestinations(destinationsWithCoords);
+    
+    const validDestinations = destinationsWithCoords.filter(d => d.coordinates);
     if (validDestinations.length < 2) {
       toast.error('Please add at least 2 valid destinations');
       return;
