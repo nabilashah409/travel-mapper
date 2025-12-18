@@ -450,7 +450,7 @@ const RouteBuilderNew = () => {
       </div>
 
       {/* Map */}
-      <div className="flex-1 relative h-full">
+      <div className="flex-1 relative h-full w-full z-0">
         <MapContainer
           center={[39.8283, -98.5795]}
           zoom={4}
