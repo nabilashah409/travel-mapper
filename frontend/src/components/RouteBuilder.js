@@ -508,7 +508,12 @@ const RouteBuilder = () => {
                       id={`destination-input-${dest.id}`}
                       placeholder="Enter location..."
                       className="flex-1"
-                      style={{ backgroundColor: '#0f172a', borderColor: 'rgba(255,255,255,0.1)', color: '#f8fafc' }}
+                      style={{ 
+                        backgroundColor: '#0f172a', 
+                        borderColor: dest.coordinates ? getTransportColor() : 'rgba(255,255,255,0.1)', 
+                        color: '#f8fafc',
+                        borderWidth: dest.coordinates ? '2px' : '1px'
+                      }}
                       data-testid={`destination-input-${index}`}
                     />
                     {destinations.length > 1 && (
