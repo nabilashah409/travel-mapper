@@ -250,7 +250,7 @@ const RouteBuilder = () => {
 
   const animateMarker = (startTime) => {
     const totalPoints = routePaths.reduce((sum, path) => sum + path.length, 0);
-    const animationDuration = (totalPoints / animationSpeed) * 20; // Increased for smoother animation
+    const animationDuration = (totalPoints / animationSpeed) * 30; // Smooth, consistent speed
     
     const animate = () => {
       const currentTime = Date.now();
