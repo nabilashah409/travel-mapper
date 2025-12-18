@@ -1,0 +1,441 @@
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { MapContainer, TileLayer, Polyline, Marker, useMap } from 'react-leaflet';
+import { Plane, Car, Train, Footprints, Truck, PlaneTakeoff, Play, Pause, Download, Plus, X, Loader2, Search } from 'lucide-react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { toast } from 'sonner';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix Leaflet default marker icon issue
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+});
+
+const transportModes = [
+  { id: 'flight', icon: Plane, label: 'Plane' },
+  { id: 'car', icon: Car, label: 'Car' },
+  { id: 'train', icon: Train, label: 'Train' },
+  { id: 'walk', icon: Footprints, label: 'Walk' },
+  { id: 'truck', icon: Truck, label: 'Truck' },
+  { id: 'helicopter', icon: PlaneTakeoff, label: 'Helicopter' },
+];
+
+const RouteBuilderNew = () => {
+  const [destinations, setDestinations] = useState([]);
+  const [selectedTransport, setSelectedTransport] = useState('flight');
+  const [routePaths, setRoutePaths] = useState([]);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationProgress, setAnimationProgress] = useState(0);
+  const [currentMarkerPosition, setCurrentMarkerPosition] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  
+  const animationRef = useRef(null);
+  const mapRef = useRef(null);
+
+  const addDestination = async () => {
+    if (!searchQuery.trim()) {
+      toast.error('Please enter a location');
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      // Use Nominatim for geocoding
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`
+      );
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        const newDest = {
+          id: Date.now(),
+          location: data[0].display_name,
+          coordinates: {
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon),
+          },
+        };
+        setDestinations([...destinations, newDest]);
+        setSearchQuery('');
+        toast.success(`Added: ${data[0].display_name}`);
+      } else {
+        toast.error('Location not found');
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      toast.error('Failed to find location');
+    }
+    setIsSearching(false);
+  };
+
+  const removeDestination = (id) => {
+    setDestinations(destinations.filter(d => d.id !== id));
+    setRoutePaths([]);
+    setCurrentMarkerPosition(null);
+  };
+
+  const calculateRoute = () => {
+    if (destinations.length < 2) {
+      toast.error('Please add at least 2 destinations');
+      return;
+    }
+
+    const paths = [];
+    
+    for (let i = 0; i < destinations.length - 1; i++) {
+      const start = destinations[i].coordinates;
+      const end = destinations[i + 1].coordinates;
+      
+      // Create curved path for flights
+      if (selectedTransport === 'flight' || selectedTransport === 'helicopter') {
+        const path = createCurvedPath(start, end);
+        paths.push(path);
+      } else {
+        // For ground transport, create straight line (in real app, use routing API)
+        const path = [start, end];
+        paths.push(path);
+      }
+    }
+
+    setRoutePaths(paths);
+    toast.success('Route calculated!');
+  };
+
+  const createCurvedPath = (start, end) => {
+    const points = [];
+    const numPoints = 500;
+    const arcHeight = 0.1;
+
+    for (let i = 0; i <= numPoints; i++) {
+      const t = i / numPoints;
+      const lat = start.lat + (end.lat - start.lat) * t;
+      const lng = start.lng + (end.lng - start.lng) * t;
+      
+      const offsetLat = Math.sin(t * Math.PI) * arcHeight * Math.abs(end.lat - start.lat);
+      
+      points.push([lat + offsetLat, lng]);
+    }
+    return points;
+  };
+
+  const startAnimation = () => {
+    if (routePaths.length === 0) {
+      toast.error('Please calculate a route first');
+      return;
+    }
+
+    setAnimationProgress(0);
+    setIsAnimating(true);
+    
+    if (routePaths[0] && routePaths[0][0]) {
+      setCurrentMarkerPosition(routePaths[0][0]);
+    }
+    
+    const startTime = Date.now();
+    animateMarker(startTime);
+  };
+
+  const animateMarker = (startTime) => {
+    const totalPoints = routePaths.reduce((sum, path) => sum + path.length, 0);
+    const animationDuration = 15000; // 15 seconds
+    
+    const animate = () => {
+      const currentTime = Date.now();
+      const elapsed = currentTime - startTime;
+      
+      if (elapsed >= animationDuration) {
+        setIsAnimating(false);
+        setAnimationProgress(100);
+        return;
+      }
+
+      const linearProgress = elapsed / animationDuration;
+      const progress = linearProgress * totalPoints;
+      
+      let currentPoint = 0;
+      
+      for (let i = 0; i < routePaths.length; i++) {
+        if (currentPoint + routePaths[i].length > progress) {
+          const pointInPath = Math.floor(progress - currentPoint);
+          setCurrentMarkerPosition(routePaths[i][pointInPath]);
+          break;
+        }
+        currentPoint += routePaths[i].length;
+      }
+
+      setAnimationProgress(linearProgress * 100);
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+  };
+
+  const pauseAnimation = () => {
+    setIsAnimating(false);
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+
+  return (
+    <div className="h-screen w-screen flex">
+      {/* Left Sidebar */}
+      <div className="w-96 bg-white shadow-lg flex flex-col overflow-y-auto">
+        <div className="p-8">
+          {/* Title */}
+          <h1 
+            className="text-5xl font-black leading-tight mb-2"
+            style={{ fontFamily: 'Playfair Display, serif' }}
+          >
+            Travel Route Animator
+          </h1>
+          <p className="text-gray-600 text-sm mb-8">
+            Create stunning animated travel videos for Instagram
+          </p>
+
+          {/* Add Destinations Section */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Add Destinations</h3>
+            
+            {/* Search Input */}
+            <div className="flex gap-2 mb-4">
+              <Input
+                placeholder="Search for a city or location..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && addDestination()}
+                className="flex-1"
+                style={{ fontSize: '14px' }}
+              />
+              <Button
+                onClick={addDestination}
+                disabled={isSearching}
+                size="icon"
+                style={{ backgroundColor: '#3b82f6' }}
+              >
+                {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+              </Button>
+            </div>
+
+            {/* Destinations List */}
+            {destinations.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <Search className="w-12 h-12 mx-auto mb-2 opacity-30" />
+                <p className="text-sm">Start by adding your first destination</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {destinations.map((dest, index) => (
+                  <div
+                    key={dest.id}
+                    className="flex items-center gap-2 p-3 rounded-lg border destination-item"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1 text-sm truncate">{dest.location}</div>
+                    <button
+                      onClick={() => removeDestination(dest.id)}
+                      className="text-gray-400 hover:text-red-500"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Choose Travel Mode */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Choose Travel Mode</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {transportModes.map((mode) => {
+                const Icon = mode.icon;
+                const isSelected = selectedTransport === mode.id;
+                return (
+                  <button
+                    key={mode.id}
+                    onClick={() => setSelectedTransport(mode.id)}
+                    className={`transport-mode-btn p-4 rounded-lg border-2 flex flex-col items-center gap-2 ${
+                      isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Icon className={`w-6 h-6 ${isSelected ? 'text-blue-500' : 'text-gray-600'}`} />
+                    <span className={`text-xs font-medium ${isSelected ? 'text-blue-500' : 'text-gray-600'}`}>
+                      {mode.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          {destinations.length < 2 ? (
+            <Button
+              disabled
+              className="w-full"
+              style={{ backgroundColor: '#93c5fd', color: '#fff' }}
+            >
+              Add at least 2 destinations
+            </Button>
+          ) : !routePaths.length ? (
+            <Button
+              onClick={calculateRoute}
+              className="w-full"
+              style={{ backgroundColor: '#3b82f6' }}
+            >
+              Generate Route
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              {!isAnimating ? (
+                <Button
+                  onClick={startAnimation}
+                  className="flex-1"
+                  style={{ backgroundColor: '#3b82f6' }}
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Play Animation
+                </Button>
+              ) : (
+                <Button
+                  onClick={pauseAnimation}
+                  className="flex-1"
+                  style={{ backgroundColor: '#ef4444' }}
+                >
+                  <Pause className="w-4 h-4 mr-2" />
+                  Pause
+                </Button>
+              )}
+              <Button
+                onClick={calculateRoute}
+                variant="outline"
+              >
+                Recalculate
+              </Button>
+            </div>
+          )}
+
+          {animationProgress > 0 && (
+            <div className="mt-4">
+              <div className="flex justify-between text-xs text-gray-600 mb-1">
+                <span>Progress</span>
+                <span>{Math.round(animationProgress)}%</span>
+              </div>
+              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-500 transition-all duration-300"
+                  style={{ width: `${animationProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Made with Emergent Badge */}
+        <div className="mt-auto p-4 border-t">
+          <a
+            href="https://app.emergent.sh/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-700"
+          >
+            <span className="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center font-bold">
+              E
+            </span>
+            Made with Emergent
+          </a>
+        </div>
+      </div>
+
+      {/* Map */}
+      <div className="flex-1 relative">
+        <MapContainer
+          center={[39.8283, -98.5795]}
+          zoom={4}
+          style={{ height: '100%', width: '100%' }}
+          zoomControl={true}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"
+          />
+          
+          {/* Route Lines */}
+          {routePaths.map((path, index) => (
+            <Polyline
+              key={index}
+              positions={path}
+              color="#ff6b35"
+              weight={4}
+              opacity={1}
+            />
+          ))}
+          
+          {/* Destination Markers */}
+          {destinations.map((dest, index) => (
+            <Marker
+              key={dest.id}
+              position={[dest.coordinates.lat, dest.coordinates.lng]}
+              icon={L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 50%;
+                  background: #3b82f6;
+                  border: 3px solid white;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-weight: bold;
+                  font-size: 14px;
+                  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                ">${index + 1}</div>`,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16],
+              })}
+            />
+          ))}
+          
+          {/* Animated Marker */}
+          {currentMarkerPosition && (
+            <Marker
+              position={currentMarkerPosition}
+              icon={L.divIcon({
+                className: 'animated-marker',
+                html: `<div style="
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 50%;
+                  background: white;
+                  border: 3px solid #ff6b35;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  box-shadow: 0 4px 12px rgba(255,107,53,0.4);
+                ">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff6b35">
+                    <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                  </svg>
+                </div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 20],
+              })}
+            />
+          )}
+        </MapContainer>
+      </div>
+    </div>
+  );
+};
+
+export default RouteBuilderNew;
