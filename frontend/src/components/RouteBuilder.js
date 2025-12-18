@@ -475,17 +475,23 @@ const RouteBuilder = () => {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glassmorphism rounded-xl p-6 w-full max-w-md"
+            className="fun-panel p-6 w-full max-w-md"
           >
             <h1 
-              className="text-3xl font-black mb-2" 
-              style={{ fontFamily: 'Chivo, sans-serif', color: '#f8fafc', letterSpacing: '-0.025em' }}
+              className="text-4xl font-black mb-2" 
+              style={{ 
+                fontFamily: 'Fredoka, sans-serif', 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
               data-testid="app-title"
             >
-              Journey Mapper
+              🗺️ Journey Mapper
             </h1>
-            <p className="text-sm mb-6" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-              Create animated travel routes
+            <p className="text-sm mb-6 font-semibold" style={{ color: '#7c3aed', fontFamily: 'Quicksand, sans-serif' }}>
+              Create fun animated travel routes! ✈️🚗🚂
             </p>
 
             <div className="space-y-3 mb-6">
