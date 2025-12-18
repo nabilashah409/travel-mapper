@@ -220,10 +220,14 @@ const RouteBuilder = () => {
     if (routePaths[0] && routePaths[0][0]) {
       setCurrentMarkerPosition(routePaths[0][0]);
       
-      // Zoom to starting point
-      if (mapRef.current) {
-        mapRef.current.panTo(routePaths[0][0]);
-        mapRef.current.setZoom(10);
+      // Keep the map zoomed out to show the entire route - don't follow marker
+      const validDestinations = destinations.filter(d => d.coordinates);
+      if (mapRef.current && validDestinations.length > 0) {
+        const bounds = new window.google.maps.LatLngBounds();
+        validDestinations.forEach(dest => {
+          bounds.extend(dest.coordinates);
+        });
+        mapRef.current.fitBounds(bounds);
       }
     }
     
