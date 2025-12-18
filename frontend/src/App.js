@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import RouteBuilder from './components/RouteBuilder';
+import RouteBuilderNew from './components/RouteBuilderNew';
 import { Toaster } from 'sonner';
 import './App.css';
 
@@ -9,10 +9,10 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<RouteBuilder />} />
+          <Route path="/" element={<RouteBuilderNew />} />
         </Routes>
       </BrowserRouter>
-      <Toaster position="top-right" theme="dark" richColors />
+      <Toaster position="top-right" richColors />
     </>
   );
 }
