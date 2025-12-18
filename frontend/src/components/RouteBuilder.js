@@ -290,6 +290,11 @@ const RouteBuilder = () => {
             setMarkerRotation(heading);
           }
           
+          // Smoothly pan camera to follow marker
+          if (mapRef.current) {
+            mapRef.current.panTo(interpolatedPosition);
+          }
+          
           break;
         }
         currentPoint += routePaths[i].length;
