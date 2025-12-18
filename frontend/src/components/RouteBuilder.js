@@ -210,23 +210,31 @@ const RouteBuilder = () => {
       return;
     }
 
-    setIsAnimating(true);
+    // Reset and start from beginning
     setAnimationProgress(0);
-    animateMarker();
+    setIsAnimating(true);
+    
+    // Set initial position to first point of first path
+    if (routePaths[0] && routePaths[0][0]) {
+      setCurrentMarkerPosition(routePaths[0][0]);
+    }
+    
+    // Start animation loop
+    const startTime = Date.now();
+    animateMarker(startTime);
   };
 
-  const animateMarker = () => {
-    let progress = 0;
+  const animateMarker = (startTime) => {
     const totalPoints = routePaths.reduce((sum, path) => sum + path.length, 0);
+    const animationDuration = (totalPoints / animationSpeed) * 16; // milliseconds
     
     const animate = () => {
-      if (!isAnimating && animationRef.current) {
-        return;
-      }
-
-      progress += (0.5 * animationSpeed);
+      const currentTime = Date.now();
+      const elapsed = currentTime - startTime;
+      const progress = Math.min((elapsed / animationDuration) * totalPoints, totalPoints);
       
-      if (progress >= totalPoints) {
+      if (progress >= totalPoints - 1) {
+        // Animation complete
         setIsAnimating(false);
         setAnimationProgress(100);
         if (isRecording) {
@@ -235,13 +243,15 @@ const RouteBuilder = () => {
         return;
       }
 
+      // Find current position in the path
       let currentPoint = 0;
-      let pathIndex = 0;
       
       for (let i = 0; i < routePaths.length; i++) {
         if (currentPoint + routePaths[i].length > progress) {
-          pathIndex = i;
-          const pointInPath = Math.floor(progress - currentPoint);
+          const pointInPath = Math.min(
+            Math.floor(progress - currentPoint), 
+            routePaths[i].length - 1
+          );
           setCurrentMarkerPosition(routePaths[i][pointInPath]);
           break;
         }
