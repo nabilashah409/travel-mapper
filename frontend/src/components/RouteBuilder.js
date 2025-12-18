@@ -550,21 +550,34 @@ const RouteBuilder = () => {
             <Button
               onClick={addDestination}
               variant="outline"
-              className="w-full mb-4"
-              style={{ borderColor: getTransportColor(), color: getTransportColor() }}
+              className="w-full mb-4 font-bold"
+              style={{ 
+                borderColor: '#fbbf24', 
+                color: '#f59e0b',
+                backgroundColor: '#fef3c7',
+                borderWidth: '3px',
+                borderRadius: '12px',
+                fontFamily: 'Fredoka, sans-serif'
+              }}
               data-testid="add-destination-btn"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Destination
+              <Plus className="w-5 h-5 mr-2" />
+              Add Stop ➕
             </Button>
 
             <Button
               onClick={calculateRoute}
-              className="w-full"
-              style={{ backgroundColor: getTransportColor(), color: '#020617' }}
+              className="w-full font-bold text-lg"
+              style={{ 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: '#ffffff',
+                borderRadius: '12px',
+                fontFamily: 'Fredoka, sans-serif',
+                boxShadow: '0 8px 20px rgba(102, 126, 234, 0.4)'
+              }}
               data-testid="calculate-route-btn"
             >
-              Calculate Route
+              🚀 Calculate Route
             </Button>
           </motion.div>
         </div>
