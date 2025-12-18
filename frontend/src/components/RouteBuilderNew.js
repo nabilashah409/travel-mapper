@@ -178,9 +178,13 @@ const RouteBuilderNew = () => {
     animateMarker(startTime);
   };
 
+  const easeInOutCubic = (t) => {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  };
+
   const animateMarker = (startTime) => {
     const totalPoints = routePaths.reduce((sum, path) => sum + path.length, 0);
-    const animationDuration = 15000; // 15 seconds
+    const animationDuration = 25000; // 25 seconds for very realistic speed
     
     const animate = () => {
       const currentTime = Date.now();
@@ -192,15 +196,38 @@ const RouteBuilderNew = () => {
         return;
       }
 
+      // Apply smooth easing
       const linearProgress = elapsed / animationDuration;
-      const progress = linearProgress * totalPoints;
+      const easedProgress = easeInOutCubic(linearProgress);
+      const progress = easedProgress * totalPoints;
       
       let currentPoint = 0;
       
       for (let i = 0; i < routePaths.length; i++) {
         if (currentPoint + routePaths[i].length > progress) {
-          const pointInPath = Math.floor(progress - currentPoint);
-          setCurrentMarkerPosition(routePaths[i][pointInPath]);
+          const pointInPath = progress - currentPoint;
+          const floorIndex = Math.floor(pointInPath);
+          const ceilIndex = Math.min(floorIndex + 1, routePaths[i].length - 1);
+          const fraction = pointInPath - floorIndex;
+          
+          // Smooth interpolation between points
+          const p1 = routePaths[i][floorIndex];
+          const p2 = routePaths[i][ceilIndex];
+          
+          if (p1 && p2) {
+            const interpolatedPosition = [
+              p1[0] + (p2[0] - p1[0]) * fraction,
+              p1[1] + (p2[1] - p1[1]) * fraction
+            ];
+            
+            setCurrentMarkerPosition(interpolatedPosition);
+            
+            // Calculate heading for rotation
+            if (floorIndex < routePaths[i].length - 1) {
+              const heading = calculateHeading(p1, p2);
+              setMarkerRotation(heading);
+            }
+          }
           break;
         }
         currentPoint += routePaths[i].length;
