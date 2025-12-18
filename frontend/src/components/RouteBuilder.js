@@ -591,6 +591,15 @@ const RouteBuilder = () => {
                       id={`destination-input-${dest.id}`}
                       placeholder="Where to? 🌍"
                       className="flex-1 font-medium"
+                      value={dest.location || ''}
+                      onChange={(e) => {
+                        const newDestinations = [...destinations];
+                        newDestinations[index] = {
+                          ...newDestinations[index],
+                          location: e.target.value,
+                        };
+                        setDestinations(newDestinations);
+                      }}
                       style={{ 
                         backgroundColor: '#ffffff', 
                         borderColor: dest.coordinates ? getTransportColor() : '#d1d5db', 
