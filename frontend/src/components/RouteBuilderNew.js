@@ -441,12 +441,13 @@ const RouteBuilderNew = () => {
       </div>
 
       {/* Map */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative h-full">
         <MapContainer
           center={[39.8283, -98.5795]}
           zoom={4}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
+          scrollWheelZoom={true}
         >
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
