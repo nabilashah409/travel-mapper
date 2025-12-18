@@ -546,8 +546,28 @@ const RouteBuilder = () => {
         </GoogleMap>
       </div>
 
+      {/* Top Bar - Back to Edit button */}
+      {isPlaying && (
+        <div className="absolute top-6 left-6 z-20 pointer-events-auto">
+          <button
+            onClick={() => setIsPlaying(false)}
+            className="flex items-center gap-2 px-6 py-3 rounded-full font-bold shadow-lg"
+            style={{
+              backgroundColor: '#ffffff',
+              color: '#1f2937',
+              fontFamily: 'Fredoka, sans-serif',
+              fontSize: '16px'
+            }}
+            data-testid="back-to-edit-btn"
+          >
+            ← Back to Edit
+          </button>
+        </div>
+      )}
+
       <div className="relative z-10 pointer-events-none">
-        <div className="p-6 md:p-8 flex flex-col gap-4 pointer-events-auto">
+        {!isPlaying && (
+          <div className="p-6 md:p-8 flex flex-col gap-4 pointer-events-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
