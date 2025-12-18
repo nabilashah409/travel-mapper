@@ -66,6 +66,7 @@ const RouteBuilder = () => {
   const [animationSpeed, setAnimationSpeed] = useState(1);
   const [markerRotation, setMarkerRotation] = useState(0);
   const [currentMarkerPosition, setCurrentMarkerPosition] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   
   const mapRef = useRef(null);
   const autocompleteRefs = useRef({});
