@@ -462,8 +462,8 @@ const RouteBuilder = () => {
               position={currentMarkerPosition}
               icon={{
                 url: getTransportIconUrl(),
-                scaledSize: new window.google.maps.Size(48, 48),
-                anchor: new window.google.maps.Point(24, 24)
+                scaledSize: new window.google.maps.Size(64, 64),
+                anchor: new window.google.maps.Point(32, 32)
               }}
               zIndex={1000}
             />
