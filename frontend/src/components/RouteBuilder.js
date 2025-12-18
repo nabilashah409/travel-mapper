@@ -253,16 +253,22 @@ const RouteBuilder = () => {
     return (heading + 360) % 360;
   };
 
+  const easeInOutCubic = (t) => {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  };
+
   const animateMarker = (startTime) => {
     const totalPoints = routePaths.reduce((sum, path) => sum + path.length, 0);
-    const animationDuration = (totalPoints / animationSpeed) * 30; // Smooth, consistent speed
+    
+    // Much longer base duration for realistic speed
+    const baseSpeed = selectedTransport === 'flight' || selectedTransport === 'helicopter' ? 15000 : 20000;
+    const animationDuration = baseSpeed / animationSpeed;
     
     const animate = () => {
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
-      const progress = Math.min((elapsed / animationDuration) * totalPoints, totalPoints);
       
-      if (progress >= totalPoints - 1) {
+      if (elapsed >= animationDuration) {
         // Animation complete
         setIsAnimating(false);
         setAnimationProgress(100);
@@ -272,7 +278,12 @@ const RouteBuilder = () => {
         return;
       }
 
-      // Find current position in the path with interpolation for smoothness
+      // Apply easing for more natural movement
+      const linearProgress = elapsed / animationDuration;
+      const easedProgress = easeInOutCubic(linearProgress);
+      const progress = easedProgress * totalPoints;
+      
+      // Find current position in the path with smooth interpolation
       let currentPoint = 0;
       
       for (let i = 0; i < routePaths.length; i++) {
@@ -282,13 +293,16 @@ const RouteBuilder = () => {
           const ceilIndex = Math.min(floorIndex + 1, routePaths[i].length - 1);
           const fraction = pointInPath - floorIndex;
           
-          // Interpolate between points for smoother animation
+          // Smooth interpolation between points
           const p1 = routePaths[i][floorIndex];
           const p2 = routePaths[i][ceilIndex];
           
+          // Apply smooth interpolation
+          const smoothFraction = easeInOutCubic(fraction);
+          
           const interpolatedPosition = {
-            lat: p1.lat + (p2.lat - p1.lat) * fraction,
-            lng: p1.lng + (p2.lng - p1.lng) * fraction
+            lat: p1.lat + (p2.lat - p1.lat) * smoothFraction,
+            lng: p1.lng + (p2.lng - p1.lng) * smoothFraction
           };
           
           setCurrentMarkerPosition(interpolatedPosition);
@@ -304,7 +318,7 @@ const RouteBuilder = () => {
         currentPoint += routePaths[i].length;
       }
 
-      setAnimationProgress((progress / totalPoints) * 100);
+      setAnimationProgress(linearProgress * 100);
       animationRef.current = requestAnimationFrame(animate);
     };
 
