@@ -517,17 +517,18 @@ const RouteBuilder = () => {
               position={dest.coordinates}
               label={{
                 text: String(index + 1),
-                color: '#f8fafc',
-                fontSize: '14px',
+                color: '#ffffff',
+                fontSize: '16px',
                 fontWeight: 'bold',
+                fontFamily: 'Fredoka, sans-serif'
               }}
               icon={{
                 path: window.google.maps.SymbolPath.CIRCLE,
-                scale: 12,
-                fillColor: getTransportColor(),
-                fillOpacity: 0.9,
-                strokeColor: '#f8fafc',
-                strokeWeight: 2,
+                scale: 14,
+                fillColor: '#3b82f6',
+                fillOpacity: 1,
+                strokeColor: '#ffffff',
+                strokeWeight: 3,
               }}
             />
           ))}
