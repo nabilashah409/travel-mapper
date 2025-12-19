@@ -47,10 +47,20 @@ const RouteBuilderNew = () => {
 
     setIsSearching(true);
     try {
-      // Use Nominatim for geocoding
+      // Use Nominatim for geocoding with proper headers
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&addressdetails=1`,
+        {
+          headers: {
+            'User-Agent': 'TravelRouteAnimator/1.0'
+          }
+        }
       );
+      
+      if (!response.ok) {
+        throw new Error('Search failed');
+      }
+      
       const data = await response.json();
       
       if (data && data.length > 0) {
@@ -64,13 +74,13 @@ const RouteBuilderNew = () => {
         };
         setDestinations([...destinations, newDest]);
         setSearchQuery('');
-        toast.success(`Added: ${data[0].display_name}`);
+        toast.success(`Added: ${data[0].display_name.split(',')[0]}`);
       } else {
-        toast.error('Location not found');
+        toast.error('Location not found. Try a different search term.');
       }
     } catch (error) {
       console.error('Geocoding error:', error);
-      toast.error('Failed to find location');
+      toast.error('Failed to search. Please try again.');
     }
     setIsSearching(false);
   };
