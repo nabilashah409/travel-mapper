@@ -464,13 +464,15 @@ const RouteBuilderNew = () => {
         <MapContainer
           center={[39.8283, -98.5795]}
           zoom={4}
-          style={{ height: '100%', width: '100%' }}
+          style={{ height: '100%', width: '100%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
           zoomControl={true}
           scrollWheelZoom={true}
         >
+          {/* Fun colorful map tiles */}
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"
+            opacity={0.85}
           />
           
           {/* Route Lines with gradient effect */}
