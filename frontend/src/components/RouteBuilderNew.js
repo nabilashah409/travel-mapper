@@ -501,29 +501,79 @@ const RouteBuilderNew = () => {
             />
           ))}
           
-          {/* Animated Marker */}
+          {/* Animated Marker - Fun & Playful */}
           {currentMarkerPosition && (
             <Marker
-              key={`animated-${selectedTransport}-${markerRotation}`}
+              key={`animated-${selectedTransport}-${Math.floor(animationProgress)}`}
               position={currentMarkerPosition}
               icon={L.divIcon({
-                className: 'animated-marker',
-                html: `<div style="
-                  width: 48px;
-                  height: 48px;
-                  border-radius: 50%;
-                  background: white;
-                  border: 3px solid #ff6b35;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  box-shadow: 0 4px 16px rgba(255,107,53,0.5);
-                  transform: rotate(${markerRotation}deg);
-                ">
-                  ${getTransportIcon()}
-                </div>`,
-                iconSize: [48, 48],
-                iconAnchor: [24, 24],
+                className: 'animated-marker-fun',
+                html: `
+                  <div style="
+                    position: relative;
+                    width: 64px;
+                    height: 64px;
+                  ">
+                    <!-- Outer glow ring -->
+                    <div style="
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      width: 64px;
+                      height: 64px;
+                      border-radius: 50%;
+                      background: radial-gradient(circle, rgba(255,107,53,0.4) 0%, rgba(255,107,53,0) 70%);
+                      animation: pulse 2s ease-in-out infinite;
+                    "></div>
+                    
+                    <!-- Main circle with vibrant gradient -->
+                    <div style="
+                      position: absolute;
+                      top: 8px;
+                      left: 8px;
+                      width: 48px;
+                      height: 48px;
+                      border-radius: 50%;
+                      background: linear-gradient(135deg, #ff6b35 0%, #f9a826 100%);
+                      box-shadow: 
+                        0 4px 20px rgba(255,107,53,0.6),
+                        0 0 30px rgba(255,107,53,0.4),
+                        inset 0 -2px 8px rgba(0,0,0,0.2);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      transform: rotate(${markerRotation}deg);
+                    ">
+                      ${getTransportIcon()}
+                    </div>
+                    
+                    <!-- Sparkle effect -->
+                    <div style="
+                      position: absolute;
+                      top: 6px;
+                      right: 6px;
+                      width: 8px;
+                      height: 8px;
+                      border-radius: 50%;
+                      background: white;
+                      box-shadow: 0 0 8px rgba(255,255,255,0.8);
+                      animation: sparkle 1.5s ease-in-out infinite;
+                    "></div>
+                  </div>
+                  
+                  <style>
+                    @keyframes pulse {
+                      0%, 100% { transform: scale(1); opacity: 0.6; }
+                      50% { transform: scale(1.2); opacity: 0.3; }
+                    }
+                    @keyframes sparkle {
+                      0%, 100% { opacity: 0; transform: scale(0); }
+                      50% { opacity: 1; transform: scale(1); }
+                    }
+                  </style>
+                `,
+                iconSize: [64, 64],
+                iconAnchor: [32, 32],
               })}
             />
           )}
