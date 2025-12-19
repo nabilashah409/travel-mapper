@@ -463,14 +463,32 @@ const RouteBuilderNew = () => {
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"
           />
           
-          {/* Route Lines */}
+          {/* Route Lines with gradient effect */}
           {routePaths.map((path, index) => (
             <Polyline
               key={index}
               positions={path}
-              color="#ff6b35"
-              weight={4}
-              opacity={1}
+              pathOptions={{
+                color: '#ff6b35',
+                weight: 5,
+                opacity: 0.8,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+          ))}
+          
+          {/* Add dashed overlay for fun effect */}
+          {routePaths.map((path, index) => (
+            <Polyline
+              key={`dash-${index}`}
+              positions={path}
+              pathOptions={{
+                color: '#fff',
+                weight: 2,
+                opacity: 0.6,
+                dashArray: '10, 15',
+              }}
             />
           ))}
           
