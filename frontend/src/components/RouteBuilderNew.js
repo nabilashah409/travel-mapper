@@ -576,7 +576,7 @@ const RouteBuilderNew = () => {
             />
           ))}
           
-          {/* Animated Marker - Fun & Playful */}
+          {/* Animated Marker - Super Fun & Big! */}
           {currentMarkerPosition && (
             <Marker
               key={`animated-${selectedTransport}-${Math.floor(animationProgress)}`}
@@ -586,34 +586,34 @@ const RouteBuilderNew = () => {
                 html: `
                   <div style="
                     position: relative;
-                    width: 64px;
-                    height: 64px;
+                    width: 80px;
+                    height: 80px;
                   ">
                     <!-- Outer glow ring -->
                     <div style="
                       position: absolute;
                       top: 0;
                       left: 0;
-                      width: 64px;
-                      height: 64px;
+                      width: 80px;
+                      height: 80px;
                       border-radius: 50%;
-                      background: radial-gradient(circle, rgba(255,107,53,0.4) 0%, rgba(255,107,53,0) 70%);
-                      animation: pulse 2s ease-in-out infinite;
+                      background: radial-gradient(circle, rgba(255,20,147,0.6) 0%, rgba(255,20,147,0) 70%);
+                      animation: megaPulse 1.5s ease-in-out infinite;
                     "></div>
                     
                     <!-- Main circle with vibrant gradient -->
                     <div style="
                       position: absolute;
-                      top: 8px;
-                      left: 8px;
-                      width: 48px;
-                      height: 48px;
+                      top: 10px;
+                      left: 10px;
+                      width: 60px;
+                      height: 60px;
                       border-radius: 50%;
-                      background: linear-gradient(135deg, #ff6b35 0%, #f9a826 100%);
+                      background: linear-gradient(135deg, #FF1493 0%, #FF6B35 50%, #FFD700 100%);
                       box-shadow: 
-                        0 4px 20px rgba(255,107,53,0.6),
-                        0 0 30px rgba(255,107,53,0.4),
-                        inset 0 -2px 8px rgba(0,0,0,0.2);
+                        0 6px 30px rgba(255,20,147,0.8),
+                        0 0 50px rgba(255,215,0,0.6),
+                        inset 0 -3px 10px rgba(0,0,0,0.3);
                       display: flex;
                       align-items: center;
                       justify-content: center;
@@ -622,33 +622,49 @@ const RouteBuilderNew = () => {
                       ${getTransportIcon()}
                     </div>
                     
-                    <!-- Sparkle effect -->
+                    <!-- Multiple sparkles -->
                     <div style="
                       position: absolute;
-                      top: 6px;
-                      right: 6px;
+                      top: 8px;
+                      right: 8px;
+                      width: 10px;
+                      height: 10px;
+                      border-radius: 50%;
+                      background: white;
+                      box-shadow: 0 0 15px rgba(255,255,255,1);
+                      animation: sparkle1 1s ease-in-out infinite;
+                    "></div>
+                    
+                    <div style="
+                      position: absolute;
+                      bottom: 10px;
+                      left: 12px;
                       width: 8px;
                       height: 8px;
                       border-radius: 50%;
-                      background: white;
-                      box-shadow: 0 0 8px rgba(255,255,255,0.8);
-                      animation: sparkle 1.5s ease-in-out infinite;
+                      background: #FFD700;
+                      box-shadow: 0 0 12px rgba(255,215,0,1);
+                      animation: sparkle2 1.2s ease-in-out infinite;
                     "></div>
                   </div>
                   
                   <style>
-                    @keyframes pulse {
-                      0%, 100% { transform: scale(1); opacity: 0.6; }
-                      50% { transform: scale(1.2); opacity: 0.3; }
+                    @keyframes megaPulse {
+                      0%, 100% { transform: scale(1); opacity: 0.8; }
+                      50% { transform: scale(1.4); opacity: 0.3; }
                     }
-                    @keyframes sparkle {
+                    @keyframes sparkle1 {
                       0%, 100% { opacity: 0; transform: scale(0); }
-                      50% { opacity: 1; transform: scale(1); }
+                      50% { opacity: 1; transform: scale(1.2); }
+                    }
+                    @keyframes sparkle2 {
+                      0%, 100% { opacity: 0; transform: scale(0); }
+                      60% { opacity: 1; transform: scale(1); }
                     }
                   </style>
                 `,
-                iconSize: [64, 64],
-                iconAnchor: [32, 32],
+                iconSize: [80, 80],
+                iconAnchor: [40, 40],
               })}
             />
           )}
