@@ -492,29 +492,74 @@ const RouteBuilderNew = () => {
             />
           ))}
           
-          {/* Destination Markers */}
+          {/* Destination Markers - Fun & Vibrant */}
           {destinations.map((dest, index) => (
             <Marker
               key={dest.id}
               position={[dest.coordinates.lat, dest.coordinates.lng]}
               icon={L.divIcon({
-                className: 'custom-marker',
-                html: `<div style="
-                  width: 32px;
-                  height: 32px;
-                  border-radius: 50%;
-                  background: #3b82f6;
-                  border: 3px solid white;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  color: white;
-                  font-weight: bold;
-                  font-size: 14px;
-                  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                ">${index + 1}</div>`,
-                iconSize: [32, 32],
-                iconAnchor: [16, 16],
+                className: 'fun-destination-marker',
+                html: `
+                  <div style="position: relative; width: 48px; height: 48px;">
+                    <!-- Pulsing outer ring -->
+                    <div style="
+                      position: absolute;
+                      width: 48px;
+                      height: 48px;
+                      border-radius: 50%;
+                      background: radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(59,130,246,0) 70%);
+                      animation: markerPulse 2s ease-in-out infinite;
+                    "></div>
+                    
+                    <!-- Main marker circle with gradient -->
+                    <div style="
+                      position: absolute;
+                      top: 6px;
+                      left: 6px;
+                      width: 36px;
+                      height: 36px;
+                      border-radius: 50%;
+                      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+                      border: 3px solid white;
+                      display: flex;
+                      align-items: center;
+                      justify-center;
+                      color: white;
+                      font-weight: bold;
+                      font-size: 16px;
+                      box-shadow: 
+                        0 4px 12px rgba(59,130,246,0.5),
+                        0 0 20px rgba(59,130,246,0.3);
+                      font-family: 'Fredoka', sans-serif;
+                    ">${index + 1}</div>
+                    
+                    <!-- Sparkle stars -->
+                    <div style="
+                      position: absolute;
+                      top: 2px;
+                      right: 8px;
+                      width: 6px;
+                      height: 6px;
+                      background: white;
+                      border-radius: 50%;
+                      box-shadow: 0 0 6px rgba(255,255,255,0.9);
+                      animation: twinkle 1.5s ease-in-out infinite;
+                    "></div>
+                  </div>
+                  
+                  <style>
+                    @keyframes markerPulse {
+                      0%, 100% { transform: scale(1); opacity: 0.6; }
+                      50% { transform: scale(1.3); opacity: 0.2; }
+                    }
+                    @keyframes twinkle {
+                      0%, 100% { opacity: 0; }
+                      50% { opacity: 1; }
+                    }
+                  </style>
+                `,
+                iconSize: [48, 48],
+                iconAnchor: [24, 24],
               })}
             />
           ))}
