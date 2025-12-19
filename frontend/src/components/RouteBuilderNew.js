@@ -504,77 +504,99 @@ const RouteBuilderNew = () => {
             />
           ))}
           
-          {/* Destination Markers - Fun & Vibrant */}
-          {destinations.map((dest, index) => (
-            <Marker
-              key={dest.id}
-              position={[dest.coordinates.lat, dest.coordinates.lng]}
-              icon={L.divIcon({
-                className: 'fun-destination-marker',
-                html: `
-                  <div style="position: relative; width: 48px; height: 48px;">
-                    <!-- Pulsing outer ring -->
-                    <div style="
-                      position: absolute;
-                      width: 48px;
-                      height: 48px;
-                      border-radius: 50%;
-                      background: radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(59,130,246,0) 70%);
-                      animation: markerPulse 2s ease-in-out infinite;
-                    "></div>
+          {/* Destination Markers - Rainbow Fun! */}
+          {destinations.map((dest, index) => {
+            const colors = ['#FF1493', '#FF6B35', '#FFD700', '#00D9FF', '#00FF88', '#B042FF'];
+            const markerColor = colors[index % colors.length];
+            return (
+              <Marker
+                key={dest.id}
+                position={[dest.coordinates.lat, dest.coordinates.lng]}
+                icon={L.divIcon({
+                  className: 'fun-destination-marker',
+                  html: `
+                    <div style="position: relative; width: 56px; height: 56px;">
+                      <!-- Mega pulsing outer ring -->
+                      <div style="
+                        position: absolute;
+                        width: 56px;
+                        height: 56px;
+                        border-radius: 50%;
+                        background: radial-gradient(circle, ${markerColor}50 0%, ${markerColor}00 70%);
+                        animation: rainbowPulse 1.8s ease-in-out infinite;
+                      "></div>
+                      
+                      <!-- Main marker circle with vibrant color -->
+                      <div style="
+                        position: absolute;
+                        top: 8px;
+                        left: 8px;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background: ${markerColor};
+                        border: 4px solid white;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: 900;
+                        font-size: 20px;
+                        box-shadow: 
+                          0 6px 20px ${markerColor}80,
+                          0 0 30px ${markerColor}60,
+                          inset 0 2px 6px rgba(255,255,255,0.3);
+                        font-family: 'Fredoka', 'Arial Black', sans-serif;
+                        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                      ">${index + 1}</div>
+                      
+                      <!-- Multiple sparkles -->
+                      <div style="
+                        position: absolute;
+                        top: 4px;
+                        right: 10px;
+                        width: 8px;
+                        height: 8px;
+                        background: white;
+                        border-radius: 50%;
+                        box-shadow: 0 0 10px rgba(255,255,255,1);
+                        animation: twinkle1 1.2s ease-in-out infinite;
+                      "></div>
+                      
+                      <div style="
+                        position: absolute;
+                        bottom: 6px;
+                        left: 6px;
+                        width: 6px;
+                        height: 6px;
+                        background: ${markerColor};
+                        border-radius: 50%;
+                        box-shadow: 0 0 8px ${markerColor};
+                        animation: twinkle2 1.5s ease-in-out infinite;
+                      "></div>
+                    </div>
                     
-                    <!-- Main marker circle with gradient -->
-                    <div style="
-                      position: absolute;
-                      top: 6px;
-                      left: 6px;
-                      width: 36px;
-                      height: 36px;
-                      border-radius: 50%;
-                      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-                      border: 3px solid white;
-                      display: flex;
-                      align-items: center;
-                      justify-center;
-                      color: white;
-                      font-weight: bold;
-                      font-size: 16px;
-                      box-shadow: 
-                        0 4px 12px rgba(59,130,246,0.5),
-                        0 0 20px rgba(59,130,246,0.3);
-                      font-family: 'Fredoka', sans-serif;
-                    ">${index + 1}</div>
-                    
-                    <!-- Sparkle stars -->
-                    <div style="
-                      position: absolute;
-                      top: 2px;
-                      right: 8px;
-                      width: 6px;
-                      height: 6px;
-                      background: white;
-                      border-radius: 50%;
-                      box-shadow: 0 0 6px rgba(255,255,255,0.9);
-                      animation: twinkle 1.5s ease-in-out infinite;
-                    "></div>
-                  </div>
-                  
-                  <style>
-                    @keyframes markerPulse {
-                      0%, 100% { transform: scale(1); opacity: 0.6; }
-                      50% { transform: scale(1.3); opacity: 0.2; }
-                    }
-                    @keyframes twinkle {
-                      0%, 100% { opacity: 0; }
-                      50% { opacity: 1; }
-                    }
-                  </style>
-                `,
-                iconSize: [48, 48],
-                iconAnchor: [24, 24],
-              })}
-            />
-          ))}
+                    <style>
+                      @keyframes rainbowPulse {
+                        0%, 100% { transform: scale(1); opacity: 0.8; }
+                        50% { transform: scale(1.5); opacity: 0.3; }
+                      }
+                      @keyframes twinkle1 {
+                        0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+                        50% { opacity: 1; transform: scale(1.3) rotate(180deg); }
+                      }
+                      @keyframes twinkle2 {
+                        0%, 100% { opacity: 0; transform: scale(0); }
+                        60% { opacity: 1; transform: scale(1); }
+                      }
+                    </style>
+                  `,
+                  iconSize: [56, 56],
+                  iconAnchor: [28, 28],
+                })}
+              />
+            );
+          })}
           
           {/* Animated Marker - Super Fun & Big! */}
           {currentMarkerPosition && (
