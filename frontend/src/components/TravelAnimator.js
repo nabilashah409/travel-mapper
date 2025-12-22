@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
 });
 
 // Map Controller component to handle zoom/pan - fits all destinations with margin
-const MapController = ({ destinations, defaultCenter }) => {
+const MapController = ({ destinations, defaultCenter, isAnimating }) => {
   const map = useMap();
   
   useEffect(() => {
