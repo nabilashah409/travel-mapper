@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
-import { Plus, X, GripVertical } from 'lucide-react';
+import { Plus, X, GripVertical, Play, Pause, Plane, Car, Train, Footprints } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -13,14 +13,38 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
+// Map Controller component to handle zoom/pan
+const MapController = ({ destinations, defaultCenter }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (destinations.length > 0) {
+      // Zoom to first destination
+      map.flyTo([destinations[0].lat, destinations[0].lng], 6, { duration: 1.5 });
+    } else {
+      // Default to USA
+      map.flyTo(defaultCenter, 4, { duration: 1 });
+    }
+  }, [destinations, map, defaultCenter]);
+  
+  return null;
+};
+
 const TravelAnimator = () => {
   const [showLanding, setShowLanding] = useState(true);
   const [destinations, setDestinations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [routePath, setRoutePath] = useState([]);
+  const [selectedTransport, setSelectedTransport] = useState('flight');
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationProgress, setAnimationProgress] = useState(0);
   const markerRef = useRef(null);
   const mapRef = useRef(null);
+  const animationRef = useRef(null);
+  
+  // Default center (USA)
+  const defaultCenter = [39.8283, -98.5795];
 
   // Start animation after component mounts
   useEffect(() => {
