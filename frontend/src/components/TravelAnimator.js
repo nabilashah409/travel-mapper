@@ -697,9 +697,16 @@ const TravelAnimator = () => {
               {destinations.map((dest, index) => (
                 <div
                   key={dest.id}
-                  className="flex items-center gap-2 p-2 bg-white rounded-xl hover:bg-pink-50 transition-colors"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDrop={(e) => handleDrop(e, index)}
+                  className={`flex items-center gap-2 p-2 bg-white rounded-xl hover:bg-pink-50 transition-all cursor-grab active:cursor-grabbing ${
+                    draggedIndex === index ? 'opacity-50 scale-95' : ''
+                  } ${draggedIndex !== null && draggedIndex !== index ? 'border-2 border-dashed border-pink-300' : ''}`}
                 >
-                  <GripVertical className="w-4 h-4 text-gray-400 cursor-grab" />
+                  <GripVertical className="w-4 h-4 text-gray-400" />
                   <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 text-white flex items-center justify-center text-xs font-bold">
                     {index + 1}
                   </div>
@@ -713,6 +720,7 @@ const TravelAnimator = () => {
                 </div>
               ))}
             </div>
+            <p className="text-xs text-gray-400 mt-2 text-center">Drag to reorder destinations</p>
           </div>
         </div>
       )}
