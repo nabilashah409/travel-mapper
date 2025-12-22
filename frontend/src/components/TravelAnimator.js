@@ -515,27 +515,31 @@ const TravelAnimator = () => {
 const LandingPage = () => {
   const planeRef = useRef(null);
   const containerRef = useRef(null);
+  const iconsContainerRef = useRef(null);
   
   useEffect(() => {
     const plane = planeRef.current;
-    if (!plane) return;
+    const iconsContainer = iconsContainerRef.current;
+    if (!plane || !iconsContainer) return;
+    
+    // Get all orbit icons (excluding plane)
+    const orbitIcons = iconsContainer.querySelectorAll('.icon-orbit:not(.plane-icon)');
     
     // Timeline:
-    // 0-800ms: Plane gathers in with other icons (CSS animation handles this)
-    // 800-900ms: Small pause while in orbit
-    // 900ms+: Plane flies across the title
-    // After flight: Plane returns to orbit position
+    // 0-800ms: All icons (including plane) gather in
+    // 800-900ms: Brief pause in orbit
+    // 900ms: Plane leaves, other icons spread to fill gap
+    // 900-3500ms: Plane flies across
+    // 3500ms: Plane arrives, icons make space, plane joins orbit
     
     const gatherDuration = 800;
     const orbitPause = 100;
-    const flightDuration = 2800; // Slightly faster flight
-    const planeStartAngle = 180; // Plane starts at 180° position (left side)
-    const orbitRadius = 40; // vmin percentage for orbit
+    const flightDuration = 2600;
     
     // Bezier curve for flight across title
-    const bezierStart = { x: 5, y: 55 };
-    const bezierControl = { x: 50, y: 35 };
-    const bezierEnd = { x: 95, y: 55 };
+    const bezierStart = { x: 8, y: 50 };
+    const bezierControl = { x: 50, y: 30 };
+    const bezierEnd = { x: 92, y: 50 };
     
     const quadraticBezier = (t, p0, p1, p2) => {
       const oneMinusT = 1 - t;
@@ -546,23 +550,40 @@ const LandingPage = () => {
       return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     };
     
+    // Function to update icon spacing
+    const updateIconSpacing = (numIcons, startAngleOffset = 0) => {
+      const angleStep = 360 / numIcons;
+      orbitIcons.forEach((icon, index) => {
+        const newAngle = startAngleOffset + (index * angleStep);
+        icon.style.setProperty('--current-angle', `${newAngle}deg`);
+      });
+    };
+    
     let animationId;
     let startTime = null;
+    let hasLeftOrbit = false;
+    let hasJoinedOrbit = false;
     
     const animate = (timestamp) => {
       if (!startTime) startTime = timestamp;
       const elapsed = timestamp - startTime;
       
-      // Phase 1: Gathering (handled by CSS, plane hidden)
-      if (elapsed < gatherDuration) {
+      // Phase 1: Gathering (CSS handles this)
+      if (elapsed < gatherDuration + orbitPause) {
         animationId = requestAnimationFrame(animate);
         return;
       }
       
-      // Phase 2: Brief orbit pause
-      if (elapsed < gatherDuration + orbitPause) {
-        animationId = requestAnimationFrame(animate);
-        return;
+      // Phase 2: Plane leaves orbit - spread other icons
+      if (!hasLeftOrbit) {
+        hasLeftOrbit = true;
+        // Spread 10 icons to fill the circle (was 11)
+        orbitIcons.forEach((icon, index) => {
+          const newAngle = index * (360 / 10); // 36° apart instead of ~32.7°
+          icon.style.transition = 'transform 0.5s ease-out';
+          icon.style.setProperty('--angle', `${newAngle}deg`);
+        });
+        plane.classList.add('flying');
       }
       
       // Phase 3: Flight across title
@@ -585,19 +606,35 @@ const LandingPage = () => {
         const angle = Math.atan2(dy, dx) * (180 / Math.PI);
         const adjustedRotation = angle + 45;
         
-        const scale = 0.8 + 0.4 * Math.sin(easedProgress * Math.PI);
+        // Scale: smoothly increase to 1.8x at middle, back to 1x at end
+        const scale = 1 + 0.8 * Math.sin(easedProgress * Math.PI);
         
         plane.style.left = `${x}%`;
         plane.style.top = `${y}%`;
         plane.style.transform = `translate(-50%, -50%) rotate(${adjustedRotation}deg) scale(${scale})`;
         plane.style.opacity = '1';
-        plane.classList.add('flying');
         
         animationId = requestAnimationFrame(animate);
-      } else {
-        // Phase 4: Return to orbit - snap back to orbit position on right side
+      } else if (!hasJoinedOrbit) {
+        // Phase 4: Plane arrives - icons make space, plane joins
+        hasJoinedOrbit = true;
+        
+        // Make space for plane at position 0 (right side)
+        orbitIcons.forEach((icon, index) => {
+          // Shift all icons to make room: plane at 0°, others start at ~32.7°
+          const newAngle = ((index + 1) * (360 / 11));
+          icon.style.transition = 'transform 0.4s ease-out';
+          icon.style.setProperty('--angle', `${newAngle}deg`);
+        });
+        
+        // Plane joins at 0° position (right side of circle)
         plane.classList.remove('flying');
-        plane.classList.add('orbiting');
+        plane.classList.add('in-orbit');
+        plane.style.transition = 'all 0.4s ease-out';
+        plane.style.left = '50%';
+        plane.style.top = '50%';
+        plane.style.transform = 'rotate(0deg) translateX(min(40vmin, 200px)) rotate(0deg) scale(1)';
+        plane.style.opacity = '1';
       }
     };
     
@@ -615,46 +652,43 @@ const LandingPage = () => {
     };
   }, []);
 
-  // Icons for the circle (plane will be separate with special animation)
+  // 10 regular icons + 1 plane = 11 total, evenly spaced
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
+  const totalIcons = circleIcons.length + 1; // +1 for plane
+  const angleStep = 360 / totalIcons; // ~32.7°
 
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
-      {/* Everything scrolls up together */}
       <div ref={containerRef} className="landing-content">
-        {/* Bounding box for circle and plane */}
         <div className="bounding-box">
-          {/* Circular rotating icons */}
-          <div className="circular-container">
+          <div className="circular-container" ref={iconsContainerRef}>
+            {/* Regular icons */}
             {circleIcons.map((icon, index) => (
               <div 
                 key={index}
-                className="icon-orbit" 
+                className="icon-orbit"
                 style={{ 
-                  '--angle': `${index * (360 / circleIcons.length)}deg`,
-                  '--delay': `${index * 0.08}s`
+                  '--angle': `${(index + 1) * angleStep}deg`,
+                  '--delay': `${(index + 1) * 0.06}s`
                 }}
               >
                 {icon}
               </div>
             ))}
             
-            {/* Plane icon - starts in circle, flies across, returns to orbit */}
+            {/* Plane icon - starts at position 0 (right side), will fly across */}
             <div 
               ref={planeRef}
-              className="plane-in-circle"
-              style={{ '--angle': '180deg', '--delay': '0.4s' }}
+              className="icon-orbit plane-icon"
+              style={{ '--angle': '0deg', '--delay': '0s' }}
             >
               ✈️
             </div>
           </div>
         </div>
         
-        {/* Title centered */}
         <div className="title-overlay">
-          <h1 className="title-text">
-            Travel Animator
-          </h1>
+          <h1 className="title-text">Travel Animator</h1>
           <p className="subtitle-text">Plan your journey</p>
         </div>
       </div>
@@ -665,7 +699,7 @@ const LandingPage = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          animation: scrollUp 0.8s ease-in-out 3.7s forwards;
+          animation: scrollUp 0.8s ease-in-out 3.5s forwards;
         }
         
         .bounding-box {
@@ -723,32 +757,24 @@ const LandingPage = () => {
           transform-origin: center;
           animation: 
             gatherIn 0.8s ease-out var(--delay) forwards,
-            orbit 10s linear 0.8s infinite;
+            orbit 12s linear 0.8s infinite;
           opacity: 0;
         }
-
-        .plane-in-circle {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          font-size: clamp(1.4rem, 3.5vw, 2.2rem);
-          transform-origin: center;
-          animation: gatherIn 0.8s ease-out var(--delay) forwards;
-          opacity: 0;
+        
+        .plane-icon {
           z-index: 15;
+          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
         }
         
-        .plane-in-circle.flying {
-          animation: none;
-          /* Position controlled by JS */
+        .plane-icon.flying {
+          animation: none !important;
+          z-index: 25;
+          filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
         }
         
-        .plane-in-circle.orbiting {
-          animation: orbit 10s linear infinite;
-          opacity: 1;
-          left: 50%;
-          top: 50%;
-          transform: rotate(0deg) translateX(min(40vmin, 200px)) rotate(0deg);
+        .plane-icon.in-orbit {
+          animation: orbit 12s linear infinite !important;
+          z-index: 15;
         }
 
         @keyframes gatherIn {
