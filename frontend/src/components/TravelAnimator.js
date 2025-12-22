@@ -498,22 +498,27 @@ const LandingPage = () => {
     const plane = planeRef.current;
     if (!plane) return;
     
-    const duration = 3000; // 3 seconds
+    const duration = 4500; // Slower: 4.5 seconds for smoother flight
     const startTime = Date.now();
     
-    // Define curved path points (bezier-like curve from bottom-left to top-right)
+    // Curved path within bounding box (starts just outside circle, not page edge)
+    // Values are percentages relative to the bounding box container
     const pathPoints = [
-      { x: -10, y: 85, rotation: -35, scale: 0.5 },
-      { x: 15, y: 65, rotation: -25, scale: 0.8 },
-      { x: 35, y: 45, rotation: -10, scale: 1.0 },
-      { x: 55, y: 35, rotation: 5, scale: 1.1 },
-      { x: 75, y: 28, rotation: 15, scale: 1.0 },
-      { x: 95, y: 15, rotation: 25, scale: 0.9 },
-      { x: 115, y: -5, rotation: 30, scale: 0.7 },
+      { x: 5, y: 90, rotation: -40, scale: 0.6 },
+      { x: 15, y: 70, rotation: -30, scale: 0.8 },
+      { x: 28, y: 52, rotation: -18, scale: 0.95 },
+      { x: 42, y: 40, rotation: -5, scale: 1.05 },
+      { x: 58, y: 35, rotation: 8, scale: 1.1 },
+      { x: 72, y: 32, rotation: 18, scale: 1.0 },
+      { x: 85, y: 25, rotation: 28, scale: 0.9 },
+      { x: 95, y: 12, rotation: 35, scale: 0.7 },
     ];
     
     // Lerp function
     const lerp = (start, end, t) => start + (end - start) * t;
+    
+    // Smooth step function for even smoother easing
+    const smoothStep = (t) => t * t * (3 - 2 * t);
     
     // Get interpolated position on path
     const getPositionOnPath = (progress) => {
@@ -521,14 +526,17 @@ const LandingPage = () => {
       const segmentIndex = Math.min(Math.floor(progress * numSegments), numSegments - 1);
       const segmentProgress = (progress * numSegments) - segmentIndex;
       
+      // Apply smoothstep to segment progress for smoother transitions
+      const smoothedProgress = smoothStep(segmentProgress);
+      
       const start = pathPoints[segmentIndex];
       const end = pathPoints[Math.min(segmentIndex + 1, numSegments)];
       
       return {
-        x: lerp(start.x, end.x, segmentProgress),
-        y: lerp(start.y, end.y, segmentProgress),
-        rotation: lerp(start.rotation, end.rotation, segmentProgress),
-        scale: lerp(start.scale, end.scale, segmentProgress),
+        x: lerp(start.x, end.x, smoothedProgress),
+        y: lerp(start.y, end.y, smoothedProgress),
+        rotation: lerp(start.rotation, end.rotation, smoothedProgress),
+        scale: lerp(start.scale, end.scale, smoothedProgress),
       };
     };
     
@@ -537,8 +545,10 @@ const LandingPage = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Ease-out cubic for smooth deceleration
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      // Ease-in-out for natural feel
+      const easedProgress = progress < 0.5 
+        ? 2 * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
       
       const pos = getPositionOnPath(easedProgress);
       
@@ -546,7 +556,12 @@ const LandingPage = () => {
       plane.style.left = `${pos.x}%`;
       plane.style.top = `${pos.y}%`;
       plane.style.transform = `rotate(${pos.rotation}deg) scale(${pos.scale})`;
-      plane.style.opacity = progress < 0.05 ? progress * 20 : (progress > 0.9 ? (1 - progress) * 10 : 1);
+      
+      // Fade in/out at edges
+      let opacity = 1;
+      if (progress < 0.1) opacity = progress * 10;
+      else if (progress > 0.85) opacity = (1 - progress) * 6.67;
+      plane.style.opacity = opacity;
       
       if (progress < 1) {
         animationId = requestAnimationFrame(animate);
@@ -560,43 +575,46 @@ const LandingPage = () => {
     };
   }, []);
 
-  // Icons for the circle - evenly distributed, no center stacking
+  // Icons for the circle
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
 
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
       {/* Everything scrolls up together */}
       <div ref={containerRef} className="landing-content">
-        {/* Circular rotating icons */}
-        <div className="circular-container">
-          {circleIcons.map((icon, index) => (
-            <div 
-              key={index}
-              className="icon-orbit" 
-              style={{ 
-                '--angle': `${index * (360 / circleIcons.length)}deg`
-              }}
-            >
-              {icon}
-            </div>
-          ))}
+        {/* Bounding box for circle and plane */}
+        <div className="bounding-box">
+          {/* Circular rotating icons */}
+          <div className="circular-container">
+            {circleIcons.map((icon, index) => (
+              <div 
+                key={index}
+                className="icon-orbit" 
+                style={{ 
+                  '--angle': `${index * (360 / circleIcons.length)}deg`
+                }}
+              >
+                {icon}
+              </div>
+            ))}
+          </div>
+          
+          {/* Flying plane - inside bounding box */}
+          <div 
+            ref={planeRef}
+            className="plane-element"
+          >
+            ✈️
+          </div>
         </div>
         
-        {/* Title in center - scrolls with icons */}
+        {/* Title centered absolutely */}
         <div className="title-overlay">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-500 to-orange-400 bg-clip-text text-transparent">
+          <h1 className="title-text">
             Travel Animator
           </h1>
-          <p className="text-gray-500 text-sm mt-2">Plan your journey</p>
+          <p className="subtitle-text">Plan your journey</p>
         </div>
-      </div>
-
-      {/* Flying plane - animated with lerp */}
-      <div 
-        ref={planeRef}
-        className="plane-element"
-      >
-        ✈️
       </div>
 
       <style jsx>{`
@@ -605,88 +623,86 @@ const LandingPage = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          animation: scrollUp 0.8s ease-in-out 3.2s forwards;
+          animation: scrollUp 0.8s ease-in-out 4.5s forwards;
+        }
+        
+        .bounding-box {
+          position: relative;
+          width: 85vmin;
+          height: 85vmin;
+          max-width: 500px;
+          max-height: 500px;
+          min-width: 280px;
+          min-height: 280px;
         }
         
         .title-overlay {
           position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
           text-align: center;
           z-index: 10;
           pointer-events: none;
+          width: 100%;
+        }
+        
+        .title-text {
+          font-size: clamp(1.75rem, 6vw, 3.5rem);
+          font-weight: 700;
+          background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          line-height: 1.2;
+        }
+        
+        .subtitle-text {
+          font-size: clamp(0.75rem, 2vw, 1rem);
+          color: #6b7280;
+          margin-top: 0.5rem;
         }
 
         .circular-container {
-          position: relative;
-          width: 260px;
-          height: 260px;
-        }
-
-        @media (min-width: 768px) {
-          .circular-container {
-            width: 320px;
-            height: 320px;
-          }
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+          height: 100%;
         }
 
         .icon-orbit {
           position: absolute;
           top: 50%;
           left: 50%;
-          font-size: 1.6rem;
+          font-size: clamp(1.5rem, 4vw, 2.5rem);
           transform-origin: center;
-          animation: orbit 6s linear infinite;
-        }
-
-        @media (min-width: 768px) {
-          .icon-orbit {
-            font-size: 2rem;
-          }
+          animation: orbit 8s linear infinite;
         }
 
         @keyframes orbit {
           0% {
             transform: 
               rotate(var(--angle)) 
-              translateX(110px) 
+              translateX(min(42vmin, 220px)) 
               rotate(calc(-1 * var(--angle)));
           }
           100% {
             transform: 
               rotate(calc(var(--angle) + 360deg)) 
-              translateX(110px) 
+              translateX(min(42vmin, 220px)) 
               rotate(calc(-1 * (var(--angle) + 360deg)));
-          }
-        }
-
-        @media (min-width: 768px) {
-          @keyframes orbit {
-            0% {
-              transform: 
-                rotate(var(--angle)) 
-                translateX(140px) 
-                rotate(calc(-1 * var(--angle)));
-            }
-            100% {
-              transform: 
-                rotate(calc(var(--angle) + 360deg)) 
-                translateX(140px) 
-                rotate(calc(-1 * (var(--angle) + 360deg)));
-            }
           }
         }
 
         .plane-element {
           position: absolute;
-          font-size: 3rem;
-          filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
+          font-size: clamp(2rem, 6vw, 4rem);
+          filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
           z-index: 20;
           will-change: transform, left, top, opacity;
-        }
-
-        @media (min-width: 768px) {
-          .plane-element {
-            font-size: 4rem;
-          }
+          pointer-events: none;
         }
 
         @keyframes scrollUp {
@@ -697,6 +713,12 @@ const LandingPage = () => {
           100% {
             transform: translateY(-100vh);
             opacity: 0;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
           }
         }
       `}</style>
