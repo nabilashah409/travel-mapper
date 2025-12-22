@@ -118,7 +118,7 @@ const TravelAnimator = () => {
     setIsSearching(false);
   };
 
-  // Create curved path for all routes (great circle arc style)
+  // Create curved path for all routes (great circle arc style - matches landing page curve)
   const createCurvedPath = (start, end) => {
     const points = [];
     const numPoints = 100;
@@ -128,15 +128,16 @@ const TravelAnimator = () => {
     const lngDiff = Math.abs(end.lng - start.lng);
     const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
     
-    // Arc height proportional to distance (more curve for longer routes)
-    const arcHeight = Math.min(distance * 0.3, 15); // Cap at 15 degrees
+    // Great circle arc height - higher arc for longer distances (same style as landing page)
+    // Arc peaks at ~45-50% of the way up, creating that characteristic great circle look
+    const arcHeight = Math.min(distance * 0.4, 20); // Higher arc, cap at 20 degrees
 
     for (let i = 0; i <= numPoints; i++) {
       const t = i / numPoints;
       const lat = start.lat + (end.lat - start.lat) * t;
       const lng = start.lng + (end.lng - start.lng) * t;
       
-      // Sine curve for natural arc (peaks at middle)
+      // Sine curve for natural great circle arc (peaks at middle, t=0.5)
       const arcOffset = Math.sin(t * Math.PI) * arcHeight;
       
       points.push([lat + arcOffset, lng]);
