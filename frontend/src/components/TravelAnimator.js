@@ -568,9 +568,11 @@ const LandingPage = () => {
         hasLeftOrbit = true;
         
         // 10 remaining icons spread evenly: 36° apart (360/10)
+        // Start from where plane was (180°) and distribute clockwise
         const spreadAngleStep = 360 / 10;
         orbitIcons.forEach((icon, index) => {
-          const newAngle = index * spreadAngleStep;
+          // Redistribute starting from 180° + offset to fill the gap
+          const newAngle = (180 + (index + 0.5) * spreadAngleStep) % 360;
           icon.style.transition = 'transform 0.5s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
