@@ -16,11 +16,11 @@ L.Icon.Default.mergeOptions({
 const MapController = ({ destinations, defaultCenter, isAnimating }) => {
   const map = useMap();
   
-  // Calculate optimal zoom to ensure minimum visual distance between destinations
+  // Calculate optimal zoom to ensure good visual distance between destinations
   const calculateOptimalZoom = (destinations) => {
-    if (destinations.length < 2) return 8;
+    if (destinations.length < 2) return 10;
     
-    // Find minimum distance between consecutive destinations
+    // Find minimum distance between consecutive destinations (in degrees)
     let minDistance = Infinity;
     for (let i = 0; i < destinations.length - 1; i++) {
       const d1 = destinations[i];
@@ -31,40 +31,39 @@ const MapController = ({ destinations, defaultCenter, isAnimating }) => {
       minDistance = Math.min(minDistance, distance);
     }
     
-    // Ensure minimum ~100px visual distance (roughly 1 inch at 96dpi)
-    // Lower minDistance = closer points = need higher zoom
-    // Each zoom level doubles the scale
-    if (minDistance < 0.5) return 12;      // Very close (same city area)
-    if (minDistance < 1) return 10;        // Close (nearby cities)
-    if (minDistance < 3) return 8;         // Medium distance
-    if (minDistance < 10) return 6;        // Far
-    return 5;                               // Very far (cross-country)
+    // More aggressive zoom levels for close destinations
+    // 1 degree ≈ 111 km, so we want to zoom in much more for nearby places
+    if (minDistance < 0.3) return 14;       // Same city/very close (~30km)
+    if (minDistance < 0.5) return 13;       // Nearby suburbs (~50km)
+    if (minDistance < 1) return 12;         // Same metro area (~100km)
+    if (minDistance < 2) return 11;         // Nearby cities (~200km)
+    if (minDistance < 4) return 10;         // Regional (~400km)
+    if (minDistance < 8) return 8;          // State level (~800km)
+    if (minDistance < 15) return 6;         // Multi-state
+    return 5;                                // Cross-country
   };
   
   useEffect(() => {
     if (destinations.length === 0) {
-      // Default to USA
       map.flyTo(defaultCenter, 4, { duration: 1 });
     } else if (destinations.length === 1) {
-      // Single destination - zoom to it
-      map.flyTo([destinations[0].lat, destinations[0].lng], 8, { duration: 1.5 });
+      map.flyTo([destinations[0].lat, destinations[0].lng], 10, { duration: 1.5 });
     } else {
-      // Multiple destinations - fit bounds with optimal zoom
       const bounds = L.latLngBounds(
         destinations.map(d => [d.lat, d.lng])
       );
       const optimalZoom = calculateOptimalZoom(destinations);
       
       map.flyToBounds(bounds, {
-        padding: [150, 150], // More generous padding
+        padding: [100, 100],
         duration: 1.5,
         maxZoom: optimalZoom,
-        minZoom: 4
+        minZoom: optimalZoom > 8 ? optimalZoom - 2 : 4  // Allow some flexibility but stay zoomed in
       });
     }
   }, [destinations, map, defaultCenter]);
   
-  // Keep all destinations visible during animation (don't follow the icon)
+  // Keep all destinations visible during animation
   useEffect(() => {
     if (isAnimating && destinations.length > 1) {
       const bounds = L.latLngBounds(
@@ -73,9 +72,9 @@ const MapController = ({ destinations, defaultCenter, isAnimating }) => {
       const optimalZoom = calculateOptimalZoom(destinations);
       
       map.fitBounds(bounds, {
-        padding: [120, 120],
+        padding: [100, 100],
         maxZoom: optimalZoom,
-        minZoom: 4,
+        minZoom: optimalZoom > 8 ? optimalZoom - 2 : 4,
         animate: false
       });
     }
