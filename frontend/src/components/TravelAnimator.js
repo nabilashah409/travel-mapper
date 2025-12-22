@@ -598,15 +598,15 @@ const LandingPage = () => {
   // Icons for the circle
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
 
-  // Generate SVG path for the flight curve (simple arc, not too curvy)
+  // Generate SVG path for the flight curve (simple arc, consistent direction)
   const generateFlightPath = () => {
-    // Simple quadratic bezier: start bottom-left, gentle arc, end right-middle
-    const startX = 10;
-    const startY = 80;
+    // Simple curve: left to right with gentle upward arc - no direction flip
+    const startX = 5;
+    const startY = 55;
     const controlX = 50;
-    const controlY = 20; // Gentle curve - not too high
-    const endX = 90;
-    const endY = 50;
+    const controlY = 35; // Gentle upward arc
+    const endX = 95;
+    const endY = 55;
     
     return `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
   };
