@@ -380,15 +380,15 @@ const RouteBuilderNew = () => {
         z-[80] md:z-auto
       `}>
         <div className="p-4 sm:p-6 md:p-8">
-          {/* Title */}
+          {/* Title - More compact on mobile */}
           <h1 
-            className="text-3xl sm:text-4xl md:text-5xl font-black leading-tight mb-2"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black leading-tight mb-1"
             style={{ fontFamily: 'Playfair Display, serif' }}
           >
             Travel Route Animator
           </h1>
-          <p className="text-gray-600 text-xs sm:text-sm mb-6 sm:mb-8">
-            Create stunning animated travel videos for Instagram
+          <p className="text-gray-600 text-xs mb-4 sm:mb-6">
+            Create animated travel videos
           </p>
 
           {/* Add Destinations Section */}
