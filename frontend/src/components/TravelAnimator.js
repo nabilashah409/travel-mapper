@@ -642,7 +642,7 @@ const LandingPage = () => {
   }, []);
 
   // 10 regular icons + 1 plane = 11 total
-  // Plane is fixed at 180° (true left), other icons distribute around it
+  // Plane is fixed at 180° (true left), other 10 icons distribute evenly around it
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
   const totalIcons = 11;
   const angleStep = 360 / totalIcons; // ~32.727°
@@ -653,15 +653,18 @@ const LandingPage = () => {
       <div ref={containerRef} className="landing-content">
         <div className="bounding-box">
           <div className="circular-container" ref={iconsContainerRef}>
-            {/* Regular icons distributed evenly, skipping 180° where plane is */}
+            {/* 10 icons evenly distributed, with plane at position index that equals ~180° */}
             {circleIcons.map((icon, index) => {
-              // Calculate angle: start from 0°, but skip 180° (position 5.5 ≈ 180°)
-              // Use positions: 0, 1, 2, 3, 4, 5 → then skip 180° → 6, 7, 8, 9, 10
-              let position = index;
-              // Icons 0-4 take positions 0-4 (0° to ~131°)
-              // Icons 5-9 take positions 6-10 (196° to 327°) - skipping position 5.5 (180°)
-              if (index >= 5) position = index + 1;
-              const iconAngle = position * angleStep;
+              // All 11 icons evenly spaced at 32.727° apart
+              // Plane occupies index position that falls near 180°
+              // Index 5 would be at 5 * 32.727 = 163.6° (too early)
+              // Index 6 would be at 6 * 32.727 = 196.4° (just after 180°)
+              // To have plane exactly at 180°, we offset all icons so plane sits at 180°
+              // Plane at 180° means we calculate from there
+              // Offset: if plane is at 180°, icon at index 0 should be at 180 + angleStep = 212.7°
+              // Or: icon angles = 180 + (index + 1) * angleStep, wrapped
+              const baseAngle = planeAngle + (index + 1) * angleStep;
+              const iconAngle = baseAngle % 360;
               return (
                 <div 
                   key={index}
