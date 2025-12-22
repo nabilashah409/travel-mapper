@@ -373,36 +373,37 @@ const RouteBuilderNew = () => {
         <div className="p-4 sm:p-6 md:p-8">
           {/* Title */}
           <h1 
-            className="text-5xl font-black leading-tight mb-2"
+            className="text-3xl sm:text-4xl md:text-5xl font-black leading-tight mb-2"
             style={{ fontFamily: 'Playfair Display, serif' }}
           >
             Travel Route Animator
           </h1>
-          <p className="text-gray-600 text-sm mb-8">
+          <p className="text-gray-600 text-xs sm:text-sm mb-6 sm:mb-8">
             Create stunning animated travel videos for Instagram
           </p>
 
           {/* Add Destinations Section */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Add Destinations</h3>
             
-            {/* Search Input */}
+            {/* Search Input - Mobile optimized */}
             <div className="flex gap-2 mb-4">
               <Input
-                placeholder="Search for a city or location..."
+                placeholder="Search for a city..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addDestination()}
-                className="flex-1"
-                style={{ fontSize: '14px' }}
+                className="flex-1 h-12 text-base"
+                style={{ fontSize: '16px', touchAction: 'manipulation' }}
               />
               <Button
                 onClick={addDestination}
                 disabled={isSearching}
                 size="icon"
-                style={{ backgroundColor: '#3b82f6' }}
+                className="h-12 w-12 flex-shrink-0"
+                style={{ backgroundColor: '#3b82f6', touchAction: 'manipulation' }}
               >
-                {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
               </Button>
             </div>
 
