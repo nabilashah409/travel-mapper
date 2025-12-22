@@ -535,11 +535,13 @@ const LandingPage = () => {
     const planeStartAngle = 7 * angleStep; // ~229° (lower-left quadrant)
     const planeEndAngle = 0; // 0° (right side)
     
-    // Get the actual position of plane in orbit for seamless transition
+    // Get viewport position for the orbit
+    // The orbit circle is centered on screen with radius ~200px on typical viewport
+    // For a 1920px wide screen, 200px = ~10.4%, but we need wider arc for visual effect
     const getOrbitPosition = (angleDeg) => {
       const angleRad = (angleDeg * Math.PI) / 180;
-      // Orbit appears roughly ±12% from center (50%) on a typical viewport
-      const radiusPercent = 12;
+      // Use wider radius for more dramatic flight path
+      const radiusPercent = 18;
       return {
         x: 50 + radiusPercent * Math.cos(angleRad),
         y: 50 + radiusPercent * Math.sin(angleRad)
@@ -551,7 +553,7 @@ const LandingPage = () => {
     const endPos = getOrbitPosition(planeEndAngle);
     
     const bezierStart = { x: startPos.x, y: startPos.y };
-    const bezierControl = { x: 50, y: 20 }; // Arc above center
+    const bezierControl = { x: 50, y: 15 }; // Arc high above center for smooth curve
     const bezierEnd = { x: endPos.x, y: endPos.y };
     
     const quadraticBezier = (t, p0, p1, p2) => {
