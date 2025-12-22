@@ -646,18 +646,19 @@ const LandingPage = () => {
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
   const totalIcons = 11;
   const angleStep = 360 / totalIcons; // ~32.727°
+  const planePosition = 5; // Plane takes position 5 (~163.6°, left side)
+  const planeAngle = planePosition * angleStep;
 
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
       <div ref={containerRef} className="landing-content">
         <div className="bounding-box">
           <div className="circular-container" ref={iconsContainerRef}>
-            {/* Regular icons at positions 1-10 (skip position 0 for plane at start, skip position 6 where plane starts at 180°) */}
+            {/* Regular icons at all positions except position 5 (where plane starts) */}
             {circleIcons.map((icon, index) => {
-              // Place icons at all positions except 180° (position 6)
-              // Positions: 0, 1, 2, 3, 4, 5, 7, 8, 9, 10 → angles: 0°, 32.7°, 65.5°, 98.2°, 130.9°, 163.6°, 229.1°, 261.8°, 294.5°, 327.3°
+              // 10 icons fill positions 0,1,2,3,4,6,7,8,9,10 (skip 5 for plane)
               let position = index;
-              if (index >= 6) position = index + 1; // Skip position 6 (180°) for plane
+              if (index >= planePosition) position = index + 1; // Skip position 5 for plane
               const iconAngle = position * angleStep;
               return (
                 <div 
@@ -673,11 +674,11 @@ const LandingPage = () => {
               );
             })}
             
-            {/* Plane at position 6 (180°, left side) */}
+            {/* Plane at position 5 (~163.6°, left side) */}
             <div 
               ref={planeRef}
               className="icon-orbit plane-icon"
-              style={{ '--angle': '180deg', '--delay': '0.36s' }}
+              style={{ '--angle': `${planeAngle}deg`, '--delay': '0.3s' }}
             >
               ✈️
             </div>
