@@ -529,10 +529,12 @@ const LandingPage = () => {
     };
     
     // Get tangent angle for rotation (derivative of bezier)
+    // Note: In screen coordinates Y increases downward, so we negate dy
     const getBezierAngle = (t) => {
       const dx = 2 * (1 - t) * (bezierControl.x - bezierStart.x) + 2 * t * (bezierEnd.x - bezierControl.x);
       const dy = 2 * (1 - t) * (bezierControl.y - bezierStart.y) + 2 * t * (bezierEnd.y - bezierControl.y);
-      return Math.atan2(dy, dx) * (180 / Math.PI);
+      // Negate dy because screen Y is inverted (down is positive)
+      return Math.atan2(-dy, dx) * (180 / Math.PI);
     };
     
     // Smooth easing function
