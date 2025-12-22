@@ -303,8 +303,6 @@ const TravelAnimator = () => {
 
   return (
     <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
-      <Toaster position="top-center" />
-      
       {/* Map */}
       <MapContainer
         center={defaultCenter}
@@ -320,31 +318,21 @@ const TravelAnimator = () => {
         
         <MapController destinations={destinations} defaultCenter={defaultCenter} />
         
-        {/* Route line */}
+        {/* Route line - white dotted style like reference image */}
         {routePath.length > 1 && (
-          <>
-            <Polyline
-              positions={routePath}
-              pathOptions={{
-                color: '#ec4899',
-                weight: 4,
-                opacity: 0.8,
-                lineCap: 'round',
-              }}
-            />
-            <Polyline
-              positions={routePath}
-              pathOptions={{
-                color: '#fbbf24',
-                weight: 2,
-                opacity: 0.9,
-                dashArray: '8, 12',
-              }}
-            />
-          </>
+          <Polyline
+            positions={routePath}
+            pathOptions={{
+              color: '#ffffff',
+              weight: 3,
+              opacity: 1,
+              dashArray: '8, 12',
+              lineCap: 'round',
+            }}
+          />
         )}
         
-        {/* Destination markers */}
+        {/* Destination markers - red pins like reference */}
         {destinations.map((dest, index) => (
           <Marker
             key={dest.id}
@@ -352,17 +340,17 @@ const TravelAnimator = () => {
             icon={L.divIcon({
               className: 'custom-marker',
               html: `<div style="
-                width: 36px;
-                height: 36px;
+                width: 24px;
+                height: 24px;
                 border-radius: 50%;
-                background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+                background: #ef4444;
                 border: 3px solid white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+              "></div>`,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12],
+            })}
+          />
                 box-shadow: 0 4px 12px rgba(236,72,153,0.4);
               ">${index + 1}</div>`,
               iconSize: [36, 36],
