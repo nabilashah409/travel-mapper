@@ -595,22 +595,17 @@ const LandingPage = () => {
         // When sin(angle) > 0, plane is "in front" (larger, higher z-index)
         // When sin(angle) < 0, plane is "behind" (smaller, lower z-index)
         const depthFactor = Math.sin(angleRad);
-        const baseScale = 1.2;
-        const scaleVariation = 0.7;
+        const baseScale = 1.0;
+        const scaleVariation = 0.5;
         const scale = baseScale + scaleVariation * depthFactor;
         
         // Opacity: dimmer when behind
-        const opacity = depthFactor > 0 ? 1 : 0.6;
+        const opacity = depthFactor > 0 ? 1 : 0.5;
         
         // Z-index: behind content when in back half of orbit
         const zIndex = depthFactor > 0 ? 100 : 1;
         
-        // 3D rotation effect - show side of plane when going around back
-        // Use rotateY to simulate 3D perspective
-        // cos(angle) gives us the "side" factor: 1 = facing right, -1 = facing left, 0 = side view
-        const sideFactor = Math.cos(angleRad);
-        
-        // Calculate the path-following rotation (plane nose direction)
+        // Simple rotation: plane nose follows the orbit path (no sideways tilt)
         const nextAngle = currentAngle + 5;
         const nextAngleRad = (nextAngle * Math.PI) / 180;
         const nextX = orbitCenterX + orbitRadiusX * Math.cos(nextAngleRad);
@@ -619,16 +614,9 @@ const LandingPage = () => {
         const dy = nextY - y;
         const pathRotation = Math.atan2(dy, dx) * (180 / Math.PI) + 45;
         
-        // 3D tilt: rotateY based on depth position (simulates seeing side of plane)
-        // When behind (depthFactor < 0), tilt the plane to show "side view"
-        const tiltY = -sideFactor * 60; // Tilt up to 60 degrees
-        
-        // Additional rotateX for depth illusion
-        const tiltX = depthFactor * 20; // Slight forward/back tilt
-        
         plane.style.left = `${x}%`;
         plane.style.top = `${y}%`;
-        plane.style.transform = `translate(-50%, -50%) rotateY(${tiltY}deg) rotateX(${tiltX}deg) rotate(${pathRotation}deg) scale(${scale})`;
+        plane.style.transform = `translate(-50%, -50%) rotate(${pathRotation}deg) scale(${scale})`;
         plane.style.opacity = String(opacity);
         plane.style.zIndex = String(zIndex);
         
