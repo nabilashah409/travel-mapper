@@ -633,7 +633,7 @@ const LandingPage = () => {
       <div ref={containerRef} className="landing-content">
         {/* Bounding box for circle and plane */}
         <div className="bounding-box">
-          {/* Flight path - visible curved dotted line */}
+          {/* Flight path - invisible (plane follows this path) */}
           <svg 
             className="flight-path-svg"
             viewBox="0 0 100 100" 
@@ -642,10 +642,8 @@ const LandingPage = () => {
             <path
               d={generateFlightPath()}
               fill="none"
-              stroke="rgba(100, 116, 139, 0.4)"
-              strokeWidth="0.8"
-              strokeDasharray="2, 3"
-              strokeLinecap="round"
+              stroke="transparent"
+              strokeWidth="0"
             />
           </svg>
 
