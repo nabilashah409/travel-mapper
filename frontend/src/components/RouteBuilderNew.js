@@ -38,6 +38,7 @@ const RouteBuilderNew = () => {
   
   const animationRef = useRef(null);
   const mapRef = useRef(null);
+  const markerRef = useRef(null); // Store reference to animated marker
 
   const addDestination = async () => {
     if (!searchQuery.trim()) {
