@@ -525,11 +525,16 @@ const LandingPage = () => {
     const orbitIcons = iconsContainer.querySelectorAll('.icon-orbit:not(.plane-icon)');
     
     const gatherDuration = 800;
-    const flightDuration = 2400;
+    const flightDuration = 2600;
     
     // 11 icons total, evenly spaced at 32.727° apart
     const totalIcons = 11;
     const angleStep = 360 / totalIcons;
+    
+    // Simple bezier curve across the title
+    const bezierStart = { x: 8, y: 50 };
+    const bezierControl = { x: 50, y: 20 };
+    const bezierEnd = { x: 92, y: 50 };
     
     const quadraticBezier = (t, p0, p1, p2) => {
       const oneMinusT = 1 - t;
@@ -544,9 +549,6 @@ const LandingPage = () => {
     let startTime = null;
     let hasStartedFlight = false;
     let hasJoinedOrbit = false;
-    let bezierStart = null;
-    let bezierEnd = null;
-    let bezierControl = null;
     
     const animate = (timestamp) => {
       if (!startTime) startTime = timestamp;
@@ -558,55 +560,35 @@ const LandingPage = () => {
         return;
       }
       
-      // Start flight - get plane's ACTUAL position from the DOM
+      // Start flight
       if (!hasStartedFlight) {
         hasStartedFlight = true;
         
-        // Get plane's current visual position
-        const planeRect = plane.getBoundingClientRect();
-        const startX = ((planeRect.left + planeRect.width / 2) / window.innerWidth) * 100;
-        const startY = ((planeRect.top + planeRect.height / 2) / window.innerHeight) * 100;
-        
-        // End position: right side of orbit (0°)
-        // Calculate based on container center + orbit radius
-        const container = iconsContainer.getBoundingClientRect();
-        const centerX = ((container.left + container.width / 2) / window.innerWidth) * 100;
-        const centerY = ((container.top + container.height / 2) / window.innerHeight) * 100;
-        const orbitRadius = Math.min(container.width, container.height) * 0.4; // 40% of container
-        const radiusPercent = (orbitRadius / window.innerWidth) * 100;
-        
-        bezierStart = { x: startX, y: startY };
-        bezierEnd = { x: centerX + radiusPercent, y: centerY };
-        bezierControl = { x: centerX, y: centerY - 15 }; // Arc above center
-        
-        // Redistribute other icons smoothly
+        // Redistribute other icons
         const spreadAngleStep = 360 / 10;
         orbitIcons.forEach((icon, index) => {
           const newAngle = index * spreadAngleStep;
-          icon.style.transition = 'transform 0.6s ease-out';
+          icon.style.transition = 'transform 0.5s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
         
-        // Start flying from current position
+        // Start flying
         plane.style.animation = 'none';
         plane.classList.add('flying');
         plane.style.opacity = '1';
-        plane.style.left = `${bezierStart.x}%`;
-        plane.style.top = `${bezierStart.y}%`;
-        plane.style.transform = `translate(-50%, -50%) rotate(45deg) scale(1)`;
       }
       
       // Flight animation
       const flightElapsed = elapsed - gatherDuration;
       const progress = Math.min(flightElapsed / flightDuration, 1);
       
-      if (progress < 1 && bezierStart && bezierEnd && bezierControl) {
+      if (progress < 1) {
         const easedProgress = easeInOutCubic(progress);
         
         const x = quadraticBezier(easedProgress, bezierStart.x, bezierControl.x, bezierEnd.x);
         const y = quadraticBezier(easedProgress, bezierStart.y, bezierControl.y, bezierEnd.y);
         
-        // Calculate rotation to point along curve
+        // Calculate rotation
         const lookAhead = Math.min(easedProgress + 0.05, 1);
         const nextX = quadraticBezier(lookAhead, bezierStart.x, bezierControl.x, bezierEnd.x);
         const nextY = quadraticBezier(lookAhead, bezierStart.y, bezierControl.y, bezierEnd.y);
@@ -615,8 +597,8 @@ const LandingPage = () => {
         const angle = Math.atan2(dy, dx) * (180 / Math.PI);
         const adjustedRotation = angle + 45;
         
-        // Scale: grow to 1.5x at middle, back to 1x at end
-        const scale = 1 + 0.5 * Math.sin(easedProgress * Math.PI);
+        // Scale
+        const scale = 1 + 0.8 * Math.sin(easedProgress * Math.PI);
         
         plane.style.left = `${x}%`;
         plane.style.top = `${y}%`;
@@ -626,38 +608,30 @@ const LandingPage = () => {
       } else if (!hasJoinedOrbit) {
         hasJoinedOrbit = true;
         
-        // Redistribute all 11 icons with plane at position 0
+        // Redistribute all 11 icons
         orbitIcons.forEach((icon, index) => {
           const newAngle = (index + 1) * angleStep;
-          icon.style.transition = 'transform 0.4s ease-out';
+          icon.style.transition = 'transform 0.3s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
         
-        // Plane joins orbit at 0° (right side)
+        // Plane joins orbit at 0°
         plane.classList.remove('flying');
         plane.classList.add('in-orbit');
-        plane.style.transition = 'none';
         plane.style.left = '50%';
         plane.style.top = '50%';
         plane.style.setProperty('--angle', '0deg');
         plane.style.transform = 'rotate(0deg) translateX(min(40vmin, 200px)) rotate(0deg) scale(1)';
         
-        // Scroll up after brief orbit
+        // Scroll up
         setTimeout(() => {
           const container = document.querySelector('.landing-content');
           if (container) {
             container.classList.add('scroll-up-now');
           }
-        }, 200);
+        }, 100);
       }
     };
-    
-    // Play sound when flight starts
-    setTimeout(() => {
-      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSl+zPLTgjMGHGS56+CZSwkPVanm7qxfHAU7ldj');
-      audio.volume = 0.3;
-      audio.play().catch(() => {});
-    }, gatherDuration);
     
     animationId = requestAnimationFrame(animate);
     
