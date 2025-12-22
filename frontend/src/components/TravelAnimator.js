@@ -636,6 +636,7 @@ const LandingPage = () => {
         plane.classList.add('in-orbit');
         plane.style.left = '50%';
         plane.style.top = '50%';
+        plane.style.zIndex = '15';
         plane.style.setProperty('--angle', '0deg');
         plane.style.transform = 'rotate(0deg) translateX(min(40vmin, 200px)) rotate(0deg) scale(1)';
         
