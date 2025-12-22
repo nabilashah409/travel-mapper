@@ -313,8 +313,8 @@ const TravelAnimator = () => {
       
       {/* Map */}
       <MapContainer
-        center={[20, 0]}
-        zoom={2}
+        center={defaultCenter}
+        zoom={4}
         style={{ height: '100%', width: '100%' }}
         zoomControl={false}
         ref={(map) => { if (map) mapRef.current = map; }}
@@ -324,17 +324,30 @@ const TravelAnimator = () => {
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
         />
         
+        <MapController destinations={destinations} defaultCenter={defaultCenter} />
+        
         {/* Route line */}
         {routePath.length > 1 && (
-          <Polyline
-            positions={routePath}
-            pathOptions={{
-              color: '#ec4899',
-              weight: 3,
-              opacity: 0.7,
-              dashArray: '10, 10',
-            }}
-          />
+          <>
+            <Polyline
+              positions={routePath}
+              pathOptions={{
+                color: '#ec4899',
+                weight: 4,
+                opacity: 0.8,
+                lineCap: 'round',
+              }}
+            />
+            <Polyline
+              positions={routePath}
+              pathOptions={{
+                color: '#fbbf24',
+                weight: 2,
+                opacity: 0.9,
+                dashArray: '8, 12',
+              }}
+            />
+          </>
         )}
         
         {/* Destination markers */}
@@ -345,8 +358,8 @@ const TravelAnimator = () => {
             icon={L.divIcon({
               className: 'custom-marker',
               html: `<div style="
-                width: 32px;
-                height: 32px;
+                width: 36px;
+                height: 36px;
                 border-radius: 50%;
                 background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
                 border: 3px solid white;
@@ -356,25 +369,25 @@ const TravelAnimator = () => {
                 color: white;
                 font-weight: bold;
                 font-size: 14px;
-                box-shadow: 0 4px 12px rgba(236,72,153,0.3);
+                box-shadow: 0 4px 12px rgba(236,72,153,0.4);
               ">${index + 1}</div>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 16],
+              iconSize: [36, 36],
+              iconAnchor: [18, 18],
             })}
           />
         ))}
       </MapContainer>
 
       {/* Floating search box */}
-      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-[1000]">
-        <div className="bg-white/90 backdrop-blur-md rounded-full shadow-xl px-4 py-3 flex items-center gap-2 border border-pink-100">
+      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-[1000]">
+        <div className="bg-white/95 backdrop-blur-md rounded-full shadow-xl px-4 py-3 flex items-center gap-2 border border-pink-100">
           <input
             type="text"
             placeholder="Search destination..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && addDestination()}
-            className="bg-transparent outline-none text-sm w-64 placeholder-gray-400"
+            className="bg-transparent outline-none text-sm w-56 md:w-64 placeholder-gray-400"
             style={{ fontSize: '16px' }}
           />
           <button
@@ -387,21 +400,71 @@ const TravelAnimator = () => {
         </div>
       </div>
 
+      {/* Transport selector */}
+      <div className="absolute top-6 right-4 z-[1000]">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-2 flex gap-1 border border-pink-100">
+          {transportModes.map((mode) => (
+            <button
+              key={mode.id}
+              onClick={() => {
+                setSelectedTransport(mode.id);
+                if (destinations.length > 1) calculateRoute(destinations);
+              }}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all ${
+                selectedTransport === mode.id 
+                  ? 'bg-gradient-to-r from-pink-500 to-orange-400 scale-110' 
+                  : 'hover:bg-pink-50'
+              }`}
+            >
+              {mode.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Play/Pause button */}
+      {destinations.length >= 2 && (
+        <div className="absolute top-20 right-4 z-[1000]">
+          <button
+            onClick={isAnimating ? pauseAnimation : startAnimation}
+            className={`w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110 ${
+              isAnimating 
+                ? 'bg-red-500 text-white' 
+                : 'bg-gradient-to-r from-pink-500 to-orange-400 text-white'
+            }`}
+          >
+            {isAnimating ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
+          </button>
+        </div>
+      )}
+
+      {/* Progress bar */}
+      {animationProgress > 0 && (
+        <div className="absolute top-36 right-4 z-[1000] w-14">
+          <div className="bg-white/90 rounded-full h-2 overflow-hidden shadow">
+            <div 
+              className="h-full bg-gradient-to-r from-pink-500 to-orange-400 transition-all"
+              style={{ width: `${animationProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Floating destination list */}
       {destinations.length > 0 && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-[1000] max-w-md w-full px-4">
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-4 border border-pink-100">
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[1000] max-w-md w-full px-4">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-4 border border-pink-100">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-gray-700">Your Journey</h3>
               <span className="text-xs text-gray-500">{destinations.length} stops</span>
             </div>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+            <div className="space-y-2 max-h-40 overflow-y-auto">
               {destinations.map((dest, index) => (
                 <div
                   key={dest.id}
                   className="flex items-center gap-2 p-2 bg-white rounded-xl hover:bg-pink-50 transition-colors"
                 >
-                  <GripVertical className="w-4 h-4 text-gray-400" />
+                  <GripVertical className="w-4 h-4 text-gray-400 cursor-grab" />
                   <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 text-white flex items-center justify-center text-xs font-bold">
                     {index + 1}
                   </div>
