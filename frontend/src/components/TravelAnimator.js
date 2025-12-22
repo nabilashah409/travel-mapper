@@ -137,8 +137,11 @@ const TravelAnimator = () => {
     let pLat = -dLng / len;
     let pLng =  dLat / len;
 
-    // Optional: force a consistent "upward" bend (pick one)
-    // if (pLat < 0) { pLat *= -1; pLng *= -1; }  // bends to +lat side
+    // FIX: flip perpendicular if curve dips downward
+    if (pLat < 0) {
+      pLat *= -1;
+      pLng *= -1;
+    }
 
     for (let i = 0; i <= numPoints; i++) {
       const t = i / numPoints;
