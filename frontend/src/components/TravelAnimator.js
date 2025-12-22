@@ -96,17 +96,15 @@ const TravelAnimator = () => {
         const updatedDestinations = [...destinations, newDest];
         setDestinations(updatedDestinations);
         setSearchQuery('');
-        toast.success(`Added ${newDest.name}`);
+        // Removed toast notification - it was hiding the input box
         
         // Calculate route path
         if (updatedDestinations.length > 1) {
           calculateRoute(updatedDestinations);
         }
-      } else {
-        toast.error('City not found');
       }
     } catch (error) {
-      toast.error('Search failed');
+      // Silent fail - no toast
     }
     setIsSearching(false);
   };
