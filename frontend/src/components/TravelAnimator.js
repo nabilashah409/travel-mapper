@@ -159,10 +159,147 @@ const TravelAnimator = () => {
   const removeDestination = (id) => {
     const updated = destinations.filter(d => d.id !== id);
     setDestinations(updated);
+    
+    // Stop any ongoing animation
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      setIsAnimating(false);
+    }
+    
+    // Remove animated marker
+    if (markerRef.current && mapRef.current) {
+      mapRef.current.removeLayer(markerRef.current);
+      markerRef.current = null;
+    }
+    
     if (updated.length > 1) {
-      setRoutePath(updated.map(d => [d.lat, d.lng]));
+      calculateRoute(updated);
     } else {
       setRoutePath([]);
+    }
+    setAnimationProgress(0);
+  };
+
+  // Get transport emoji for animated marker
+  const getTransportEmoji = () => {
+    const emojis = { flight: '✈️', car: '🚗', train: '🚂', walk: '🚶' };
+    return emojis[selectedTransport] || '✈️';
+  };
+
+  // Calculate heading between two points
+  const calculateHeading = (from, to) => {
+    const lat1 = from[0] * Math.PI / 180;
+    const lat2 = to[0] * Math.PI / 180;
+    const dLng = (to[1] - from[1]) * Math.PI / 180;
+    
+    const y = Math.sin(dLng) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+    const heading = Math.atan2(y, x) * 180 / Math.PI;
+    
+    return (heading + 360) % 360;
+  };
+
+  // Linear interpolation
+  const lerp = (start, end, t) => start + (end - start) * t;
+
+  // Start route animation
+  const startAnimation = () => {
+    if (routePath.length < 2) {
+      toast.error('Add at least 2 destinations first');
+      return;
+    }
+
+    setIsAnimating(true);
+    setAnimationProgress(0);
+    
+    // Remove existing marker
+    if (markerRef.current && mapRef.current) {
+      mapRef.current.removeLayer(markerRef.current);
+    }
+
+    // Create animated marker
+    const customIcon = L.divIcon({
+      className: 'animated-transport-marker',
+      html: `<div style="
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+      ">${getTransportEmoji()}</div>`,
+      iconSize: [50, 50],
+      iconAnchor: [25, 25],
+    });
+
+    markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
+    
+    // Animation loop using lerp
+    const duration = 8000; // 8 seconds
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      if (progress >= 1) {
+        setIsAnimating(false);
+        setAnimationProgress(100);
+        toast.success('Journey complete! 🎉');
+        return;
+      }
+
+      const totalPoints = routePath.length;
+      const targetIndex = Math.floor(progress * (totalPoints - 1));
+      const nextIndex = Math.min(targetIndex + 1, totalPoints - 1);
+      const segmentProgress = (progress * (totalPoints - 1)) - targetIndex;
+      
+      const currentPoint = routePath[targetIndex];
+      const nextPoint = routePath[nextIndex];
+      
+      if (currentPoint && nextPoint && markerRef.current) {
+        const lat = lerp(currentPoint[0], nextPoint[0], segmentProgress);
+        const lng = lerp(currentPoint[1], nextPoint[1], segmentProgress);
+        
+        // Update marker position directly (no React re-render)
+        markerRef.current.setLatLng([lat, lng]);
+        
+        // Update rotation for flights
+        if (selectedTransport === 'flight') {
+          const heading = calculateHeading(currentPoint, nextPoint);
+          const rotatedIcon = L.divIcon({
+            className: 'animated-transport-marker',
+            html: `<div style="
+              width: 50px;
+              height: 50px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 32px;
+              transform: rotate(${heading - 90}deg);
+              filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            ">${getTransportEmoji()}</div>`,
+            iconSize: [50, 50],
+            iconAnchor: [25, 25],
+          });
+          markerRef.current.setIcon(rotatedIcon);
+        }
+        
+        setAnimationProgress(progress * 100);
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+  };
+
+  // Pause animation
+  const pauseAnimation = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      setIsAnimating(false);
     }
   };
 
