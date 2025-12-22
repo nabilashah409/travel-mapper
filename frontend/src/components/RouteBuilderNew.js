@@ -391,25 +391,25 @@ const RouteBuilderNew = () => {
             Create animated travel videos
           </p>
 
-          {/* Add Destinations Section */}
-          <div className="mb-4 sm:mb-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Add Destinations</h3>
+          {/* Add Destinations Section - Compact */}
+          <div className="mb-3 sm:mb-4">
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Add Destinations</h3>
             
             {/* Search Input - Mobile optimized */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-3">
               <Input
-                placeholder="Search for a city..."
+                placeholder="Search city..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addDestination()}
-                className="flex-1 h-12 text-base"
+                className="flex-1 h-11 text-sm"
                 style={{ fontSize: '16px', touchAction: 'manipulation' }}
               />
               <Button
                 onClick={addDestination}
                 disabled={isSearching}
                 size="icon"
-                className="h-12 w-12 flex-shrink-0"
+                className="h-11 w-11 flex-shrink-0"
                 style={{ backgroundColor: '#3b82f6', touchAction: 'manipulation' }}
               >
                 {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
