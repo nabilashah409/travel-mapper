@@ -534,7 +534,8 @@ const RouteBuilderNew = () => {
             href="https://app.emergent.sh/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-700"
+            className="flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-700 py-2"
+            style={{ touchAction: 'manipulation' }}
           >
             <span className="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center font-bold">
               E
@@ -544,8 +545,8 @@ const RouteBuilderNew = () => {
         </div>
       </div>
 
-      {/* Map */}
-      <div className="flex-1 relative h-full w-full z-0">
+      {/* Map - Touch optimized */}
+      <div className="flex-1 relative h-full w-full z-0" style={{ touchAction: 'pan-x pan-y' }}>
         <MapContainer
           center={[39.8283, -98.5795]}
           zoom={4}
