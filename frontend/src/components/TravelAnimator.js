@@ -608,21 +608,23 @@ const LandingPage = () => {
       } else if (!hasJoinedOrbit) {
         hasJoinedOrbit = true;
         
-        // Redistribute all 11 icons - plane at position 10 (~327°), others spread evenly
+        // Redistribute all 11 icons - plane joins at position 5 (~163°, lower-left)
         orbitIcons.forEach((icon, index) => {
-          // Icons take positions 0-9, plane takes position 10
-          const newAngle = index * angleStep;
+          // Icons take positions 0-4 and 6-10, plane takes position 5
+          let position = index;
+          if (index >= 5) position = index + 1;
+          const newAngle = position * angleStep;
           icon.style.transition = 'transform 0.3s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
         
-        // Plane joins orbit at position 10 (~327°, upper-right)
+        // Plane joins orbit at position 5 (~163°, lower-left)
         plane.classList.remove('flying');
         plane.classList.add('in-orbit');
         plane.style.left = '50%';
         plane.style.top = '50%';
-        plane.style.setProperty('--angle', `${10 * angleStep}deg`);
-        plane.style.transform = `rotate(${10 * angleStep}deg) translateX(min(40vmin, 200px)) rotate(-${10 * angleStep}deg) scale(1)`;
+        plane.style.setProperty('--angle', `${5 * angleStep}deg`);
+        plane.style.transform = `rotate(${5 * angleStep}deg) translateX(min(40vmin, 200px)) rotate(-${5 * angleStep}deg) scale(1)`;
         
         // Scroll up
         setTimeout(() => {
