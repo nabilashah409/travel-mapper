@@ -598,12 +598,41 @@ const LandingPage = () => {
   // Icons for the circle
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
 
+  // Generate SVG path for the flight curve (simple arc, not too curvy)
+  const generateFlightPath = () => {
+    // Simple quadratic bezier: start bottom-left, gentle arc, end right-middle
+    const startX = 10;
+    const startY = 80;
+    const controlX = 50;
+    const controlY = 20; // Gentle curve - not too high
+    const endX = 90;
+    const endY = 50;
+    
+    return `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
+  };
+
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
       {/* Everything scrolls up together */}
       <div ref={containerRef} className="landing-content">
         {/* Bounding box for circle and plane */}
         <div className="bounding-box">
+          {/* Flight path - visible curved dotted line */}
+          <svg 
+            className="flight-path-svg"
+            viewBox="0 0 100 100" 
+            preserveAspectRatio="none"
+          >
+            <path
+              d={generateFlightPath()}
+              fill="none"
+              stroke="rgba(100, 116, 139, 0.4)"
+              strokeWidth="0.8"
+              strokeDasharray="2, 3"
+              strokeLinecap="round"
+            />
+          </svg>
+
           {/* Circular rotating icons - animate in from outside */}
           <div className="circular-container">
             {circleIcons.map((icon, index) => (
@@ -655,6 +684,16 @@ const LandingPage = () => {
           max-height: 500px;
           min-width: 300px;
           min-height: 300px;
+        }
+
+        .flight-path-svg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 5;
+          pointer-events: none;
         }
         
         .title-overlay {
