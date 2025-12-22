@@ -93,15 +93,14 @@ const TravelAnimator = () => {
           lat: parseFloat(data[0].lat),
           lng: parseFloat(data[0].lon),
         };
-        setDestinations([...destinations, newDest]);
+        const updatedDestinations = [...destinations, newDest];
+        setDestinations(updatedDestinations);
         setSearchQuery('');
         toast.success(`Added ${newDest.name}`);
         
-        // Calculate route
-        if (destinations.length > 0) {
-          const path = destinations.map(d => [d.lat, d.lng]);
-          path.push([newDest.lat, newDest.lng]);
-          setRoutePath(path);
+        // Calculate route path
+        if (updatedDestinations.length > 1) {
+          calculateRoute(updatedDestinations);
         }
       } else {
         toast.error('City not found');
@@ -110,6 +109,51 @@ const TravelAnimator = () => {
       toast.error('Search failed');
     }
     setIsSearching(false);
+  };
+
+  // Create curved path for flights
+  const createCurvedPath = (start, end) => {
+    const points = [];
+    const numPoints = 100;
+    const arcHeight = 0.15;
+
+    for (let i = 0; i <= numPoints; i++) {
+      const t = i / numPoints;
+      const lat = start.lat + (end.lat - start.lat) * t;
+      const lng = start.lng + (end.lng - start.lng) * t;
+      const offsetLat = Math.sin(t * Math.PI) * arcHeight * Math.abs(end.lat - start.lat);
+      points.push([lat + offsetLat, lng]);
+    }
+    return points;
+  };
+
+  // Calculate route based on destinations
+  const calculateRoute = (dests) => {
+    if (dests.length < 2) return;
+    
+    let allPoints = [];
+    
+    for (let i = 0; i < dests.length - 1; i++) {
+      const start = dests[i];
+      const end = dests[i + 1];
+      
+      if (selectedTransport === 'flight') {
+        const curvedPath = createCurvedPath(start, end);
+        allPoints = [...allPoints, ...curvedPath];
+      } else {
+        // Straight line for ground transport with intermediate points
+        const numPoints = 50;
+        for (let j = 0; j <= numPoints; j++) {
+          const t = j / numPoints;
+          allPoints.push([
+            start.lat + (end.lat - start.lat) * t,
+            start.lng + (end.lng - start.lng) * t
+          ]);
+        }
+      }
+    }
+    
+    setRoutePath(allPoints);
   };
 
   const removeDestination = (id) => {
