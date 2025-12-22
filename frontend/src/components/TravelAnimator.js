@@ -85,40 +85,94 @@ const TravelAnimator = () => {
     };
   }, []);
 
-  const addDestination = async () => {
-    if (!searchQuery.trim()) {
-      toast.error('Enter a city name');
+  const searchDestinations = async (query) => {
+    if (!query.trim() || query.length < 2) {
+      setSearchResults([]);
+      setShowDropdown(false);
       return;
     }
 
     setIsSearching(true);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`,
-        { headers: { 'User-Agent': 'TravelAnimator/1.0' } }
+        `${BACKEND_URL}/api/geocode?q=${encodeURIComponent(query)}&limit=5`
       );
       
       const data = await response.json();
       
       if (data && data.length > 0) {
-        const newDest = {
-          id: Date.now(),
-          name: data[0].display_name.split(',')[0],
-          lat: parseFloat(data[0].lat),
-          lng: parseFloat(data[0].lon),
-        };
-        const updatedDestinations = [...destinations, newDest];
-        setDestinations(updatedDestinations);
-        setSearchQuery('');
-        // Removed toast notification - it was hiding the input box
-        
-        // Calculate route path
-        if (updatedDestinations.length > 1) {
-          calculateRoute(updatedDestinations);
-        }
+        setSearchResults(data);
+        setShowDropdown(true);
+      } else {
+        setSearchResults([]);
+        setShowDropdown(false);
       }
     } catch (error) {
-      // Silent fail - no toast
+      console.error('Search error:', error);
+      setSearchResults([]);
+      setShowDropdown(false);
+    }
+    setIsSearching(false);
+  };
+
+  const handleSearchInput = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    // Debounce search
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    searchTimeoutRef.current = setTimeout(() => {
+      searchDestinations(value);
+    }, 300);
+  };
+
+  const selectDestination = (result) => {
+    const newDest = {
+      id: Date.now(),
+      name: result.name,
+      lat: parseFloat(result.lat),
+      lng: parseFloat(result.lon),
+    };
+    const updatedDestinations = [...destinations, newDest];
+    setDestinations(updatedDestinations);
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowDropdown(false);
+    
+    // Calculate route path
+    if (updatedDestinations.length > 1) {
+      calculateRoute(updatedDestinations);
+    }
+  };
+
+  const addDestination = async () => {
+    if (!searchQuery.trim()) {
+      return;
+    }
+
+    // If there are search results, select the first one
+    if (searchResults.length > 0) {
+      selectDestination(searchResults[0]);
+      return;
+    }
+
+    // Otherwise, do a search and add the first result
+    setIsSearching(true);
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/api/geocode?q=${encodeURIComponent(searchQuery)}&limit=1`
+      );
+      
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        selectDestination(data[0]);
+      }
+    } catch (error) {
+      console.error('Add destination error:', error);
     }
     setIsSearching(false);
   };
