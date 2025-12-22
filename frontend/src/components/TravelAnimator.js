@@ -16,23 +16,50 @@ L.Icon.Default.mergeOptions({
 const MapController = ({ destinations, defaultCenter, isAnimating }) => {
   const map = useMap();
   
+  // Calculate optimal zoom to ensure minimum visual distance between destinations
+  const calculateOptimalZoom = (destinations) => {
+    if (destinations.length < 2) return 8;
+    
+    // Find minimum distance between consecutive destinations
+    let minDistance = Infinity;
+    for (let i = 0; i < destinations.length - 1; i++) {
+      const d1 = destinations[i];
+      const d2 = destinations[i + 1];
+      const distance = Math.sqrt(
+        Math.pow(d2.lat - d1.lat, 2) + Math.pow(d2.lng - d1.lng, 2)
+      );
+      minDistance = Math.min(minDistance, distance);
+    }
+    
+    // Ensure minimum ~100px visual distance (roughly 1 inch at 96dpi)
+    // Lower minDistance = closer points = need higher zoom
+    // Each zoom level doubles the scale
+    if (minDistance < 0.5) return 12;      // Very close (same city area)
+    if (minDistance < 1) return 10;        // Close (nearby cities)
+    if (minDistance < 3) return 8;         // Medium distance
+    if (minDistance < 10) return 6;        // Far
+    return 5;                               // Very far (cross-country)
+  };
+  
   useEffect(() => {
     if (destinations.length === 0) {
       // Default to USA
       map.flyTo(defaultCenter, 4, { duration: 1 });
     } else if (destinations.length === 1) {
       // Single destination - zoom to it
-      map.flyTo([destinations[0].lat, destinations[0].lng], 6, { duration: 1.5 });
+      map.flyTo([destinations[0].lat, destinations[0].lng], 8, { duration: 1.5 });
     } else {
-      // Multiple destinations - fit bounds with padding
+      // Multiple destinations - fit bounds with optimal zoom
       const bounds = L.latLngBounds(
         destinations.map(d => [d.lat, d.lng])
       );
+      const optimalZoom = calculateOptimalZoom(destinations);
+      
       map.flyToBounds(bounds, {
-        padding: [100, 100], // Generous padding
+        padding: [150, 150], // More generous padding
         duration: 1.5,
-        maxZoom: 10,  // Allow closer zoom for nearby destinations
-        minZoom: 3    // But not too far out
+        maxZoom: optimalZoom,
+        minZoom: 4
       });
     }
   }, [destinations, map, defaultCenter]);
@@ -43,10 +70,11 @@ const MapController = ({ destinations, defaultCenter, isAnimating }) => {
       const bounds = L.latLngBounds(
         destinations.map(d => [d.lat, d.lng])
       );
-      // Fit to show all destinations with minimum zoom of 4
+      const optimalZoom = calculateOptimalZoom(destinations);
+      
       map.fitBounds(bounds, {
-        padding: [80, 80],
-        maxZoom: 8,
+        padding: [120, 120],
+        maxZoom: optimalZoom,
         minZoom: 4,
         animate: false
       });
