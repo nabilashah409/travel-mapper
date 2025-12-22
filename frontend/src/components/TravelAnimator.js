@@ -545,9 +545,11 @@ const LandingPage = () => {
       const scale = 0.7 + 0.5 * Math.sin(easedProgress * Math.PI);
       
       // Direct DOM manipulation for 60fps
+      // ✈️ emoji points NORTHEAST (~45°) by default, so subtract 45° from bezier tangent angle
+      const adjustedRotation = rotation - 45;
       plane.style.left = `${x}%`;
       plane.style.top = `${y}%`;
-      plane.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+      plane.style.transform = `rotate(${adjustedRotation}deg) scale(${scale})`;
       
       // Fade in/out
       let opacity = 1;
