@@ -12,17 +12,27 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// Map Controller component to handle zoom/pan
+// Map Controller component to handle zoom/pan - fits all destinations with margin
 const MapController = ({ destinations, defaultCenter }) => {
   const map = useMap();
   
   useEffect(() => {
-    if (destinations.length > 0) {
-      // Zoom to first destination
-      map.flyTo([destinations[0].lat, destinations[0].lng], 6, { duration: 1.5 });
-    } else {
+    if (destinations.length === 0) {
       // Default to USA
       map.flyTo(defaultCenter, 4, { duration: 1 });
+    } else if (destinations.length === 1) {
+      // Single destination - zoom to it
+      map.flyTo([destinations[0].lat, destinations[0].lng], 6, { duration: 1.5 });
+    } else {
+      // Multiple destinations - fit bounds with padding
+      const bounds = L.latLngBounds(
+        destinations.map(d => [d.lat, d.lng])
+      );
+      map.flyToBounds(bounds, {
+        padding: [80, 80], // Generous padding for centered look
+        duration: 1.5,
+        maxZoom: 8
+      });
     }
   }, [destinations, map, defaultCenter]);
   
