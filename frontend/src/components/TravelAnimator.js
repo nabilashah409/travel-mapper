@@ -95,6 +95,7 @@ const TravelAnimator = () => {
   const [selectedTransport, setSelectedTransport] = useState('flight');
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationProgress, setAnimationProgress] = useState(0);
+  const [draggedIndex, setDraggedIndex] = useState(null);
   const markerRef = useRef(null);
   const mapRef = useRef(null);
   const animationRef = useRef(null);
