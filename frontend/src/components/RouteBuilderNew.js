@@ -416,29 +416,29 @@ const RouteBuilderNew = () => {
               </Button>
             </div>
 
-            {/* Destinations List */}
+            {/* Destinations List - More compact */}
             {destinations.length === 0 ? (
-              <div className="text-center py-6 sm:py-8 text-gray-400">
-                <Search className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 opacity-30" />
-                <p className="text-xs sm:text-sm">Start by adding your first destination</p>
+              <div className="text-center py-4 text-gray-400">
+                <Search className="w-8 h-8 mx-auto mb-1 opacity-30" />
+                <p className="text-xs">Add your first destination</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {destinations.map((dest, index) => (
                   <div
                     key={dest.id}
-                    className="flex items-center gap-2 p-3 sm:p-3 rounded-lg border destination-item"
+                    className="flex items-center gap-2 p-2 rounded-lg border destination-item"
                   >
-                    <div className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {index + 1}
                     </div>
-                    <div className="flex-1 text-xs sm:text-sm truncate">{dest.location}</div>
+                    <div className="flex-1 text-xs truncate">{dest.location}</div>
                     <button
                       onClick={() => removeDestination(dest.id)}
-                      className="text-gray-400 hover:text-red-500 p-2 -m-2"
+                      className="text-gray-400 hover:text-red-500 p-1 -m-1"
                       style={{ touchAction: 'manipulation' }}
                     >
-                      <X className="w-5 h-5" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                 ))}
@@ -446,10 +446,10 @@ const RouteBuilderNew = () => {
             )}
           </div>
 
-          {/* Choose Travel Mode */}
-          <div className="mb-4 sm:mb-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Choose Travel Mode</h3>
-            <div className="grid grid-cols-3 gap-2">
+          {/* Choose Travel Mode - Compact */}
+          <div className="mb-3 sm:mb-4">
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Travel Mode</h3>
+            <div className="grid grid-cols-3 gap-1.5">
               {transportModes.map((mode) => {
                 const Icon = mode.icon;
                 const isSelected = selectedTransport === mode.id;
@@ -457,13 +457,13 @@ const RouteBuilderNew = () => {
                   <button
                     key={mode.id}
                     onClick={() => setSelectedTransport(mode.id)}
-                    className={`transport-mode-btn p-3 sm:p-4 rounded-lg border-2 flex flex-col items-center gap-1 sm:gap-2 min-h-[80px] ${
+                    className={`transport-mode-btn p-2 rounded-lg border-2 flex flex-col items-center gap-1 min-h-[70px] ${
                       isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
                     }`}
                     style={{ touchAction: 'manipulation' }}
                   >
-                    <Icon className={`w-6 h-6 sm:w-6 sm:h-6 ${isSelected ? 'text-blue-500' : 'text-gray-600'}`} />
-                    <span className={`text-xs font-medium ${isSelected ? 'text-blue-500' : 'text-gray-600'}`}>
+                    <Icon className={`w-5 h-5 ${isSelected ? 'text-blue-500' : 'text-gray-600'}`} />
+                    <span className={`text-[10px] font-medium ${isSelected ? 'text-blue-500' : 'text-gray-600'}`}>
                       {mode.label}
                     </span>
                   </button>
