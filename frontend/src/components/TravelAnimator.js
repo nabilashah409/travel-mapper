@@ -43,7 +43,9 @@ const TravelAnimator = () => {
   const [showLanding, setShowLanding] = useState(true);
   const [destinations, setDestinations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [routePath, setRoutePath] = useState([]);
   const [selectedTransport, setSelectedTransport] = useState('flight');
   const [isAnimating, setIsAnimating] = useState(false);
@@ -51,6 +53,9 @@ const TravelAnimator = () => {
   const markerRef = useRef(null);
   const mapRef = useRef(null);
   const animationRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
+  
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   
   // Default center (USA)
   const defaultCenter = [39.8283, -98.5795];
