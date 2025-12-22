@@ -464,25 +464,50 @@ const TravelAnimator = () => {
         ))}
       </MapContainer>
 
-      {/* Floating search box */}
+      {/* Floating search box with dropdown */}
       <div className="absolute top-4 left-4 right-4 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 z-[1000]">
-        <div className="bg-white/95 backdrop-blur-md rounded-full shadow-xl px-3 md:px-4 py-2 md:py-3 flex items-center gap-2 border border-pink-100">
-          <input
-            type="text"
-            placeholder="Search destination..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && addDestination()}
-            className="bg-transparent outline-none text-sm flex-1 min-w-0 placeholder-gray-400"
-            style={{ fontSize: '16px' }}
-          />
-          <button
-            onClick={addDestination}
-            disabled={isSearching}
-            className="bg-gradient-to-r from-pink-500 to-orange-400 text-white rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center hover:scale-110 transition-transform"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+        <div className="relative">
+          <div className="bg-white/95 backdrop-blur-md rounded-full shadow-xl px-3 md:px-4 py-2 md:py-3 flex items-center gap-2 border border-pink-100">
+            <input
+              type="text"
+              placeholder="Search destination..."
+              value={searchQuery}
+              onChange={handleSearchInput}
+              onKeyPress={(e) => e.key === 'Enter' && addDestination()}
+              onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
+              className="bg-transparent outline-none text-sm flex-1 min-w-0 placeholder-gray-400"
+              style={{ fontSize: '16px' }}
+            />
+            {isSearching ? (
+              <div className="w-8 h-8 flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <button
+                onClick={addDestination}
+                disabled={isSearching}
+                className="bg-gradient-to-r from-pink-500 to-orange-400 text-white rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center hover:scale-110 transition-transform"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+          
+          {/* Search results dropdown */}
+          {showDropdown && searchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-pink-100 overflow-hidden">
+              {searchResults.map((result, index) => (
+                <button
+                  key={index}
+                  onClick={() => selectDestination(result)}
+                  className="w-full px-4 py-3 text-left hover:bg-pink-50 transition-colors border-b border-pink-50 last:border-b-0"
+                >
+                  <div className="font-medium text-gray-800">{result.name}</div>
+                  <div className="text-xs text-gray-500 truncate">{result.display_name}</div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
