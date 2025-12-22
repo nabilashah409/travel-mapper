@@ -46,12 +46,29 @@ const TravelAnimator = () => {
   // Default center (USA)
   const defaultCenter = [39.8283, -98.5795];
 
+  // Transport modes
+  const transportModes = [
+    { id: 'flight', icon: Plane, label: '✈️' },
+    { id: 'car', icon: Car, label: '🚗' },
+    { id: 'train', icon: Train, label: '🚂' },
+    { id: 'walk', icon: Footprints, label: '🚶' },
+  ];
+
   // Start animation after component mounts
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLanding(false);
     }, 4000); // 4 seconds of landing animation
     return () => clearTimeout(timer);
+  }, []);
+
+  // Cleanup animation on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
   }, []);
 
   const addDestination = async () => {
