@@ -493,105 +493,161 @@ const LandingPage = () => {
     audio.play().catch(() => {}); // Ignore if autoplay blocked
   }, []);
 
+  // Icons for the circle (no plane - it flies separately)
+  const circleIcons = ['🚗', '🚶', '🧳', '👜', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🏝️', '🚢'];
+
   return (
-    <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
-      {/* Circular rotating icons */}
-      <div className="absolute inset-0 flex items-center justify-center landing-animation">
+    <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
+      {/* Circular rotating icons - smaller to fit page */}
+      <div className="landing-animation">
         <div className="circular-container">
-          {/* 20 icons in circle */}
-          <div className="icon-orbit" style={{ '--angle': '0deg', '--delay': '0s' }}>✈️</div>
-          <div className="icon-orbit" style={{ '--angle': '18deg', '--delay': '0.1s' }}>🚗</div>
-          <div className="icon-orbit" style={{ '--angle': '36deg', '--delay': '0.2s' }}>🚶</div>
-          <div className="icon-orbit" style={{ '--angle': '54deg', '--delay': '0.3s' }}>🧳</div>
-          <div className="icon-orbit" style={{ '--angle': '72deg', '--delay': '0.4s' }}>👜</div>
-          <div className="icon-orbit" style={{ '--angle': '90deg', '--delay': '0.5s' }}>🎫</div>
-          <div className="icon-orbit" style={{ '--angle': '108deg', '--delay': '0.6s' }}>🗺️</div>
-          <div className="icon-orbit" style={{ '--angle': '126deg', '--delay': '0.7s' }}>🛫</div>
-          <div className="icon-orbit" style={{ '--angle': '144deg', '--delay': '0.8s' }}>🚂</div>
-          <div className="icon-orbit" style={{ '--angle': '162deg', '--delay': '0.9s' }}>🎒</div>
-          <div className="icon-orbit" style={{ '--angle': '180deg', '--delay': '1s' }}>🏖️</div>
-          <div className="icon-orbit" style={{ '--angle': '198deg', '--delay': '1.1s' }}>🏔️</div>
-          <div className="icon-orbit" style={{ '--angle': '216deg', '--delay': '1.2s' }}>🏝️</div>
-          <div className="icon-orbit" style={{ '--angle': '234deg', '--delay': '1.3s' }}>🚢</div>
-          <div className="icon-orbit" style={{ '--angle': '252deg', '--delay': '1.4s' }}>🚁</div>
-          <div className="icon-orbit" style={{ '--angle': '270deg', '--delay': '1.5s' }}>🚌</div>
-          <div className="icon-orbit" style={{ '--angle': '288deg', '--delay': '1.6s' }}>🛵</div>
-          <div className="icon-orbit" style={{ '--angle': '306deg', '--delay': '1.7s' }}>🎢</div>
-          <div className="icon-orbit" style={{ '--angle': '324deg', '--delay': '1.8s' }}>🎡</div>
-          <div className="icon-orbit" style={{ '--angle': '342deg', '--delay': '1.9s' }}>🎠</div>
+          {circleIcons.map((icon, index) => (
+            <div 
+              key={index}
+              className="icon-orbit" 
+              style={{ 
+                '--angle': `${index * (360 / circleIcons.length)}deg`, 
+                '--delay': `${index * 0.15}s` 
+              }}
+            >
+              {icon}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Diagonal flying plane with swoosh */}
-      <div className="flight-diagonal">
-        <div className="text-8xl animate-wobble">✈️</div>
+      {/* Diagonal flying plane with smooth curved path */}
+      <div className="flight-curved">
+        <div className="plane-wrapper">✈️</div>
+      </div>
+
+      {/* Title in center */}
+      <div className="absolute z-10 text-center pointer-events-none">
+        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-500 to-orange-400 bg-clip-text text-transparent">
+          Travel Animator
+        </h1>
+        <p className="text-gray-500 text-sm mt-2">Plan your journey</p>
       </div>
 
       <style jsx>{`
         .circular-container {
           position: relative;
-          width: 600px;
-          height: 600px;
+          width: 280px;
+          height: 280px;
+        }
+
+        @media (min-width: 768px) {
+          .circular-container {
+            width: 350px;
+            height: 350px;
+          }
         }
 
         .icon-orbit {
           position: absolute;
           top: 50%;
           left: 50%;
-          width: 60px;
-          height: 60px;
-          margin: -30px 0 0 -30px;
-          font-size: 3rem;
+          width: 40px;
+          height: 40px;
+          margin: -20px 0 0 -20px;
+          font-size: 1.8rem;
           transform-origin: center;
-          animation: orbit 8s linear infinite;
+          animation: orbit 10s linear infinite;
           animation-delay: var(--delay);
+        }
+
+        @media (min-width: 768px) {
+          .icon-orbit {
+            width: 50px;
+            height: 50px;
+            margin: -25px 0 0 -25px;
+            font-size: 2.2rem;
+          }
         }
 
         @keyframes orbit {
           0% {
             transform: 
               rotate(var(--angle)) 
-              translateX(300px) 
+              translateX(120px) 
               rotate(calc(-1 * var(--angle)));
           }
           100% {
             transform: 
               rotate(calc(var(--angle) + 360deg)) 
-              translateX(300px) 
+              translateX(120px) 
               rotate(calc(-1 * (var(--angle) + 360deg)));
           }
         }
 
-        .flight-diagonal {
-          position: absolute;
-          top: -100px;
-          left: -100px;
-          animation: flyDiagonal 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        @media (min-width: 768px) {
+          @keyframes orbit {
+            0% {
+              transform: 
+                rotate(var(--angle)) 
+                translateX(150px) 
+                rotate(calc(-1 * var(--angle)));
+            }
+            100% {
+              transform: 
+                rotate(calc(var(--angle) + 360deg)) 
+                translateX(150px) 
+                rotate(calc(-1 * (var(--angle) + 360deg)));
+            }
+          }
         }
 
-        @keyframes flyDiagonal {
+        .flight-curved {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+        }
+
+        .plane-wrapper {
+          position: absolute;
+          font-size: 3rem;
+          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+          animation: flyCurved 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+
+        @media (min-width: 768px) {
+          .plane-wrapper {
+            font-size: 4rem;
+          }
+        }
+
+        @keyframes flyCurved {
           0% {
-            top: -100px;
-            left: -100px;
-            transform: rotate(-20deg) scale(0.8);
+            top: 90%;
+            left: -10%;
+            transform: rotate(-30deg) scale(0.6);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          25% {
+            top: 60%;
+            left: 20%;
+            transform: rotate(-20deg) scale(0.9);
           }
           50% {
-            transform: rotate(-5deg) scale(1.2);
+            top: 30%;
+            left: 50%;
+            transform: rotate(0deg) scale(1.1);
+          }
+          75% {
+            top: 20%;
+            left: 75%;
+            transform: rotate(15deg) scale(1);
           }
           100% {
-            top: calc(100% + 100px);
-            left: calc(100% + 100px);
-            transform: rotate(10deg) scale(1);
+            top: -15%;
+            left: 110%;
+            transform: rotate(25deg) scale(0.8);
+            opacity: 0;
           }
-        }
-
-        .animate-wobble {
-          animation: wobble 0.5s ease-in-out infinite;
-        }
-
-        @keyframes wobble {
-          0%, 100% { transform: rotate(-2deg); }
-          50% { transform: rotate(2deg); }
         }
 
         @keyframes scrollUp {
@@ -600,13 +656,13 @@ const LandingPage = () => {
             opacity: 1;
           }
           100% {
-            transform: translateY(-150vh);
+            transform: translateY(-100vh);
             opacity: 0;
           }
         }
 
         .landing-animation {
-          animation: scrollUp 1s ease-in-out 3.2s forwards;
+          animation: scrollUp 0.8s ease-in-out 3.2s forwards;
         }
       `}</style>
     </div>
