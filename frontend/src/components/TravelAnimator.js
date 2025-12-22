@@ -313,11 +313,12 @@ const TravelAnimator = () => {
       mapRef.current.removeLayer(markerRef.current);
     }
 
-    // First, fit all destinations with padding so route is visible and centered
+    // Fit all destinations with padding so all are visible during animation
     const bounds = L.latLngBounds(routePath);
     mapRef.current.fitBounds(bounds, {
-      padding: [100, 100],
-      maxZoom: 6,
+      padding: [120, 120],  // More padding for better visibility
+      maxZoom: 10,          // Allow closer zoom for nearby destinations
+      minZoom: 4,           // Minimum zoom to prevent too zoomed out
       animate: true,
       duration: 0.5
     });
@@ -340,7 +341,7 @@ const TravelAnimator = () => {
 
     markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
     
-    // Animation loop using lerp - keeps icon centered
+    // Animation loop - keep all destinations visible, don't follow the icon
     const duration = 8000; // 8 seconds
     const startTime = Date.now();
     
@@ -352,7 +353,7 @@ const TravelAnimator = () => {
         setIsAnimating(false);
         setAnimationProgress(100);
         // Fit bounds again at the end
-        mapRef.current.fitBounds(bounds, { padding: [80, 80], maxZoom: 8 });
+        mapRef.current.fitBounds(bounds, { padding: [100, 100], maxZoom: 10 });
         return;
       }
 
@@ -371,8 +372,14 @@ const TravelAnimator = () => {
         // Update marker position directly (no React re-render)
         markerRef.current.setLatLng([lat, lng]);
         
-        // Keep the animated icon in the center of the map
-        mapRef.current.panTo([lat, lng], { animate: false });
+        // Don't pan to follow the icon - keep all destinations visible
+        // Only pan if the icon goes off screen
+        const mapBounds = mapRef.current.getBounds();
+        if (!mapBounds.contains([lat, lng])) {
+          // If icon is outside view, gently expand to include it
+          const newBounds = mapBounds.extend([lat, lng]);
+          mapRef.current.fitBounds(newBounds, { animate: false, padding: [50, 50] });
+        }
         
         // Update rotation - ✈️ emoji points NORTHEAST (~45°) by default
         const heading = calculateHeading(currentPoint, nextPoint);
