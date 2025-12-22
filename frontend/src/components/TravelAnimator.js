@@ -563,15 +563,17 @@ const LandingPage = () => {
       // Calculate direction from current to next point (like map's currentPoint to nextPoint)
       const dx = nextX - x;
       const dy = nextY - y;
-      // In screen coords, Y increases downward, so negate dy for proper angle
-      const rotation = Math.atan2(-dy, dx) * (180 / Math.PI);
+      // Calculate angle - in screen coords Y increases downward
+      // atan2(dy, dx) gives angle where 0° = right, positive = clockwise (down)
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
       
       // Scale - slightly larger in middle
       const scale = 0.7 + 0.5 * Math.sin(easedProgress * Math.PI);
       
       // Direct DOM manipulation for 60fps
-      // ✈️ emoji points NORTHEAST (~45°) by default, so subtract 45°
-      const adjustedRotation = rotation - 45;
+      // ✈️ emoji points at ~45° (upper-right) by default
+      // CSS rotate is clockwise, so to point at angle θ: rotation = θ - 45
+      const adjustedRotation = angle - 45;
       plane.style.left = `${x}%`;
       plane.style.top = `${y}%`;
       // Use translate to center the plane on the path point, then rotate
