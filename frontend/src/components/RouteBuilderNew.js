@@ -183,10 +183,142 @@ const RouteBuilderNew = () => {
     
     if (routePaths[0] && routePaths[0][0]) {
       setCurrentMarkerPosition(routePaths[0][0]);
+      
+      // Create marker only once if it doesn't exist
+      if (!markerRef.current && mapRef.current) {
+        const customIcon = L.divIcon({
+          className: 'animated-marker-smooth',
+          html: getMarkerHTML(0),
+          iconSize: [80, 80],
+          iconAnchor: [40, 40],
+        });
+        
+        markerRef.current = L.marker(routePaths[0][0], { icon: customIcon }).addTo(mapRef.current);
+      }
     }
     
+    animateWithLerp();
+  };
+
+  const getMarkerHTML = (rotation) => {
+    return `
+      <div style="
+        position: relative;
+        width: 80px;
+        height: 80px;
+      ">
+        <div style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(255,20,147,0.6) 0%, rgba(255,20,147,0) 70%);
+          animation: megaPulse 1.5s ease-in-out infinite;
+        "></div>
+        
+        <div style="
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #FF1493 0%, #FF6B35 50%, #FFD700 100%);
+          box-shadow: 
+            0 6px 30px rgba(255,20,147,0.8),
+            0 0 50px rgba(255,215,0,0.6),
+            inset 0 -3px 10px rgba(0,0,0,0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform: rotate(${rotation}deg);
+        ">
+          ${getTransportIcon()}
+        </div>
+        
+        <div style="
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: white;
+          box-shadow: 0 0 15px rgba(255,255,255,1);
+          animation: sparkle1 1s ease-in-out infinite;
+        "></div>
+      </div>
+      
+      <style>
+        @keyframes megaPulse {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.4); opacity: 0.3; }
+        }
+        @keyframes sparkle1 {
+          0%, 100% { opacity: 0; transform: scale(0); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+      </style>
+    `;
+  };
+
+  const lerp = (start, end, t) => {
+    return start + (end - start) * t;
+  };
+
+  const animateWithLerp = () => {
+    const allPoints = routePaths.flat();
+    const totalPoints = allPoints.length;
+    const duration = 10000; // 10 seconds
     const startTime = Date.now();
-    animateMarker(startTime);
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      if (progress >= 1) {
+        setIsAnimating(false);
+        setAnimationProgress(100);
+        return;
+      }
+
+      // Calculate which segment we're on
+      const targetIndex = Math.floor(progress * (totalPoints - 1));
+      const nextIndex = Math.min(targetIndex + 1, totalPoints - 1);
+      
+      // Calculate interpolation within segment
+      const segmentProgress = (progress * (totalPoints - 1)) - targetIndex;
+      
+      const currentPoint = allPoints[targetIndex];
+      const nextPoint = allPoints[nextIndex];
+      
+      if (currentPoint && nextPoint && markerRef.current) {
+        // Smooth lerp between points
+        const lat = lerp(currentPoint[0], nextPoint[0], segmentProgress);
+        const lng = lerp(currentPoint[1], nextPoint[1], segmentProgress);
+        
+        // Direct DOM update - no React re-render!
+        markerRef.current.setLatLng([lat, lng]);
+        
+        // Update rotation
+        const heading = calculateHeading(currentPoint, nextPoint);
+        const newIcon = L.divIcon({
+          className: 'animated-marker-smooth',
+          html: getMarkerHTML(heading),
+          iconSize: [80, 80],
+          iconAnchor: [40, 40],
+        });
+        markerRef.current.setIcon(newIcon);
+        
+        setAnimationProgress(progress * 100);
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
   };
 
   const easeInOutCubic = (t) => {
