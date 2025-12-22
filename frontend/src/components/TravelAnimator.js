@@ -674,7 +674,7 @@ const LandingPage = () => {
               );
             })}
             
-            {/* Plane at position 5 (~163.6°, left side) */}
+            {/* Plane at position 6 (~196.4°, true left side) */}
             <div 
               ref={planeRef}
               className="icon-orbit plane-icon"
