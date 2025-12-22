@@ -327,6 +327,27 @@ const TravelAnimator = () => {
   // Linear interpolation
   const lerp = (start, end, t) => start + (end - start) * t;
 
+  // Calculate optimal zoom for animation based on destination distances
+  const getAnimationZoom = () => {
+    if (destinations.length < 2) return 8;
+    
+    let minDistance = Infinity;
+    for (let i = 0; i < destinations.length - 1; i++) {
+      const d1 = destinations[i];
+      const d2 = destinations[i + 1];
+      const distance = Math.sqrt(
+        Math.pow(d2.lat - d1.lat, 2) + Math.pow(d2.lng - d1.lng, 2)
+      );
+      minDistance = Math.min(minDistance, distance);
+    }
+    
+    if (minDistance < 0.5) return 12;
+    if (minDistance < 1) return 10;
+    if (minDistance < 3) return 8;
+    if (minDistance < 10) return 6;
+    return 5;
+  };
+
   // Start route animation
   const startAnimation = () => {
     if (routePath.length < 2) {
@@ -341,8 +362,9 @@ const TravelAnimator = () => {
       mapRef.current.removeLayer(markerRef.current);
     }
 
-    // Fit all destinations with padding so all are visible during animation
+    // Fit all destinations with optimal zoom
     const bounds = L.latLngBounds(routePath);
+    const optimalZoom = getAnimationZoom();
     mapRef.current.fitBounds(bounds, {
       padding: [120, 120],  // More padding for better visibility
       maxZoom: 10,          // Allow closer zoom for nearby destinations
