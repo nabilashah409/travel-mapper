@@ -593,6 +593,7 @@ const LandingPage = () => {
         // Plane starts flying - position it at its current orbit location
         plane.style.animation = 'none';
         plane.classList.add('flying');
+        plane.style.opacity = '1';
         plane.style.left = `${bezierStart.x}%`;
         plane.style.top = `${bezierStart.y}%`;
         plane.style.transform = `translate(-50%, -50%) rotate(45deg) scale(1)`;
