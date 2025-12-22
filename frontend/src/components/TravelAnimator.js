@@ -654,11 +654,11 @@ const LandingPage = () => {
       <div ref={containerRef} className="landing-content">
         <div className="bounding-box">
           <div className="circular-container" ref={iconsContainerRef}>
-            {/* Regular icons at all positions except position 5 (where plane starts) */}
+            {/* Regular icons at all positions except position 6 (where plane starts) */}
             {circleIcons.map((icon, index) => {
-              // 10 icons fill positions 0,1,2,3,4,6,7,8,9,10 (skip 5 for plane)
+              // 10 icons fill positions 0,1,2,3,4,5,7,8,9,10 (skip 6 for plane)
               let position = index;
-              if (index >= planePosition) position = index + 1; // Skip position 5 for plane
+              if (index >= planePosition) position = index + 1; // Skip position 6 for plane
               const iconAngle = position * angleStep;
               return (
                 <div 
