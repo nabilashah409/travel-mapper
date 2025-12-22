@@ -532,9 +532,10 @@ const LandingPage = () => {
     const angleStep = 360 / totalIcons;
     
     // Simple bezier curve across the title
-    const bezierStart = { x: 8, y: 50 };
+    // Adjusted Y positions to avoid collision with orbiting icons
+    const bezierStart = { x: 8, y: 58 };   // Start below center
     const bezierControl = { x: 50, y: 20 };
-    const bezierEnd = { x: 92, y: 50 };
+    const bezierEnd = { x: 92, y: 42 };    // End above center
     
     const quadraticBezier = (t, p0, p1, p2) => {
       const oneMinusT = 1 - t;
