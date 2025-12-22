@@ -622,33 +622,26 @@ const LandingPage = () => {
           left: 50%;
           transform: translate(-50%, -50%);
           text-align: center;
-          z-index: 10;
+          z-index: 5;
           pointer-events: none;
-        }
-        
-        .title-box {
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(8px);
-          padding: 1.5rem 2rem;
-          border-radius: 1.5rem;
-          box-shadow: 0 8px 32px rgba(236, 72, 153, 0.15);
+          width: 60%;
+          max-width: 200px;
         }
         
         .title-text {
-          font-size: clamp(1.5rem, 5vw, 2.8rem);
+          font-size: clamp(1.3rem, 4.5vw, 2.2rem);
           font-weight: 700;
           background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
           line-height: 1.2;
-          white-space: nowrap;
         }
         
         .subtitle-text {
-          font-size: clamp(0.7rem, 2vw, 0.95rem);
+          font-size: clamp(0.65rem, 1.8vw, 0.85rem);
           color: #6b7280;
-          margin-top: 0.4rem;
+          margin-top: 0.3rem;
         }
 
         .circular-container {
@@ -677,7 +670,7 @@ const LandingPage = () => {
             opacity: 0;
             transform: 
               rotate(var(--angle)) 
-              translateX(calc(min(42vmin, 220px) + 100px)) 
+              translateX(calc(min(40vmin, 200px) + 120px)) 
               rotate(calc(-1 * var(--angle)))
               scale(0.3);
           }
@@ -685,7 +678,7 @@ const LandingPage = () => {
             opacity: 1;
             transform: 
               rotate(var(--angle)) 
-              translateX(min(42vmin, 220px)) 
+              translateX(min(40vmin, 200px)) 
               rotate(calc(-1 * var(--angle)))
               scale(1);
           }
@@ -695,7 +688,7 @@ const LandingPage = () => {
           0% {
             transform: 
               rotate(var(--angle)) 
-              translateX(min(42vmin, 220px)) 
+              translateX(min(40vmin, 200px)) 
               rotate(calc(-1 * var(--angle)));
           }
           100% {
