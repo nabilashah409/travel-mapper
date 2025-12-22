@@ -379,21 +379,21 @@ const TravelAnimator = () => {
       </MapContainer>
 
       {/* Floating search box */}
-      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-[1000]">
-        <div className="bg-white/95 backdrop-blur-md rounded-full shadow-xl px-4 py-3 flex items-center gap-2 border border-pink-100">
+      <div className="absolute top-4 left-4 right-4 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 z-[1000]">
+        <div className="bg-white/95 backdrop-blur-md rounded-full shadow-xl px-3 md:px-4 py-2 md:py-3 flex items-center gap-2 border border-pink-100">
           <input
             type="text"
             placeholder="Search destination..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && addDestination()}
-            className="bg-transparent outline-none text-sm w-56 md:w-64 placeholder-gray-400"
+            className="bg-transparent outline-none text-sm flex-1 min-w-0 placeholder-gray-400"
             style={{ fontSize: '16px' }}
           />
           <button
             onClick={addDestination}
             disabled={isSearching}
-            className="bg-gradient-to-r from-pink-500 to-orange-400 text-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-110 transition-transform"
+            className="bg-gradient-to-r from-pink-500 to-orange-400 text-white rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center hover:scale-110 transition-transform"
           >
             <Plus className="w-5 h-5" />
           </button>
@@ -401,8 +401,8 @@ const TravelAnimator = () => {
       </div>
 
       {/* Transport selector */}
-      <div className="absolute top-6 right-4 z-[1000]">
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-2 flex gap-1 border border-pink-100">
+      <div className="absolute top-16 md:top-6 right-4 z-[1000]">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-1.5 md:p-2 flex gap-0.5 md:gap-1 border border-pink-100">
           {transportModes.map((mode) => (
             <button
               key={mode.id}
@@ -410,7 +410,7 @@ const TravelAnimator = () => {
                 setSelectedTransport(mode.id);
                 if (destinations.length > 1) calculateRoute(destinations);
               }}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all ${
+              className={`w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-base md:text-lg transition-all ${
                 selectedTransport === mode.id 
                   ? 'bg-gradient-to-r from-pink-500 to-orange-400 scale-110' 
                   : 'hover:bg-pink-50'
@@ -424,23 +424,23 @@ const TravelAnimator = () => {
 
       {/* Play/Pause button */}
       {destinations.length >= 2 && (
-        <div className="absolute top-20 right-4 z-[1000]">
+        <div className="absolute top-28 md:top-20 right-4 z-[1000]">
           <button
             onClick={isAnimating ? pauseAnimation : startAnimation}
-            className={`w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110 ${
+            className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110 ${
               isAnimating 
                 ? 'bg-red-500 text-white' 
                 : 'bg-gradient-to-r from-pink-500 to-orange-400 text-white'
             }`}
           >
-            {isAnimating ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
+            {isAnimating ? <Pause className="w-5 h-5 md:w-6 md:h-6" /> : <Play className="w-5 h-5 md:w-6 md:h-6 ml-0.5" />}
           </button>
         </div>
       )}
 
       {/* Progress bar */}
       {animationProgress > 0 && (
-        <div className="absolute top-36 right-4 z-[1000] w-14">
+        <div className="absolute top-44 md:top-36 right-4 z-[1000] w-12 md:w-14">
           <div className="bg-white/90 rounded-full h-2 overflow-hidden shadow">
             <div 
               className="h-full bg-gradient-to-r from-pink-500 to-orange-400 transition-all"
