@@ -678,7 +678,7 @@ const LandingPage = () => {
             <div 
               ref={planeRef}
               className="icon-orbit plane-icon"
-              style={{ '--angle': `${planeAngle}deg`, '--delay': '0.3s' }}
+              style={{ '--angle': `${planeAngle}deg`, '--delay': '0.36s' }}
             >
               ✈️
             </div>
