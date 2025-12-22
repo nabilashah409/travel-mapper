@@ -669,29 +669,24 @@ const LandingPage = () => {
   }, []);
 
   // 10 regular icons + 1 plane = 11 total
-  // Plane is fixed at 180° (true left), other 10 icons distribute evenly around it
+  // Plane at position 7 (~229°, lower-left after train) for natural upward curve
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
   const totalIcons = 11;
   const angleStep = 360 / totalIcons; // ~32.727°
-  const planeAngle = 180; // Plane at true left (180°)
+  const planePosition = 7; // Position 7 = ~229° (lower-left, after train)
+  const planeAngle = planePosition * angleStep;
 
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
       <div ref={containerRef} className="landing-content">
         <div className="bounding-box">
           <div className="circular-container" ref={iconsContainerRef}>
-            {/* 10 icons evenly distributed, with plane at position index that equals ~180° */}
+            {/* 10 icons distributed, skipping position 7 where plane is */}
             {circleIcons.map((icon, index) => {
-              // All 11 icons evenly spaced at 32.727° apart
-              // Plane occupies index position that falls near 180°
-              // Index 5 would be at 5 * 32.727 = 163.6° (too early)
-              // Index 6 would be at 6 * 32.727 = 196.4° (just after 180°)
-              // To have plane exactly at 180°, we offset all icons so plane sits at 180°
-              // Plane at 180° means we calculate from there
-              // Offset: if plane is at 180°, icon at index 0 should be at 180 + angleStep = 212.7°
-              // Or: icon angles = 180 + (index + 1) * angleStep, wrapped
-              const baseAngle = planeAngle + (index + 1) * angleStep;
-              const iconAngle = baseAngle % 360;
+              // Icons take positions 0-6 and 8-10, skipping position 7 for plane
+              let position = index;
+              if (index >= planePosition) position = index + 1;
+              const iconAngle = position * angleStep;
               return (
                 <div 
                   key={index}
@@ -706,11 +701,11 @@ const LandingPage = () => {
               );
             })}
             
-            {/* Plane at 180° (true left side) */}
+            {/* Plane at position 7 (~229°, lower-left) */}
             <div 
               ref={planeRef}
               className="icon-orbit plane-icon"
-              style={{ '--angle': `${planeAngle}deg`, '--delay': '0.3s' }}
+              style={{ '--angle': `${planeAngle}deg`, '--delay': '0.42s' }}
             >
               ✈️
             </div>
