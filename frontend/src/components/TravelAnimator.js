@@ -202,7 +202,6 @@ const TravelAnimator = () => {
   // Start route animation
   const startAnimation = () => {
     if (routePath.length < 2) {
-      toast.error('Add at least 2 destinations first');
       return;
     }
 
@@ -214,7 +213,7 @@ const TravelAnimator = () => {
       mapRef.current.removeLayer(markerRef.current);
     }
 
-    // Create animated marker
+    // Create animated marker - plane points right by default, so we adjust rotation
     const customIcon = L.divIcon({
       className: 'animated-transport-marker',
       html: `<div style="
@@ -243,7 +242,6 @@ const TravelAnimator = () => {
       if (progress >= 1) {
         setIsAnimating(false);
         setAnimationProgress(100);
-        toast.success('Journey complete! 🎉');
         return;
       }
 
@@ -262,26 +260,25 @@ const TravelAnimator = () => {
         // Update marker position directly (no React re-render)
         markerRef.current.setLatLng([lat, lng]);
         
-        // Update rotation for flights
-        if (selectedTransport === 'flight') {
-          const heading = calculateHeading(currentPoint, nextPoint);
-          const rotatedIcon = L.divIcon({
-            className: 'animated-transport-marker',
-            html: `<div style="
-              width: 50px;
-              height: 50px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 32px;
-              transform: rotate(${heading - 90}deg);
-              filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-            ">${getTransportEmoji()}</div>`,
-            iconSize: [50, 50],
-            iconAnchor: [25, 25],
-          });
-          markerRef.current.setIcon(rotatedIcon);
-        }
+        // Update rotation - plane emoji ✈️ points RIGHT by default
+        // So we need heading directly (0° = east, 90° = north, etc.)
+        const heading = calculateHeading(currentPoint, nextPoint);
+        const rotatedIcon = L.divIcon({
+          className: 'animated-transport-marker',
+          html: `<div style="
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            transform: rotate(${heading}deg);
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+          ">${getTransportEmoji()}</div>`,
+          iconSize: [50, 50],
+          iconAnchor: [25, 25],
+        });
+        markerRef.current.setIcon(rotatedIcon);
         
         setAnimationProgress(progress * 100);
       }
