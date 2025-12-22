@@ -650,11 +650,11 @@ const LandingPage = () => {
       <div ref={containerRef} className="landing-content">
         <div className="bounding-box">
           <div className="circular-container" ref={iconsContainerRef}>
-            {/* 10 icons distributed evenly, plane at position 6 (~196°) */}
+            {/* 10 icons distributed evenly, plane at position 8 */}
             {circleIcons.map((icon, index) => {
-              // Skip position 6 for plane (lower-left area)
+              // Skip position 8 for plane (upper area, between backpack and beach)
               let position = index;
-              if (index >= 6) position = index + 1;
+              if (index >= 8) position = index + 1;
               const iconAngle = position * angleStep;
               return (
                 <div 
@@ -670,11 +670,11 @@ const LandingPage = () => {
               );
             })}
             
-            {/* Plane at position 6 (~196°, lower-left) */}
+            {/* Plane at position 8 (~262°, upper area) */}
             <div 
               ref={planeRef}
               className="icon-orbit plane-icon"
-              style={{ '--angle': `${6 * angleStep}deg`, '--delay': '0.36s' }}
+              style={{ '--angle': `${8 * angleStep}deg`, '--delay': '0.48s' }}
             >
               ✈️
             </div>
