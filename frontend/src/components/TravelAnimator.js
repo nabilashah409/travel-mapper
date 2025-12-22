@@ -694,7 +694,7 @@ const LandingPage = () => {
           100% {
             transform: 
               rotate(calc(var(--angle) + 360deg)) 
-              translateX(min(42vmin, 220px)) 
+              translateX(min(40vmin, 200px)) 
               rotate(calc(-1 * (var(--angle) + 360deg)));
           }
         }
