@@ -351,12 +351,6 @@ const TravelAnimator = () => {
               iconAnchor: [12, 12],
             })}
           />
-                box-shadow: 0 4px 12px rgba(236,72,153,0.4);
-              ">${index + 1}</div>`,
-              iconSize: [36, 36],
-              iconAnchor: [18, 18],
-            })}
-          />
         ))}
       </MapContainer>
 
