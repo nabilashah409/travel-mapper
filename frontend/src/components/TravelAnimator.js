@@ -400,8 +400,10 @@ const TravelAnimator = () => {
 
   return (
     <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
-      {/* Map container */}
-      <div className="absolute inset-0 pastel-map-container">
+      {/* Map container with warm tint */}
+      <div className="absolute inset-0 pastel-map-container" style={{
+        filter: 'sepia(0.15) saturate(1.1) hue-rotate(-5deg)',
+      }}>
         <MapContainer
           center={defaultCenter}
           zoom={4}
@@ -415,7 +417,7 @@ const TravelAnimator = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           />
           
-          <MapController destinations={destinations} defaultCenter={defaultCenter} />
+          <MapController destinations={destinations} defaultCenter={defaultCenter} isAnimating={isAnimating} />
           
           {/* Route line - dotted style with pastel colors */}
           {routePath.length > 1 && (
@@ -467,11 +469,11 @@ const TravelAnimator = () => {
         </MapContainer>
       </div>
       
-      {/* Soft pastel overlay for warmth */}
+      {/* Warm pink overlay for land */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{ 
-          background: 'linear-gradient(135deg, rgba(255,182,193,0.08) 0%, rgba(255,228,196,0.06) 50%, rgba(173,216,230,0.08) 100%)',
+          background: 'linear-gradient(135deg, rgba(255,182,193,0.12) 0%, rgba(255,218,185,0.1) 50%, rgba(255,228,225,0.12) 100%)',
         }}
       />
 
