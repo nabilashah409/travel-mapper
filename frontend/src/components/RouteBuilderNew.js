@@ -338,12 +338,13 @@ const RouteBuilderNew = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden">
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button - Larger touch target */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="md:hidden fixed top-4 left-4 z-[100] w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center"
+        className="md:hidden fixed top-4 left-4 z-[100] w-14 h-14 bg-white rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-transform"
+        style={{ touchAction: 'manipulation' }}
       >
-        {isSidebarOpen ? <X className="w-6 h-6" /> : <Search className="w-6 h-6" />}
+        {isSidebarOpen ? <X className="w-7 h-7" /> : <Search className="w-7 h-7" />}
       </button>
 
       {/* Overlay for mobile */}
@@ -354,13 +355,13 @@ const RouteBuilderNew = () => {
         />
       )}
 
-      {/* Left Sidebar */}
+      {/* Left Sidebar - Optimized for mobile */}
       <div className={`
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0
         fixed md:relative
         top-0 left-0
-        w-full md:w-96 
+        w-full sm:w-96 md:w-96
         h-full
         bg-white 
         shadow-lg 
@@ -369,7 +370,7 @@ const RouteBuilderNew = () => {
         transition-transform duration-300 ease-in-out
         z-[80] md:z-auto
       `}>
-        <div className="p-8">
+        <div className="p-4 sm:p-6 md:p-8">
           {/* Title */}
           <h1 
             className="text-5xl font-black leading-tight mb-2"
