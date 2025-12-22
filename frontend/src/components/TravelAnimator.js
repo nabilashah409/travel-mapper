@@ -486,60 +486,146 @@ const TravelAnimator = () => {
 };
 
 const LandingPage = () => {
+  const planeRef = useRef(null);
+  const containerRef = useRef(null);
+  
   useEffect(() => {
     // Play swoosh sound when plane flies
     const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSl+zPLTgjMGHGS56+CZSwkPVanm7qxfHAU7ldjzzn0pBSh6y/HTgjMGHGS56+CZSwkPVanm7qxfHAU7ldj');
     audio.volume = 0.3;
-    audio.play().catch(() => {}); // Ignore if autoplay blocked
+    audio.play().catch(() => {});
+    
+    // Smooth plane animation using lerp + requestAnimationFrame
+    const plane = planeRef.current;
+    if (!plane) return;
+    
+    const duration = 3000; // 3 seconds
+    const startTime = Date.now();
+    
+    // Define curved path points (bezier-like curve from bottom-left to top-right)
+    const pathPoints = [
+      { x: -10, y: 85, rotation: -35, scale: 0.5 },
+      { x: 15, y: 65, rotation: -25, scale: 0.8 },
+      { x: 35, y: 45, rotation: -10, scale: 1.0 },
+      { x: 55, y: 35, rotation: 5, scale: 1.1 },
+      { x: 75, y: 28, rotation: 15, scale: 1.0 },
+      { x: 95, y: 15, rotation: 25, scale: 0.9 },
+      { x: 115, y: -5, rotation: 30, scale: 0.7 },
+    ];
+    
+    // Lerp function
+    const lerp = (start, end, t) => start + (end - start) * t;
+    
+    // Get interpolated position on path
+    const getPositionOnPath = (progress) => {
+      const numSegments = pathPoints.length - 1;
+      const segmentIndex = Math.min(Math.floor(progress * numSegments), numSegments - 1);
+      const segmentProgress = (progress * numSegments) - segmentIndex;
+      
+      const start = pathPoints[segmentIndex];
+      const end = pathPoints[Math.min(segmentIndex + 1, numSegments)];
+      
+      return {
+        x: lerp(start.x, end.x, segmentProgress),
+        y: lerp(start.y, end.y, segmentProgress),
+        rotation: lerp(start.rotation, end.rotation, segmentProgress),
+        scale: lerp(start.scale, end.scale, segmentProgress),
+      };
+    };
+    
+    let animationId;
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Ease-out cubic for smooth deceleration
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      
+      const pos = getPositionOnPath(easedProgress);
+      
+      // Direct DOM manipulation for 60fps smoothness
+      plane.style.left = `${pos.x}%`;
+      plane.style.top = `${pos.y}%`;
+      plane.style.transform = `rotate(${pos.rotation}deg) scale(${pos.scale})`;
+      plane.style.opacity = progress < 0.05 ? progress * 20 : (progress > 0.9 ? (1 - progress) * 10 : 1);
+      
+      if (progress < 1) {
+        animationId = requestAnimationFrame(animate);
+      }
+    };
+    
+    animationId = requestAnimationFrame(animate);
+    
+    return () => {
+      if (animationId) cancelAnimationFrame(animationId);
+    };
   }, []);
 
-  // Icons for the circle (no plane - it flies separately)
-  const circleIcons = ['🚗', '🚶', '🧳', '👜', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🏝️', '🚢'];
+  // Icons for the circle - evenly distributed, no center stacking
+  const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
 
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
-      {/* Circular rotating icons - smaller to fit page */}
-      <div className="landing-animation">
+      {/* Everything scrolls up together */}
+      <div ref={containerRef} className="landing-content">
+        {/* Circular rotating icons */}
         <div className="circular-container">
           {circleIcons.map((icon, index) => (
             <div 
               key={index}
               className="icon-orbit" 
               style={{ 
-                '--angle': `${index * (360 / circleIcons.length)}deg`, 
-                '--delay': `${index * 0.15}s` 
+                '--angle': `${index * (360 / circleIcons.length)}deg`
               }}
             >
               {icon}
             </div>
           ))}
         </div>
+        
+        {/* Title in center - scrolls with icons */}
+        <div className="title-overlay">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-500 to-orange-400 bg-clip-text text-transparent">
+            Travel Animator
+          </h1>
+          <p className="text-gray-500 text-sm mt-2">Plan your journey</p>
+        </div>
       </div>
 
-      {/* Diagonal flying plane with smooth curved path */}
-      <div className="flight-curved">
-        <div className="plane-wrapper">✈️</div>
-      </div>
-
-      {/* Title in center */}
-      <div className="absolute z-10 text-center pointer-events-none">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-500 to-orange-400 bg-clip-text text-transparent">
-          Travel Animator
-        </h1>
-        <p className="text-gray-500 text-sm mt-2">Plan your journey</p>
+      {/* Flying plane - animated with lerp */}
+      <div 
+        ref={planeRef}
+        className="plane-element"
+      >
+        ✈️
       </div>
 
       <style jsx>{`
+        .landing-content {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: scrollUp 0.8s ease-in-out 3.2s forwards;
+        }
+        
+        .title-overlay {
+          position: absolute;
+          text-align: center;
+          z-index: 10;
+          pointer-events: none;
+        }
+
         .circular-container {
           position: relative;
-          width: 280px;
-          height: 280px;
+          width: 260px;
+          height: 260px;
         }
 
         @media (min-width: 768px) {
           .circular-container {
-            width: 350px;
-            height: 350px;
+            width: 320px;
+            height: 320px;
           }
         }
 
@@ -547,21 +633,14 @@ const LandingPage = () => {
           position: absolute;
           top: 50%;
           left: 50%;
-          width: 40px;
-          height: 40px;
-          margin: -20px 0 0 -20px;
-          font-size: 1.8rem;
+          font-size: 1.6rem;
           transform-origin: center;
-          animation: orbit 10s linear infinite;
-          animation-delay: var(--delay);
+          animation: orbit 6s linear infinite;
         }
 
         @media (min-width: 768px) {
           .icon-orbit {
-            width: 50px;
-            height: 50px;
-            margin: -25px 0 0 -25px;
-            font-size: 2.2rem;
+            font-size: 2rem;
           }
         }
 
@@ -569,13 +648,13 @@ const LandingPage = () => {
           0% {
             transform: 
               rotate(var(--angle)) 
-              translateX(120px) 
+              translateX(110px) 
               rotate(calc(-1 * var(--angle)));
           }
           100% {
             transform: 
               rotate(calc(var(--angle) + 360deg)) 
-              translateX(120px) 
+              translateX(110px) 
               rotate(calc(-1 * (var(--angle) + 360deg)));
           }
         }
@@ -585,68 +664,29 @@ const LandingPage = () => {
             0% {
               transform: 
                 rotate(var(--angle)) 
-                translateX(150px) 
+                translateX(140px) 
                 rotate(calc(-1 * var(--angle)));
             }
             100% {
               transform: 
                 rotate(calc(var(--angle) + 360deg)) 
-                translateX(150px) 
+                translateX(140px) 
                 rotate(calc(-1 * (var(--angle) + 360deg)));
             }
           }
         }
 
-        .flight-curved {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-        }
-
-        .plane-wrapper {
+        .plane-element {
           position: absolute;
           font-size: 3rem;
-          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-          animation: flyCurved 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+          filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
+          z-index: 20;
+          will-change: transform, left, top, opacity;
         }
 
         @media (min-width: 768px) {
-          .plane-wrapper {
+          .plane-element {
             font-size: 4rem;
-          }
-        }
-
-        @keyframes flyCurved {
-          0% {
-            top: 90%;
-            left: -10%;
-            transform: rotate(-30deg) scale(0.6);
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          25% {
-            top: 60%;
-            left: 20%;
-            transform: rotate(-20deg) scale(0.9);
-          }
-          50% {
-            top: 30%;
-            left: 50%;
-            transform: rotate(0deg) scale(1.1);
-          }
-          75% {
-            top: 20%;
-            left: 75%;
-            transform: rotate(15deg) scale(1);
-          }
-          100% {
-            top: -15%;
-            left: 110%;
-            transform: rotate(25deg) scale(0.8);
-            opacity: 0;
           }
         }
 
@@ -659,10 +699,6 @@ const LandingPage = () => {
             transform: translateY(-100vh);
             opacity: 0;
           }
-        }
-
-        .landing-animation {
-          animation: scrollUp 0.8s ease-in-out 3.2s forwards;
         }
       `}</style>
     </div>
