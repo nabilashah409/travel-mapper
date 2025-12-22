@@ -150,14 +150,6 @@ const TravelAnimator = () => {
       // Always use curved path for visual appeal
       const curvedPath = createCurvedPath(start, end);
       allPoints = [...allPoints, ...curvedPath];
-        for (let j = 0; j <= numPoints; j++) {
-          const t = j / numPoints;
-          allPoints.push([
-            start.lat + (end.lat - start.lat) * t,
-            start.lng + (end.lng - start.lng) * t
-          ]);
-        }
-      }
     }
     
     setRoutePath(allPoints);
