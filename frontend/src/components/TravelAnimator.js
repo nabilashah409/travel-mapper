@@ -719,11 +719,5 @@ const LandingPage = () => {
     </div>
   );
 };
-          }
-        }
-      `}</style>
-    </div>
-  );
-};
 
 export default TravelAnimator;
