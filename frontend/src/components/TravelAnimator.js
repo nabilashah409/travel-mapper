@@ -586,14 +586,12 @@ const LandingPage = () => {
           </div>
         </div>
         
-        {/* Title centered with padding to avoid icon overlap */}
+        {/* Title centered - no box, just text */}
         <div className="title-overlay">
-          <div className="title-box">
-            <h1 className="title-text">
-              Travel Animator
-            </h1>
-            <p className="subtitle-text">Plan your journey</p>
-          </div>
+          <h1 className="title-text">
+            Travel Animator
+          </h1>
+          <p className="subtitle-text">Plan your journey</p>
         </div>
       </div>
 
