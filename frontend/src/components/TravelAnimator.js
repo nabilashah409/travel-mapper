@@ -535,13 +535,10 @@ const LandingPage = () => {
     // Plane starts at 180° (true left side), flies to 0° (right side)
     const planeStartAngle = 180;
     
-    // Bezier curve to match orbit positions
-    // The orbit circle edge at 180° is at the left of the icon circle
-    // At 0° it's at the right of the icon circle
-    // Adjust to match visual orbit radius (roughly 20% from center)
-    const bezierStart = { x: 30, y: 50 };  // Left side of orbit (180°)
-    const bezierControl = { x: 50, y: 20 }; // Arc above center (higher arc)
-    const bezierEnd = { x: 70, y: 50 };    // Right side of orbit (0°)
+    // Bezier curve - wide arc from left edge to right edge
+    const bezierStart = { x: 5, y: 50 };   // Left edge (5%)
+    const bezierControl = { x: 50, y: 15 }; // Arc above center (higher for smoother curve)
+    const bezierEnd = { x: 95, y: 50 };    // Right edge (95%)
     
     const quadraticBezier = (t, p0, p1, p2) => {
       const oneMinusT = 1 - t;
