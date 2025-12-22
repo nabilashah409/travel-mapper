@@ -259,9 +259,11 @@ const TravelAnimator = () => {
         // Update marker position directly (no React re-render)
         markerRef.current.setLatLng([lat, lng]);
         
-        // Update rotation - plane emoji ✈️ points RIGHT by default
-        // So we need heading directly (0° = east, 90° = north, etc.)
+        // Update rotation - ✈️ emoji points NORTHEAST (~45°) by default
+        // heading: 0° = east, 90° = north, -90° = south
+        // We subtract 45° to align the emoji nose with the travel direction
         const heading = calculateHeading(currentPoint, nextPoint);
+        const adjustedRotation = heading - 45;
         const rotatedIcon = L.divIcon({
           className: 'animated-transport-marker',
           html: `<div style="
@@ -271,7 +273,7 @@ const TravelAnimator = () => {
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            transform: rotate(${heading}deg);
+            transform: rotate(${adjustedRotation}deg);
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
           ">${getTransportEmoji()}</div>`,
           iconSize: [50, 50],
