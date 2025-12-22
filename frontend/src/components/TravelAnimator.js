@@ -529,13 +529,6 @@ const LandingPage = () => {
       return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
     };
     
-    // Calculate overall direction from start to end for consistent plane orientation
-    // Instead of following exact tangent (which changes dramatically), use a fixed direction
-    const overallDirection = Math.atan2(
-      -(bezierEnd.y - bezierStart.y),  // Negate for screen coords
-      bezierEnd.x - bezierStart.x
-    ) * (180 / Math.PI);
-    
     // Smooth easing function
     const easeInOutCubic = (t) => {
       return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -559,13 +552,20 @@ const LandingPage = () => {
       const progress = Math.min(flightElapsed / duration, 1);
       const easedProgress = easeInOutCubic(progress);
       
-      // Calculate position on bezier curve
+      // Calculate current position on bezier curve
       const x = quadraticBezier(easedProgress, bezierStart.x, bezierControl.x, bezierEnd.x);
       const y = quadraticBezier(easedProgress, bezierStart.y, bezierControl.y, bezierEnd.y);
       
-      // Use consistent direction throughout (overall direction from start to end)
-      // This keeps the plane pointing in a natural travel direction
-      const rotation = overallDirection;
+      // Calculate next position (look ahead) - same technique as map animation
+      const lookAhead = Math.min(easedProgress + 0.05, 1);
+      const nextX = quadraticBezier(lookAhead, bezierStart.x, bezierControl.x, bezierEnd.x);
+      const nextY = quadraticBezier(lookAhead, bezierStart.y, bezierControl.y, bezierEnd.y);
+      
+      // Calculate direction from current to next point (like map's currentPoint to nextPoint)
+      const dx = nextX - x;
+      const dy = nextY - y;
+      // In screen coords, Y increases downward, so negate dy for proper angle
+      const rotation = Math.atan2(-dy, dx) * (180 / Math.PI);
       
       // Scale - slightly larger in middle
       const scale = 0.7 + 0.5 * Math.sin(easedProgress * Math.PI);
