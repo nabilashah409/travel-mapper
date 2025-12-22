@@ -525,36 +525,11 @@ const LandingPage = () => {
     const orbitIcons = iconsContainer.querySelectorAll('.icon-orbit:not(.plane-icon)');
     
     const gatherDuration = 800;
-    const flightDuration = 2600;
+    const flightDuration = 2400;
     
     // 11 icons total, evenly spaced at 32.727° apart
     const totalIcons = 11;
     const angleStep = 360 / totalIcons;
-    
-    // Plane starts at position 7 (~229°, lower-left after train) for more natural curve
-    const planeStartAngle = 7 * angleStep; // ~229° (lower-left quadrant)
-    const planeEndAngle = 0; // 0° (right side)
-    
-    // Get viewport position for the orbit
-    // The orbit circle is centered on screen with radius ~200px on typical viewport
-    // For a 1920px wide screen, 200px = ~10.4%, but we need wider arc for visual effect
-    const getOrbitPosition = (angleDeg) => {
-      const angleRad = (angleDeg * Math.PI) / 180;
-      // Use wider radius for more dramatic flight path
-      const radiusPercent = 18;
-      return {
-        x: 50 + radiusPercent * Math.cos(angleRad),
-        y: 50 + radiusPercent * Math.sin(angleRad)
-      };
-    };
-    
-    // Bezier curve starts from plane's orbit position (~229°) to end position (0°)
-    const startPos = getOrbitPosition(planeStartAngle);
-    const endPos = getOrbitPosition(planeEndAngle);
-    
-    const bezierStart = { x: startPos.x, y: startPos.y };
-    const bezierControl = { x: 50, y: 15 }; // Arc high above center for smooth curve
-    const bezierEnd = { x: endPos.x, y: endPos.y };
     
     const quadraticBezier = (t, p0, p1, p2) => {
       const oneMinusT = 1 - t;
@@ -569,6 +544,9 @@ const LandingPage = () => {
     let startTime = null;
     let hasStartedFlight = false;
     let hasJoinedOrbit = false;
+    let bezierStart = null;
+    let bezierEnd = null;
+    let bezierControl = null;
     
     const animate = (timestamp) => {
       if (!startTime) startTime = timestamp;
@@ -580,19 +558,36 @@ const LandingPage = () => {
         return;
       }
       
-      // Start flight immediately after gather (no pause)
+      // Start flight - get plane's ACTUAL position from the DOM
       if (!hasStartedFlight) {
         hasStartedFlight = true;
         
-        // Smoothly redistribute other icons while plane leaves
+        // Get plane's current visual position
+        const planeRect = plane.getBoundingClientRect();
+        const startX = ((planeRect.left + planeRect.width / 2) / window.innerWidth) * 100;
+        const startY = ((planeRect.top + planeRect.height / 2) / window.innerHeight) * 100;
+        
+        // End position: right side of orbit (0°)
+        // Calculate based on container center + orbit radius
+        const container = iconsContainer.getBoundingClientRect();
+        const centerX = ((container.left + container.width / 2) / window.innerWidth) * 100;
+        const centerY = ((container.top + container.height / 2) / window.innerHeight) * 100;
+        const orbitRadius = Math.min(container.width, container.height) * 0.4; // 40% of container
+        const radiusPercent = (orbitRadius / window.innerWidth) * 100;
+        
+        bezierStart = { x: startX, y: startY };
+        bezierEnd = { x: centerX + radiusPercent, y: centerY };
+        bezierControl = { x: centerX, y: centerY - 15 }; // Arc above center
+        
+        // Redistribute other icons smoothly
         const spreadAngleStep = 360 / 10;
         orbitIcons.forEach((icon, index) => {
           const newAngle = index * spreadAngleStep;
-          icon.style.transition = 'transform 0.8s ease-out';
+          icon.style.transition = 'transform 0.6s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
         
-        // Plane starts flying - position it at its current orbit location
+        // Start flying from current position
         plane.style.animation = 'none';
         plane.classList.add('flying');
         plane.style.opacity = '1';
@@ -605,7 +600,7 @@ const LandingPage = () => {
       const flightElapsed = elapsed - gatherDuration;
       const progress = Math.min(flightElapsed / flightDuration, 1);
       
-      if (progress < 1) {
+      if (progress < 1 && bezierStart && bezierEnd && bezierControl) {
         const easedProgress = easeInOutCubic(progress);
         
         const x = quadraticBezier(easedProgress, bezierStart.x, bezierControl.x, bezierEnd.x);
@@ -618,28 +613,27 @@ const LandingPage = () => {
         const dx = nextX - x;
         const dy = nextY - y;
         const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-        const adjustedRotation = angle + 45; // +45 because plane emoji points NE
+        const adjustedRotation = angle + 45;
         
-        // Scale: grow to 1.6x at middle, back to 1x at end
-        const scale = 1 + 0.6 * Math.sin(easedProgress * Math.PI);
+        // Scale: grow to 1.5x at middle, back to 1x at end
+        const scale = 1 + 0.5 * Math.sin(easedProgress * Math.PI);
         
         plane.style.left = `${x}%`;
         plane.style.top = `${y}%`;
-        plane.style.opacity = '1';
         plane.style.transform = `translate(-50%, -50%) rotate(${adjustedRotation}deg) scale(${scale})`;
         
         animationId = requestAnimationFrame(animate);
       } else if (!hasJoinedOrbit) {
         hasJoinedOrbit = true;
         
-        // Plane joins orbit at 0° (right side) - redistribute all 11 icons
+        // Redistribute all 11 icons with plane at position 0
         orbitIcons.forEach((icon, index) => {
           const newAngle = (index + 1) * angleStep;
-          icon.style.transition = 'transform 0.5s ease-out';
+          icon.style.transition = 'transform 0.4s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
         
-        // Plane smoothly joins orbit at 0°
+        // Plane joins orbit at 0° (right side)
         plane.classList.remove('flying');
         plane.classList.add('in-orbit');
         plane.style.transition = 'none';
@@ -648,13 +642,13 @@ const LandingPage = () => {
         plane.style.setProperty('--angle', '0deg');
         plane.style.transform = 'rotate(0deg) translateX(min(40vmin, 200px)) rotate(0deg) scale(1)';
         
-        // Start scroll up after a brief moment of orbiting together
+        // Scroll up after brief orbit
         setTimeout(() => {
           const container = document.querySelector('.landing-content');
           if (container) {
             container.classList.add('scroll-up-now');
           }
-        }, 300);
+        }, 200);
       }
     };
     
