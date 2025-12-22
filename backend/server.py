@@ -53,8 +53,8 @@ async def root():
 async def geocode_search(q: str, limit: int = 5):
     """Proxy for Nominatim geocoding API"""
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
+        async with httpx.AsyncClient() as http_client:
+            response = await http_client.get(
                 "https://nominatim.openstreetmap.org/search",
                 params={
                     "format": "json",
@@ -63,7 +63,9 @@ async def geocode_search(q: str, limit: int = 5):
                     "addressdetails": 1
                 },
                 headers={
-                    "User-Agent": "TravelAnimator/1.0 (contact@example.com)"
+                    "User-Agent": "TravelAnimatorApp/1.0 (https://github.com/travel-animator; contact@travelanimator.app)",
+                    "Accept": "application/json",
+                    "Accept-Language": "en"
                 },
                 timeout=10.0
             )
