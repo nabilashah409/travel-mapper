@@ -710,7 +710,10 @@ const LandingPage = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          animation: scrollUp 0.8s ease-in-out 3.5s forwards;
+        }
+        
+        .landing-content.scroll-up-now {
+          animation: scrollUp 0.8s ease-in-out forwards;
         }
         
         .bounding-box {
