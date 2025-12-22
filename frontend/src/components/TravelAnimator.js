@@ -517,10 +517,10 @@ const LandingPage = () => {
     const duration = 3500;
     
     // Quadratic Bezier curve - simple arc matching the visible SVG path
-    // Start bottom-left, gentle arc, end right-middle
-    const bezierStart = { x: 10, y: 80 };
-    const bezierControl = { x: 50, y: 20 }; // Gentle curve - not too high
-    const bezierEnd = { x: 90, y: 50 };
+    // Left to right with gentle upward arc - plane always moves rightward
+    const bezierStart = { x: 5, y: 55 };
+    const bezierControl = { x: 50, y: 35 }; // Gentle upward arc
+    const bezierEnd = { x: 95, y: 55 };
     
     // Quadratic Bezier function: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
     const quadraticBezier = (t, p0, p1, p2) => {
