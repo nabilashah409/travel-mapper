@@ -366,9 +366,9 @@ const TravelAnimator = () => {
     const bounds = L.latLngBounds(routePath);
     const optimalZoom = getAnimationZoom();
     mapRef.current.fitBounds(bounds, {
-      padding: [120, 120],  // More padding for better visibility
-      maxZoom: 10,          // Allow closer zoom for nearby destinations
-      minZoom: 4,           // Minimum zoom to prevent too zoomed out
+      padding: [150, 150],
+      maxZoom: optimalZoom,
+      minZoom: 4,
       animate: true,
       duration: 0.5
     });
