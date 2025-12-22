@@ -365,7 +365,7 @@ const TravelAnimator = () => {
 
   // Calculate optimal zoom for animation based on destination distances
   const getAnimationZoom = () => {
-    if (destinations.length < 2) return 8;
+    if (destinations.length < 2) return 10;
     
     let minDistance = Infinity;
     for (let i = 0; i < destinations.length - 1; i++) {
@@ -377,10 +377,14 @@ const TravelAnimator = () => {
       minDistance = Math.min(minDistance, distance);
     }
     
-    if (minDistance < 0.5) return 12;
-    if (minDistance < 1) return 10;
-    if (minDistance < 3) return 8;
-    if (minDistance < 10) return 6;
+    // More aggressive zoom for close destinations
+    if (minDistance < 0.3) return 14;
+    if (minDistance < 0.5) return 13;
+    if (minDistance < 1) return 12;
+    if (minDistance < 2) return 11;
+    if (minDistance < 4) return 10;
+    if (minDistance < 8) return 8;
+    if (minDistance < 15) return 6;
     return 5;
   };
 
