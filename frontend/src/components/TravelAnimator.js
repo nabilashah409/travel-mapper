@@ -531,11 +531,11 @@ const LandingPage = () => {
     const totalIcons = 11;
     const angleStep = 360 / totalIcons;
     
+    // Plane starts at position 7 (~229°, lower-left after train) for more natural curve
+    const planeStartAngle = 7 * angleStep; // ~229° (lower-left quadrant)
+    const planeEndAngle = 0; // 0° (right side)
+    
     // Get the actual position of plane in orbit for seamless transition
-    // Orbit radius is min(40vmin, 200px), centered on screen
-    // At 180° (left): x = center - radius, y = center
-    // At 0° (right): x = center + radius, y = center
-    // As viewport percentages: radius ≈ 10-12% of viewport width
     const getOrbitPosition = (angleDeg) => {
       const angleRad = (angleDeg * Math.PI) / 180;
       // Orbit appears roughly ±12% from center (50%) on a typical viewport
@@ -546,12 +546,12 @@ const LandingPage = () => {
       };
     };
     
-    // Bezier curve starts from plane's actual orbit position (180°) to end position (0°)
-    const startPos = getOrbitPosition(180); // Left side of orbit
-    const endPos = getOrbitPosition(0);     // Right side of orbit
+    // Bezier curve starts from plane's orbit position (~229°) to end position (0°)
+    const startPos = getOrbitPosition(planeStartAngle);
+    const endPos = getOrbitPosition(planeEndAngle);
     
     const bezierStart = { x: startPos.x, y: startPos.y };
-    const bezierControl = { x: 50, y: 25 }; // Arc above center
+    const bezierControl = { x: 50, y: 20 }; // Arc above center
     const bezierEnd = { x: endPos.x, y: endPos.y };
     
     const quadraticBezier = (t, p0, p1, p2) => {
