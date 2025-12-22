@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import { Plus, X, GripVertical, Play, Pause, Plane, Car, Train, Footprints } from 'lucide-react';
-import { toast, Toaster } from 'sonner';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
