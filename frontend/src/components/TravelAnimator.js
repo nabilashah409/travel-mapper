@@ -400,9 +400,9 @@ const TravelAnimator = () => {
 
   return (
     <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
-      {/* Map with subtle pastel tint */}
+      {/* Map with enhanced water color */}
       <div className="absolute inset-0 pastel-map-container" style={{
-        filter: 'saturate(0.85) brightness(1.02) hue-rotate(5deg)',
+        filter: 'saturate(1.3) brightness(1.0) contrast(1.05)',
       }}>
         <MapContainer
           center={defaultCenter}
@@ -411,9 +411,9 @@ const TravelAnimator = () => {
           zoomControl={false}
           ref={(map) => { if (map) mapRef.current = map; }}
         >
-          {/* CARTO Voyager tiles - colorful and readable */}
+          {/* CARTO Positron - cleaner with more visible blue water */}
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
           />
           
@@ -469,11 +469,11 @@ const TravelAnimator = () => {
         </MapContainer>
       </div>
       
-      {/* Very subtle warm tint overlay - not blocking the map */}
+      {/* Warm peach tint for land areas - using gradient that's stronger on land */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{ 
-          background: 'linear-gradient(135deg, rgba(255,240,245,0.1) 0%, rgba(255,248,240,0.08) 50%, rgba(240,248,255,0.1) 100%)',
+          background: 'radial-gradient(ellipse at center, rgba(255,228,196,0.15) 0%, rgba(255,240,245,0.1) 100%)',
         }}
       />
 
