@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
+import httpx
 
 
 ROOT_DIR = Path(__file__).parent
@@ -36,9 +37,53 @@ class RouteCreate(BaseModel):
     transport_mode: str
 
 
+class GeoSearchResult(BaseModel):
+    display_name: str
+    lat: str
+    lon: str
+    name: str
+
+
 @api_router.get("/")
 async def root():
     return {"message": "Journey Mapper API"}
+
+
+@api_router.get("/geocode")
+async def geocode_search(q: str, limit: int = 5):
+    """Proxy for Nominatim geocoding API"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://nominatim.openstreetmap.org/search",
+                params={
+                    "format": "json",
+                    "q": q,
+                    "limit": limit,
+                    "addressdetails": 1
+                },
+                headers={
+                    "User-Agent": "TravelAnimator/1.0 (contact@example.com)"
+                },
+                timeout=10.0
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+            # Transform results
+            results = []
+            for item in data:
+                name = item.get('name') or item.get('display_name', '').split(',')[0]
+                results.append({
+                    "display_name": item.get('display_name', ''),
+                    "lat": item.get('lat', ''),
+                    "lon": item.get('lon', ''),
+                    "name": name
+                })
+            return results
+    except Exception as e:
+        logging.error(f"Geocoding error: {e}")
+        return []
 
 
 @api_router.post("/routes", response_model=Route)
