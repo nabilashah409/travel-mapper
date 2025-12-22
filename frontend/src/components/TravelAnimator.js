@@ -528,9 +528,13 @@ const LandingPage = () => {
     const orbitPause = 100;
     const flightDuration = 2600;
     
-    // Plane starts at 180° (left side), flies to 0° (right side)
-    const planeStartAngle = 180;
-    const planeEndAngle = 0;
+    // 11 icons total, evenly spaced at 32.727° apart
+    const totalIcons = 11;
+    const angleStep = 360 / totalIcons;
+    
+    // Plane starts at position 5 (163.6° ≈ left side), flies to position 0 (0° = right side)
+    const planeStartPosition = 5; // Position in the 11-icon circle
+    const planeStartAngle = planeStartPosition * angleStep; // ~163.6°
     
     // Bezier curve for flight across title (left to right)
     const bezierStart = { x: 8, y: 50 };
@@ -560,15 +564,14 @@ const LandingPage = () => {
         return;
       }
       
-      // Plane leaves orbit - spread other icons to fill gap at 180° (left side)
+      // Plane leaves orbit - spread remaining 10 icons evenly
       if (!hasLeftOrbit) {
         hasLeftOrbit = true;
         
-        // 10 remaining icons spread evenly, but skip the 180° position where plane was
-        // Icons were at: 0°, 32.7°, 65.5°, 98.2°, 130.9°, 163.6°, [196.4° plane], 229.1°, 261.8°, 294.5°, 327.3°
-        // Now spread 10 icons evenly: 36° apart
+        // 10 remaining icons spread evenly: 36° apart (360/10)
+        const spreadAngleStep = 360 / 10;
         orbitIcons.forEach((icon, index) => {
-          const newAngle = index * 36; // 0°, 36°, 72°, 108°, 144°, 180°, 216°, 252°, 288°, 324°
+          const newAngle = index * spreadAngleStep;
           icon.style.transition = 'transform 0.5s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
@@ -606,17 +609,15 @@ const LandingPage = () => {
       } else if (!hasJoinedOrbit) {
         hasJoinedOrbit = true;
         
-        // Plane joins at 0° (right side) - redistribute all 11 icons evenly
-        // Each icon 32.727° apart (360/11)
-        const angleStep = 360 / 11;
+        // Plane joins at position 0 (0° = right side) - redistribute all 11 icons evenly
+        // Icons take positions 1-10, plane takes position 0
         orbitIcons.forEach((icon, index) => {
-          // Icons take positions 1-10 (indices 0-9 map to angles 32.7° to 327.3°)
-          const newAngle = (index + 1) * angleStep;
+          const newAngle = (index + 1) * angleStep; // Positions 1-10: 32.7°, 65.5°, ..., 327.3°
           icon.style.transition = 'transform 0.4s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
         
-        // Plane takes position 0° (right side)
+        // Plane smoothly transitions to position 0 (0°) in the orbit
         plane.classList.remove('flying');
         plane.classList.add('in-orbit');
         plane.style.transition = 'all 0.4s ease-out';
