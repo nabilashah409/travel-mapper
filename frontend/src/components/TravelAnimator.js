@@ -29,12 +29,29 @@ const MapController = ({ destinations, defaultCenter }) => {
         destinations.map(d => [d.lat, d.lng])
       );
       map.flyToBounds(bounds, {
-        padding: [80, 80], // Generous padding for centered look
+        padding: [100, 100], // Generous padding
         duration: 1.5,
-        maxZoom: 8
+        maxZoom: 10,  // Allow closer zoom for nearby destinations
+        minZoom: 3    // But not too far out
       });
     }
   }, [destinations, map, defaultCenter]);
+  
+  // Keep all destinations visible during animation (don't follow the icon)
+  useEffect(() => {
+    if (isAnimating && destinations.length > 1) {
+      const bounds = L.latLngBounds(
+        destinations.map(d => [d.lat, d.lng])
+      );
+      // Fit to show all destinations with minimum zoom of 4
+      map.fitBounds(bounds, {
+        padding: [80, 80],
+        maxZoom: 8,
+        minZoom: 4,
+        animate: false
+      });
+    }
+  }, [isAnimating, destinations, map]);
   
   return null;
 };
