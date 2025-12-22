@@ -528,7 +528,7 @@ const LandingPage = () => {
     
     // Wait for icons to gather first
     const planeDelay = 800;
-    const duration = 3500;
+    const duration = 3150; // 10% faster (was 3500)
     
     // Quadratic Bezier curve - simple arc matching the visible SVG path
     // Left to right with gentle upward arc - plane always moves rightward
