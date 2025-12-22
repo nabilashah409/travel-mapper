@@ -73,9 +73,18 @@ const RouteBuilderNew = () => {
             lng: parseFloat(data[0].lon),
           },
         };
-        setDestinations([...destinations, newDest]);
+        const updatedDestinations = [...destinations, newDest];
+        setDestinations(updatedDestinations);
         setSearchQuery('');
         toast.success(`Added: ${data[0].display_name.split(',')[0]}`);
+        
+        // Auto-close sidebar on mobile after adding 2+ destinations
+        if (updatedDestinations.length >= 2 && window.innerWidth < 768) {
+          setTimeout(() => {
+            setIsSidebarOpen(false);
+            toast.info('Tap menu to edit destinations');
+          }, 1500);
+        }
       } else {
         toast.error('Location not found. Try a different search term.');
       }
