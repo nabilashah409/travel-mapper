@@ -614,19 +614,25 @@ const LandingPage = () => {
         // Icons take positions 1-10, plane takes position 0
         orbitIcons.forEach((icon, index) => {
           const newAngle = (index + 1) * angleStep; // Positions 1-10: 32.7°, 65.5°, ..., 327.3°
-          icon.style.transition = 'transform 0.4s ease-out';
+          icon.style.transition = 'transform 0.3s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
         
-        // Plane smoothly transitions to position 0 (0°) in the orbit
+        // Plane immediately joins orbit at 0° (right side)
         plane.classList.remove('flying');
         plane.classList.add('in-orbit');
-        plane.style.transition = 'all 0.4s ease-out';
+        plane.style.transition = 'all 0.2s ease-out';
         plane.style.left = '50%';
         plane.style.top = '50%';
         plane.style.setProperty('--angle', '0deg');
         plane.style.transform = 'rotate(0deg) translateX(min(40vmin, 200px)) rotate(0deg) scale(1)';
         plane.style.opacity = '1';
+        
+        // Trigger scroll up immediately after plane joins orbit
+        const container = document.querySelector('.landing-content');
+        if (container) {
+          container.classList.add('scroll-up-now');
+        }
       }
     };
     
