@@ -608,12 +608,9 @@ const LandingPage = () => {
       } else if (!hasJoinedOrbit) {
         hasJoinedOrbit = true;
         
-        // Redistribute all 11 icons - plane at position 0, others at 1-10
-        // Offset slightly to avoid collision with plane at 0°
+        // Redistribute all 11 icons - plane at position 0, others spread evenly
         orbitIcons.forEach((icon, index) => {
-          // Shift icons slightly: position = (index + 1) gives 32.7° to 327°
-          // Add small offset to create gap around 0° where plane joins
-          const newAngle = (index + 1) * angleStep + 5; // +5° offset
+          const newAngle = (index + 1) * angleStep;
           icon.style.transition = 'transform 0.3s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
