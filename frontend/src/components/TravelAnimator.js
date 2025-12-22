@@ -640,24 +640,21 @@ const LandingPage = () => {
     };
   }, []);
 
-  // 10 regular icons + 1 plane = 11 total
-  // Plane at position 7 (~229°, lower-left after train) for natural upward curve
+  // 10 regular icons + 1 plane = 11 total, evenly spaced
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
   const totalIcons = 11;
   const angleStep = 360 / totalIcons; // ~32.727°
-  const planePosition = 7; // Position 7 = ~229° (lower-left, after train)
-  const planeAngle = planePosition * angleStep;
 
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
       <div ref={containerRef} className="landing-content">
         <div className="bounding-box">
           <div className="circular-container" ref={iconsContainerRef}>
-            {/* 10 icons distributed, skipping position 7 where plane is */}
+            {/* 10 icons distributed evenly */}
             {circleIcons.map((icon, index) => {
-              // Icons take positions 0-6 and 8-10, skipping position 7 for plane
+              // Skip position 6 (near 180°) for plane
               let position = index;
-              if (index >= planePosition) position = index + 1;
+              if (index >= 6) position = index + 1;
               const iconAngle = position * angleStep;
               return (
                 <div 
@@ -673,11 +670,11 @@ const LandingPage = () => {
               );
             })}
             
-            {/* Plane at position 7 (~229°, lower-left) */}
+            {/* Plane at position 6 (~196°, left side) */}
             <div 
               ref={planeRef}
               className="icon-orbit plane-icon"
-              style={{ '--angle': `${planeAngle}deg`, '--delay': '0.42s' }}
+              style={{ '--angle': `${6 * angleStep}deg`, '--delay': '0.36s' }}
             >
               ✈️
             </div>
