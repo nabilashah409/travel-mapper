@@ -522,21 +522,17 @@ const LandingPage = () => {
     const iconsContainer = iconsContainerRef.current;
     if (!plane || !iconsContainer) return;
     
-    // Get all orbit icons (excluding plane)
     const orbitIcons = iconsContainer.querySelectorAll('.icon-orbit:not(.plane-icon)');
-    
-    // Timeline:
-    // 0-800ms: All icons (including plane) gather in
-    // 800-900ms: Brief pause in orbit
-    // 900ms: Plane leaves, other icons spread to fill gap
-    // 900-3500ms: Plane flies across
-    // 3500ms: Plane arrives, icons make space, plane joins orbit
     
     const gatherDuration = 800;
     const orbitPause = 100;
     const flightDuration = 2600;
     
-    // Bezier curve for flight across title
+    // Plane starts at 180° (left side), flies to 0° (right side)
+    const planeStartAngle = 180;
+    const planeEndAngle = 0;
+    
+    // Bezier curve for flight across title (left to right)
     const bezierStart = { x: 8, y: 50 };
     const bezierControl = { x: 50, y: 30 };
     const bezierEnd = { x: 92, y: 50 };
@@ -550,15 +546,6 @@ const LandingPage = () => {
       return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     };
     
-    // Function to update icon spacing
-    const updateIconSpacing = (numIcons, startAngleOffset = 0) => {
-      const angleStep = 360 / numIcons;
-      orbitIcons.forEach((icon, index) => {
-        const newAngle = startAngleOffset + (index * angleStep);
-        icon.style.setProperty('--current-angle', `${newAngle}deg`);
-      });
-    };
-    
     let animationId;
     let startTime = null;
     let hasLeftOrbit = false;
@@ -568,36 +555,37 @@ const LandingPage = () => {
       if (!startTime) startTime = timestamp;
       const elapsed = timestamp - startTime;
       
-      // Phase 1: Gathering (CSS handles this)
       if (elapsed < gatherDuration + orbitPause) {
         animationId = requestAnimationFrame(animate);
         return;
       }
       
-      // Phase 2: Plane leaves orbit - spread other icons
+      // Plane leaves orbit - spread other icons to fill gap at 180° (left side)
       if (!hasLeftOrbit) {
         hasLeftOrbit = true;
-        // Spread 10 icons to fill the circle (was 11)
+        
+        // 10 remaining icons spread evenly, but skip the 180° position where plane was
+        // Icons were at: 0°, 32.7°, 65.5°, 98.2°, 130.9°, 163.6°, [196.4° plane], 229.1°, 261.8°, 294.5°, 327.3°
+        // Now spread 10 icons evenly: 36° apart
         orbitIcons.forEach((icon, index) => {
-          const newAngle = index * (360 / 10); // 36° apart instead of ~32.7°
+          const newAngle = index * 36; // 0°, 36°, 72°, 108°, 144°, 180°, 216°, 252°, 288°, 324°
           icon.style.transition = 'transform 0.5s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
+        
         plane.classList.add('flying');
       }
       
-      // Phase 3: Flight across title
+      // Flight across title
       const flightElapsed = elapsed - gatherDuration - orbitPause;
       const progress = Math.min(flightElapsed / flightDuration, 1);
       
       if (progress < 1) {
         const easedProgress = easeInOutCubic(progress);
         
-        // Calculate position on bezier curve
         const x = quadraticBezier(easedProgress, bezierStart.x, bezierControl.x, bezierEnd.x);
         const y = quadraticBezier(easedProgress, bezierStart.y, bezierControl.y, bezierEnd.y);
         
-        // Calculate direction
         const lookAhead = Math.min(easedProgress + 0.05, 1);
         const nextX = quadraticBezier(lookAhead, bezierStart.x, bezierControl.x, bezierEnd.x);
         const nextY = quadraticBezier(lookAhead, bezierStart.y, bezierControl.y, bezierEnd.y);
@@ -606,7 +594,7 @@ const LandingPage = () => {
         const angle = Math.atan2(dy, dx) * (180 / Math.PI);
         const adjustedRotation = angle + 45;
         
-        // Scale: smoothly increase to 1.8x at middle, back to 1x at end
+        // Scale: grow to 1.8x at middle, back to 1x at end
         const scale = 1 + 0.8 * Math.sin(easedProgress * Math.PI);
         
         plane.style.left = `${x}%`;
@@ -616,29 +604,30 @@ const LandingPage = () => {
         
         animationId = requestAnimationFrame(animate);
       } else if (!hasJoinedOrbit) {
-        // Phase 4: Plane arrives - icons make space, plane joins
         hasJoinedOrbit = true;
         
-        // Make space for plane at position 0 (right side)
+        // Plane joins at 0° (right side) - redistribute all 11 icons evenly
+        // Each icon 32.727° apart (360/11)
+        const angleStep = 360 / 11;
         orbitIcons.forEach((icon, index) => {
-          // Shift all icons to make room: plane at 0°, others start at ~32.7°
-          const newAngle = ((index + 1) * (360 / 11));
+          // Icons take positions 1-10 (indices 0-9 map to angles 32.7° to 327.3°)
+          const newAngle = (index + 1) * angleStep;
           icon.style.transition = 'transform 0.4s ease-out';
           icon.style.setProperty('--angle', `${newAngle}deg`);
         });
         
-        // Plane joins at 0° position (right side of circle)
+        // Plane takes position 0° (right side)
         plane.classList.remove('flying');
         plane.classList.add('in-orbit');
         plane.style.transition = 'all 0.4s ease-out';
         plane.style.left = '50%';
         plane.style.top = '50%';
+        plane.style.setProperty('--angle', '0deg');
         plane.style.transform = 'rotate(0deg) translateX(min(40vmin, 200px)) rotate(0deg) scale(1)';
         plane.style.opacity = '1';
       }
     };
     
-    // Play swoosh sound when flight starts
     setTimeout(() => {
       const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSl+zPLTgjMGHGS56+CZSwkPVanm7qxfHAU7ldjzzn0pBSh6y/HTgjMGHGS56+CZSwkPVanm7qxfHAU7ldj');
       audio.volume = 0.3;
@@ -652,35 +641,42 @@ const LandingPage = () => {
     };
   }, []);
 
-  // 10 regular icons + 1 plane = 11 total, evenly spaced
+  // 10 regular icons + 1 plane = 11 total, evenly spaced at 32.727° apart
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
-  const totalIcons = circleIcons.length + 1; // +1 for plane
-  const angleStep = 360 / totalIcons; // ~32.7°
+  const totalIcons = 11;
+  const angleStep = 360 / totalIcons; // ~32.727°
 
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
       <div ref={containerRef} className="landing-content">
         <div className="bounding-box">
           <div className="circular-container" ref={iconsContainerRef}>
-            {/* Regular icons */}
-            {circleIcons.map((icon, index) => (
-              <div 
-                key={index}
-                className="icon-orbit"
-                style={{ 
-                  '--angle': `${(index + 1) * angleStep}deg`,
-                  '--delay': `${(index + 1) * 0.06}s`
-                }}
-              >
-                {icon}
-              </div>
-            ))}
+            {/* Regular icons at positions 1-10 (skip position 0 for plane at start, skip position 6 where plane starts at 180°) */}
+            {circleIcons.map((icon, index) => {
+              // Place icons at all positions except 180° (position 6)
+              // Positions: 0, 1, 2, 3, 4, 5, 7, 8, 9, 10 → angles: 0°, 32.7°, 65.5°, 98.2°, 130.9°, 163.6°, 229.1°, 261.8°, 294.5°, 327.3°
+              let position = index;
+              if (index >= 6) position = index + 1; // Skip position 6 (180°) for plane
+              const iconAngle = position * angleStep;
+              return (
+                <div 
+                  key={index}
+                  className="icon-orbit"
+                  style={{ 
+                    '--angle': `${iconAngle}deg`,
+                    '--delay': `${index * 0.06}s`
+                  }}
+                >
+                  {icon}
+                </div>
+              );
+            })}
             
-            {/* Plane icon - starts at position 0 (right side), will fly across */}
+            {/* Plane at position 6 (180°, left side) */}
             <div 
               ref={planeRef}
               className="icon-orbit plane-icon"
-              style={{ '--angle': '0deg', '--delay': '0s' }}
+              style={{ '--angle': '180deg', '--delay': '0.36s' }}
             >
               ✈️
             </div>
