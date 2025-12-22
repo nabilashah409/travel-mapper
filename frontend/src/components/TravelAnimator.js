@@ -531,16 +531,14 @@ const LandingPage = () => {
     const totalIcons = 11;
     const angleStep = 360 / totalIcons;
     
-    // Simple bezier curve across the title
-    // Start below orbit, end above orbit to avoid collision
-    const bezierStart = { x: 8, y: 65 };   // Start well below center
-    const bezierControl = { x: 50, y: 18 };
-    const bezierEnd = { x: 92, y: 35 };    // End well above center
-    
-    const quadraticBezier = (t, p0, p1, p2) => {
-      const oneMinusT = 1 - t;
-      return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
-    };
+    // 3D orbit path around the entire content (like Universal Studios logo)
+    // The plane orbits in an ellipse that goes behind and in front of the content
+    const orbitCenterX = 50;  // Center of screen
+    const orbitCenterY = 50;
+    const orbitRadiusX = 35;  // Horizontal radius (wider)
+    const orbitRadiusY = 12;  // Vertical radius (flatter ellipse for 3D effect)
+    const startAngle = 180;   // Start from left (behind)
+    const endAngle = 540;     // Full orbit + half (1.5 rotations for dramatic effect)
     
     const easeInOutCubic = (t) => {
       return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
