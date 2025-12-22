@@ -577,31 +577,48 @@ const LandingPage = () => {
         plane.style.opacity = '1';
       }
       
-      // Flight animation
+      // Flight animation - 3D orbit around content
       const flightElapsed = elapsed - gatherDuration;
       const progress = Math.min(flightElapsed / flightDuration, 1);
       
       if (progress < 1) {
         const easedProgress = easeInOutCubic(progress);
         
-        const x = quadraticBezier(easedProgress, bezierStart.x, bezierControl.x, bezierEnd.x);
-        const y = quadraticBezier(easedProgress, bezierStart.y, bezierControl.y, bezierEnd.y);
+        // Calculate position on elliptical orbit
+        const currentAngle = startAngle + (endAngle - startAngle) * easedProgress;
+        const angleRad = (currentAngle * Math.PI) / 180;
         
-        // Calculate rotation
-        const lookAhead = Math.min(easedProgress + 0.05, 1);
-        const nextX = quadraticBezier(lookAhead, bezierStart.x, bezierControl.x, bezierEnd.x);
-        const nextY = quadraticBezier(lookAhead, bezierStart.y, bezierControl.y, bezierEnd.y);
+        const x = orbitCenterX + orbitRadiusX * Math.cos(angleRad);
+        const y = orbitCenterY + orbitRadiusY * Math.sin(angleRad);
+        
+        // 3D effect: scale and z-index based on position in orbit
+        // When sin(angle) > 0, plane is "in front" (larger, higher z-index)
+        // When sin(angle) < 0, plane is "behind" (smaller, lower z-index)
+        const depthFactor = Math.sin(angleRad);
+        const baseScale = 1.2;
+        const scaleVariation = 0.6;
+        const scale = baseScale + scaleVariation * depthFactor;
+        
+        // Opacity: slightly dimmer when behind
+        const opacity = 0.7 + 0.3 * ((depthFactor + 1) / 2);
+        
+        // Z-index: behind content when in back half of orbit
+        const zIndex = depthFactor > 0 ? 100 : 1;
+        
+        // Rotation: plane nose follows the orbit path
+        const nextAngle = currentAngle + 5;
+        const nextAngleRad = (nextAngle * Math.PI) / 180;
+        const nextX = orbitCenterX + orbitRadiusX * Math.cos(nextAngleRad);
+        const nextY = orbitCenterY + orbitRadiusY * Math.sin(nextAngleRad);
         const dx = nextX - x;
         const dy = nextY - y;
-        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-        const adjustedRotation = angle + 45;
-        
-        // Scale
-        const scale = 1 + 0.8 * Math.sin(easedProgress * Math.PI);
+        const rotation = Math.atan2(dy, dx) * (180 / Math.PI) + 45;
         
         plane.style.left = `${x}%`;
         plane.style.top = `${y}%`;
-        plane.style.transform = `translate(-50%, -50%) rotate(${adjustedRotation}deg) scale(${scale})`;
+        plane.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scale(${scale})`;
+        plane.style.opacity = String(opacity);
+        plane.style.zIndex = String(zIndex);
         
         animationId = requestAnimationFrame(animate);
       } else if (!hasJoinedOrbit) {
