@@ -111,23 +111,33 @@ const TravelAnimator = () => {
     setIsSearching(false);
   };
 
-  // Create curved path for flights
+  // Create curved path for all routes (great circle arc style)
   const createCurvedPath = (start, end) => {
     const points = [];
     const numPoints = 100;
-    const arcHeight = 0.15;
+    
+    // Calculate distance to determine arc height
+    const latDiff = Math.abs(end.lat - start.lat);
+    const lngDiff = Math.abs(end.lng - start.lng);
+    const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
+    
+    // Arc height proportional to distance (more curve for longer routes)
+    const arcHeight = Math.min(distance * 0.3, 15); // Cap at 15 degrees
 
     for (let i = 0; i <= numPoints; i++) {
       const t = i / numPoints;
       const lat = start.lat + (end.lat - start.lat) * t;
       const lng = start.lng + (end.lng - start.lng) * t;
-      const offsetLat = Math.sin(t * Math.PI) * arcHeight * Math.abs(end.lat - start.lat);
-      points.push([lat + offsetLat, lng]);
+      
+      // Sine curve for natural arc (peaks at middle)
+      const arcOffset = Math.sin(t * Math.PI) * arcHeight;
+      
+      points.push([lat + arcOffset, lng]);
     }
     return points;
   };
 
-  // Calculate route based on destinations
+  // Calculate route based on destinations - always curved
   const calculateRoute = (dests) => {
     if (dests.length < 2) return;
     
@@ -137,12 +147,9 @@ const TravelAnimator = () => {
       const start = dests[i];
       const end = dests[i + 1];
       
-      if (selectedTransport === 'flight') {
-        const curvedPath = createCurvedPath(start, end);
-        allPoints = [...allPoints, ...curvedPath];
-      } else {
-        // Straight line for ground transport with intermediate points
-        const numPoints = 50;
+      // Always use curved path for visual appeal
+      const curvedPath = createCurvedPath(start, end);
+      allPoints = [...allPoints, ...curvedPath];
         for (let j = 0; j <= numPoints; j++) {
           const t = j / numPoints;
           allPoints.push([
