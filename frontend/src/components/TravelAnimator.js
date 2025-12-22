@@ -525,7 +525,7 @@ const LandingPage = () => {
     const orbitIcons = iconsContainer.querySelectorAll('.icon-orbit:not(.plane-icon)');
     
     const gatherDuration = 800;
-    const flightDuration = 2600;
+    const flightDuration = 3000; // Slightly longer for the orbit effect
     
     // 11 icons total, evenly spaced at 32.727° apart
     const totalIcons = 11;
