@@ -494,73 +494,73 @@ const LandingPage = () => {
     audio.volume = 0.3;
     audio.play().catch(() => {});
     
-    // Smooth plane animation using lerp + requestAnimationFrame
+    // Smooth plane animation using Quadratic Bezier curve + lerp + requestAnimationFrame
     const plane = planeRef.current;
     if (!plane) return;
     
-    const duration = 4500; // Slower: 4.5 seconds for smoother flight
-    const startTime = Date.now();
+    // Wait for icons to gather first
+    const planeDelay = 800;
+    const duration = 3500;
     
-    // Curved path within bounding box (starts just outside circle, not page edge)
-    // Values are percentages relative to the bounding box container
-    const pathPoints = [
-      { x: 5, y: 90, rotation: -40, scale: 0.6 },
-      { x: 15, y: 70, rotation: -30, scale: 0.8 },
-      { x: 28, y: 52, rotation: -18, scale: 0.95 },
-      { x: 42, y: 40, rotation: -5, scale: 1.05 },
-      { x: 58, y: 35, rotation: 8, scale: 1.1 },
-      { x: 72, y: 32, rotation: 18, scale: 1.0 },
-      { x: 85, y: 25, rotation: 28, scale: 0.9 },
-      { x: 95, y: 12, rotation: 35, scale: 0.7 },
-    ];
+    // Quadratic Bezier curve for truly smooth arc
+    // P0 = start, P1 = control point (creates the curve), P2 = end
+    const bezierStart = { x: 10, y: 85 };
+    const bezierControl = { x: 35, y: 15 }; // Control point - pull curve upward
+    const bezierEnd = { x: 90, y: 20 };
     
-    // Lerp function
-    const lerp = (start, end, t) => start + (end - start) * t;
+    // Quadratic Bezier function: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
+    const quadraticBezier = (t, p0, p1, p2) => {
+      const oneMinusT = 1 - t;
+      return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
+    };
     
-    // Smooth step function for even smoother easing
-    const smoothStep = (t) => t * t * (3 - 2 * t);
+    // Get tangent angle for rotation (derivative of bezier)
+    const getBezierAngle = (t) => {
+      const dx = 2 * (1 - t) * (bezierControl.x - bezierStart.x) + 2 * t * (bezierEnd.x - bezierControl.x);
+      const dy = 2 * (1 - t) * (bezierControl.y - bezierStart.y) + 2 * t * (bezierEnd.y - bezierControl.y);
+      return Math.atan2(dy, dx) * (180 / Math.PI);
+    };
     
-    // Get interpolated position on path
-    const getPositionOnPath = (progress) => {
-      const numSegments = pathPoints.length - 1;
-      const segmentIndex = Math.min(Math.floor(progress * numSegments), numSegments - 1);
-      const segmentProgress = (progress * numSegments) - segmentIndex;
-      
-      // Apply smoothstep to segment progress for smoother transitions
-      const smoothedProgress = smoothStep(segmentProgress);
-      
-      const start = pathPoints[segmentIndex];
-      const end = pathPoints[Math.min(segmentIndex + 1, numSegments)];
-      
-      return {
-        x: lerp(start.x, end.x, smoothedProgress),
-        y: lerp(start.y, end.y, smoothedProgress),
-        rotation: lerp(start.rotation, end.rotation, smoothedProgress),
-        scale: lerp(start.scale, end.scale, smoothedProgress),
-      };
+    // Smooth easing function
+    const easeInOutCubic = (t) => {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     };
     
     let animationId;
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+    let startTime = null;
+    
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
       
-      // Ease-in-out for natural feel
-      const easedProgress = progress < 0.5 
-        ? 2 * progress * progress 
-        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+      if (elapsed < planeDelay) {
+        // Wait for icons to gather
+        plane.style.opacity = '0';
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
       
-      const pos = getPositionOnPath(easedProgress);
+      const flightElapsed = elapsed - planeDelay;
+      const progress = Math.min(flightElapsed / duration, 1);
+      const easedProgress = easeInOutCubic(progress);
       
-      // Direct DOM manipulation for 60fps smoothness
-      plane.style.left = `${pos.x}%`;
-      plane.style.top = `${pos.y}%`;
-      plane.style.transform = `rotate(${pos.rotation}deg) scale(${pos.scale})`;
+      // Calculate position on bezier curve
+      const x = quadraticBezier(easedProgress, bezierStart.x, bezierControl.x, bezierEnd.x);
+      const y = quadraticBezier(easedProgress, bezierStart.y, bezierControl.y, bezierEnd.y);
+      const rotation = getBezierAngle(easedProgress);
       
-      // Fade in/out at edges
+      // Scale - slightly larger in middle
+      const scale = 0.7 + 0.5 * Math.sin(easedProgress * Math.PI);
+      
+      // Direct DOM manipulation for 60fps
+      plane.style.left = `${x}%`;
+      plane.style.top = `${y}%`;
+      plane.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+      
+      // Fade in/out
       let opacity = 1;
-      if (progress < 0.1) opacity = progress * 10;
-      else if (progress > 0.85) opacity = (1 - progress) * 6.67;
+      if (progress < 0.15) opacity = progress / 0.15;
+      else if (progress > 0.85) opacity = (1 - progress) / 0.15;
       plane.style.opacity = opacity;
       
       if (progress < 1) {
@@ -584,14 +584,15 @@ const LandingPage = () => {
       <div ref={containerRef} className="landing-content">
         {/* Bounding box for circle and plane */}
         <div className="bounding-box">
-          {/* Circular rotating icons */}
+          {/* Circular rotating icons - animate in from outside */}
           <div className="circular-container">
             {circleIcons.map((icon, index) => (
               <div 
                 key={index}
                 className="icon-orbit" 
                 style={{ 
-                  '--angle': `${index * (360 / circleIcons.length)}deg`
+                  '--angle': `${index * (360 / circleIcons.length)}deg`,
+                  '--delay': `${index * 0.08}s`
                 }}
               >
                 {icon}
@@ -608,12 +609,14 @@ const LandingPage = () => {
           </div>
         </div>
         
-        {/* Title centered absolutely */}
+        {/* Title centered with padding to avoid icon overlap */}
         <div className="title-overlay">
-          <h1 className="title-text">
-            Travel Animator
-          </h1>
-          <p className="subtitle-text">Plan your journey</p>
+          <div className="title-box">
+            <h1 className="title-text">
+              Travel Animator
+            </h1>
+            <p className="subtitle-text">Plan your journey</p>
+          </div>
         </div>
       </div>
 
@@ -623,7 +626,7 @@ const LandingPage = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          animation: scrollUp 0.8s ease-in-out 4.5s forwards;
+          animation: scrollUp 0.8s ease-in-out 5s forwards;
         }
         
         .bounding-box {
@@ -632,8 +635,8 @@ const LandingPage = () => {
           height: 85vmin;
           max-width: 500px;
           max-height: 500px;
-          min-width: 280px;
-          min-height: 280px;
+          min-width: 300px;
+          min-height: 300px;
         }
         
         .title-overlay {
@@ -644,23 +647,31 @@ const LandingPage = () => {
           text-align: center;
           z-index: 10;
           pointer-events: none;
-          width: 100%;
+        }
+        
+        .title-box {
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(8px);
+          padding: 1.5rem 2rem;
+          border-radius: 1.5rem;
+          box-shadow: 0 8px 32px rgba(236, 72, 153, 0.15);
         }
         
         .title-text {
-          font-size: clamp(1.75rem, 6vw, 3.5rem);
+          font-size: clamp(1.5rem, 5vw, 2.8rem);
           font-weight: 700;
           background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
           line-height: 1.2;
+          white-space: nowrap;
         }
         
         .subtitle-text {
-          font-size: clamp(0.75rem, 2vw, 1rem);
+          font-size: clamp(0.7rem, 2vw, 0.95rem);
           color: #6b7280;
-          margin-top: 0.5rem;
+          margin-top: 0.4rem;
         }
 
         .circular-container {
@@ -676,9 +687,31 @@ const LandingPage = () => {
           position: absolute;
           top: 50%;
           left: 50%;
-          font-size: clamp(1.5rem, 4vw, 2.5rem);
+          font-size: clamp(1.4rem, 3.5vw, 2.2rem);
           transform-origin: center;
-          animation: orbit 8s linear infinite;
+          animation: 
+            gatherIn 0.8s ease-out var(--delay) forwards,
+            orbit 10s linear 0.8s infinite;
+          opacity: 0;
+        }
+
+        @keyframes gatherIn {
+          0% {
+            opacity: 0;
+            transform: 
+              rotate(var(--angle)) 
+              translateX(calc(min(42vmin, 220px) + 100px)) 
+              rotate(calc(-1 * var(--angle)))
+              scale(0.3);
+          }
+          100% {
+            opacity: 1;
+            transform: 
+              rotate(var(--angle)) 
+              translateX(min(42vmin, 220px)) 
+              rotate(calc(-1 * var(--angle)))
+              scale(1);
+          }
         }
 
         @keyframes orbit {
@@ -698,11 +731,12 @@ const LandingPage = () => {
 
         .plane-element {
           position: absolute;
-          font-size: clamp(2rem, 6vw, 4rem);
-          filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
+          font-size: clamp(2.5rem, 7vw, 4.5rem);
+          filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
           z-index: 20;
           will-change: transform, left, top, opacity;
           pointer-events: none;
+          opacity: 0;
         }
 
         @keyframes scrollUp {
