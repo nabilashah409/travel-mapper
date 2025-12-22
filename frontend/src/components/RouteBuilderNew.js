@@ -409,26 +409,27 @@ const RouteBuilderNew = () => {
 
             {/* Destinations List */}
             {destinations.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
-                <Search className="w-12 h-12 mx-auto mb-2 opacity-30" />
-                <p className="text-sm">Start by adding your first destination</p>
+              <div className="text-center py-6 sm:py-8 text-gray-400">
+                <Search className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 opacity-30" />
+                <p className="text-xs sm:text-sm">Start by adding your first destination</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {destinations.map((dest, index) => (
                   <div
                     key={dest.id}
-                    className="flex items-center gap-2 p-3 rounded-lg border destination-item"
+                    className="flex items-center gap-2 p-3 sm:p-3 rounded-lg border destination-item"
                   >
-                    <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">
+                    <div className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {index + 1}
                     </div>
-                    <div className="flex-1 text-sm truncate">{dest.location}</div>
+                    <div className="flex-1 text-xs sm:text-sm truncate">{dest.location}</div>
                     <button
                       onClick={() => removeDestination(dest.id)}
-                      className="text-gray-400 hover:text-red-500"
+                      className="text-gray-400 hover:text-red-500 p-2 -m-2"
+                      style={{ touchAction: 'manipulation' }}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
                 ))}
@@ -437,7 +438,7 @@ const RouteBuilderNew = () => {
           </div>
 
           {/* Choose Travel Mode */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Choose Travel Mode</h3>
             <div className="grid grid-cols-3 gap-2">
               {transportModes.map((mode) => {
@@ -447,11 +448,12 @@ const RouteBuilderNew = () => {
                   <button
                     key={mode.id}
                     onClick={() => setSelectedTransport(mode.id)}
-                    className={`transport-mode-btn p-4 rounded-lg border-2 flex flex-col items-center gap-2 ${
+                    className={`transport-mode-btn p-3 sm:p-4 rounded-lg border-2 flex flex-col items-center gap-1 sm:gap-2 min-h-[80px] ${
                       isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
                     }`}
+                    style={{ touchAction: 'manipulation' }}
                   >
-                    <Icon className={`w-6 h-6 ${isSelected ? 'text-blue-500' : 'text-gray-600'}`} />
+                    <Icon className={`w-6 h-6 sm:w-6 sm:h-6 ${isSelected ? 'text-blue-500' : 'text-gray-600'}`} />
                     <span className={`text-xs font-medium ${isSelected ? 'text-blue-500' : 'text-gray-600'}`}>
                       {mode.label}
                     </span>
@@ -461,20 +463,20 @@ const RouteBuilderNew = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Mobile optimized */}
           {destinations.length < 2 ? (
             <Button
               disabled
-              className="w-full"
-              style={{ backgroundColor: '#93c5fd', color: '#fff' }}
+              className="w-full h-12 text-base"
+              style={{ backgroundColor: '#93c5fd', color: '#fff', touchAction: 'manipulation' }}
             >
               Add at least 2 destinations
             </Button>
           ) : !routePaths.length ? (
             <Button
               onClick={calculateRoute}
-              className="w-full"
-              style={{ backgroundColor: '#3b82f6' }}
+              className="w-full h-12 text-base"
+              style={{ backgroundColor: '#3b82f6', touchAction: 'manipulation' }}
             >
               Generate Route
             </Button>
@@ -483,25 +485,27 @@ const RouteBuilderNew = () => {
               {!isAnimating ? (
                 <Button
                   onClick={startAnimation}
-                  className="flex-1"
-                  style={{ backgroundColor: '#3b82f6' }}
+                  className="flex-1 h-12 text-base"
+                  style={{ backgroundColor: '#3b82f6', touchAction: 'manipulation' }}
                 >
-                  <Play className="w-4 h-4 mr-2" />
+                  <Play className="w-5 h-5 mr-2" />
                   Play Animation
                 </Button>
               ) : (
                 <Button
                   onClick={pauseAnimation}
-                  className="flex-1"
-                  style={{ backgroundColor: '#ef4444' }}
+                  className="flex-1 h-12 text-base"
+                  style={{ backgroundColor: '#ef4444', touchAction: 'manipulation' }}
                 >
-                  <Pause className="w-4 h-4 mr-2" />
+                  <Pause className="w-5 h-5 mr-2" />
                   Pause
                 </Button>
               )}
               <Button
                 onClick={calculateRoute}
                 variant="outline"
+                className="h-12 px-4"
+                style={{ touchAction: 'manipulation' }}
               >
                 Recalculate
               </Button>
