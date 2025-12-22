@@ -801,11 +801,13 @@ const LandingPage = () => {
         
         .plane-icon.flying {
           animation: none !important;
-          z-index: 25;
+          position: fixed !important;
+          z-index: 100;
           filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
         }
         
         .plane-icon.in-orbit {
+          position: absolute !important;
           animation: orbit 12s linear infinite !important;
           z-index: 15;
         }
