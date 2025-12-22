@@ -222,7 +222,16 @@ const TravelAnimator = () => {
       mapRef.current.removeLayer(markerRef.current);
     }
 
-    // Create animated marker - plane points right by default, so we adjust rotation
+    // First, fit all destinations with padding so route is visible and centered
+    const bounds = L.latLngBounds(routePath);
+    mapRef.current.fitBounds(bounds, {
+      padding: [100, 100],
+      maxZoom: 6,
+      animate: true,
+      duration: 0.5
+    });
+
+    // Create animated marker
     const customIcon = L.divIcon({
       className: 'animated-transport-marker',
       html: `<div style="
@@ -240,7 +249,7 @@ const TravelAnimator = () => {
 
     markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
     
-    // Animation loop using lerp
+    // Animation loop using lerp - keeps icon centered
     const duration = 8000; // 8 seconds
     const startTime = Date.now();
     
@@ -251,6 +260,8 @@ const TravelAnimator = () => {
       if (progress >= 1) {
         setIsAnimating(false);
         setAnimationProgress(100);
+        // Fit bounds again at the end
+        mapRef.current.fitBounds(bounds, { padding: [80, 80], maxZoom: 8 });
         return;
       }
 
@@ -262,16 +273,17 @@ const TravelAnimator = () => {
       const currentPoint = routePath[targetIndex];
       const nextPoint = routePath[nextIndex];
       
-      if (currentPoint && nextPoint && markerRef.current) {
+      if (currentPoint && nextPoint && markerRef.current && mapRef.current) {
         const lat = lerp(currentPoint[0], nextPoint[0], segmentProgress);
         const lng = lerp(currentPoint[1], nextPoint[1], segmentProgress);
         
         // Update marker position directly (no React re-render)
         markerRef.current.setLatLng([lat, lng]);
         
+        // Keep the animated icon in the center of the map
+        mapRef.current.panTo([lat, lng], { animate: false });
+        
         // Update rotation - ✈️ emoji points NORTHEAST (~45°) by default
-        // heading: 0° = east, 90° = north, -90° = south
-        // We subtract 45° to align the emoji nose with the travel direction
         const heading = calculateHeading(currentPoint, nextPoint);
         const adjustedRotation = heading - 45;
         const rotatedIcon = L.divIcon({
