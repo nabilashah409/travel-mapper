@@ -532,9 +532,9 @@ const LandingPage = () => {
     const totalIcons = 11;
     const angleStep = 360 / totalIcons;
     
-    // Plane starts at position 5 (163.6° ≈ left side), flies to position 0 (0° = right side)
-    const planeStartPosition = 5; // Position in the 11-icon circle
-    const planeStartAngle = planeStartPosition * angleStep; // ~163.6°
+    // Plane starts at position 6 (~196.4° ≈ true left side), flies to position 0 (0° = right side)
+    const planeStartPosition = 6; // Position in the 11-icon circle
+    const planeStartAngle = planeStartPosition * angleStep; // ~196.4°
     
     // Bezier curve for flight across title (left to right)
     const bezierStart = { x: 8, y: 50 };
