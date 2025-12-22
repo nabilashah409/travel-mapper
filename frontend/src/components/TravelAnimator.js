@@ -67,7 +67,7 @@ const TravelAnimator = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLanding(false);
-    }, 4750); // icons gather (0.8s) + plane flies (3.15s) + scroll (0.8s) = 4.75s
+    }, 4500); // icons gather (0.8s) + plane flies (2.8s) + scroll (0.8s) = 4.4s + buffer
     return () => clearTimeout(timer);
   }, []);
 
