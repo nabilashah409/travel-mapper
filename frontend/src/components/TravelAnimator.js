@@ -517,10 +517,10 @@ const LandingPage = () => {
     
     // Quadratic Bezier curve for truly smooth arc
     // P0 = start, P1 = control point (creates the curve), P2 = end
-    // Plane flies from bottom-left, arcs HIGH above center, exits top-right
-    const bezierStart = { x: 5, y: 95 };
-    const bezierControl = { x: 50, y: -20 }; // Control point HIGH above - creates big arc
-    const bezierEnd = { x: 95, y: 15 };
+    // Great circle arc style: starts bottom-left, peaks high in upper-middle, ends right-middle
+    const bezierStart = { x: 8, y: 75 };
+    const bezierControl = { x: 50, y: 5 }; // Control point at top-center creates great circle arc
+    const bezierEnd = { x: 92, y: 55 };
     
     // Quadratic Bezier function: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
     const quadraticBezier = (t, p0, p1, p2) => {
