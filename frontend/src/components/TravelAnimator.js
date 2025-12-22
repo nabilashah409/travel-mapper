@@ -400,10 +400,8 @@ const TravelAnimator = () => {
 
   return (
     <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
-      {/* Map with pastel overlay */}
-      <div className="absolute inset-0" style={{ 
-        filter: 'saturate(0.7) brightness(1.05) sepia(0.15)',
-      }}>
+      {/* Map with pastel styling */}
+      <div className="absolute inset-0 pastel-map-container">
         <MapContainer
           center={defaultCenter}
           zoom={4}
@@ -411,10 +409,16 @@ const TravelAnimator = () => {
           zoomControl={false}
           ref={(map) => { if (map) mapRef.current = map; }}
         >
+          {/* Stamen Watercolor tiles for artistic pastel look */}
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-            className="pastel-map"
+            url="https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg"
+            attribution='&copy; <a href="https://stamen.com/">Stamen Design</a>'
+          />
+          {/* Overlay with labels */}
+          <TileLayer
+            url="https://tiles.stadiamaps.com/tiles/stamen_terrain_labels/{z}/{x}/{y}.png"
+            attribution=''
+            opacity={0.6}
           />
           
           <MapController destinations={destinations} defaultCenter={defaultCenter} />
@@ -426,9 +430,9 @@ const TravelAnimator = () => {
               <Polyline
                 positions={routePath}
                 pathOptions={{
-                  color: '#f9a8d4',
-                  weight: 6,
-                  opacity: 0.4,
+                  color: '#ffffff',
+                  weight: 8,
+                  opacity: 0.8,
                   lineCap: 'round',
                 }}
               />
@@ -437,9 +441,9 @@ const TravelAnimator = () => {
                 positions={routePath}
                 pathOptions={{
                   color: '#ec4899',
-                  weight: 2.5,
-                  opacity: 0.9,
-                  dashArray: '6, 10',
+                  weight: 3,
+                  opacity: 1,
+                  dashArray: '8, 12',
                   lineCap: 'round',
                 }}
               />
@@ -454,27 +458,26 @@ const TravelAnimator = () => {
               icon={L.divIcon({
                 className: 'custom-marker',
                 html: `<div style="
-                  width: 24px;
-                  height: 24px;
+                  width: 28px;
+                  height: 28px;
                   border-radius: 50%;
                   background: linear-gradient(135deg, #f472b6, #fb923c);
-                  border: 3px solid white;
-                  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                  border: 4px solid white;
+                  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
                 "></div>`,
-                iconSize: [24, 24],
-                iconAnchor: [12, 12],
+                iconSize: [28, 28],
+                iconAnchor: [14, 14],
               })}
             />
           ))}
         </MapContainer>
       </div>
       
-      {/* Pastel gradient overlay on top of map */}
+      {/* Subtle pastel tint overlay */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{ 
-          background: 'linear-gradient(135deg, rgba(255,245,247,0.3) 0%, rgba(254,243,199,0.2) 50%, rgba(224,242,254,0.3) 100%)',
-          mixBlendMode: 'overlay'
+          background: 'linear-gradient(135deg, rgba(255,182,193,0.15) 0%, rgba(255,218,185,0.1) 50%, rgba(173,216,230,0.15) 100%)',
         }}
       />
 
