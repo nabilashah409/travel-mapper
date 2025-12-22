@@ -574,7 +574,8 @@ const LandingPage = () => {
       const adjustedRotation = rotation - 45;
       plane.style.left = `${x}%`;
       plane.style.top = `${y}%`;
-      plane.style.transform = `rotate(${adjustedRotation}deg) scale(${scale})`;
+      // Use translate to center the plane on the path point, then rotate
+      plane.style.transform = `translate(-50%, -50%) rotate(${adjustedRotation}deg) scale(${scale})`;
       
       // Fade in/out
       let opacity = 1;
