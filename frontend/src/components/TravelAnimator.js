@@ -535,17 +535,12 @@ const LandingPage = () => {
     // Plane starts at 180° (true left side), flies to 0° (right side)
     const planeStartAngle = 180;
     
-    // Calculate bezier points to match orbit positions
-    // Orbit radius is min(40vmin, 200px) from center
-    // The bounding box is 85vmin (max 500px), so radius is ~47% of box width
-    // Relative to the full container, at 180° the plane is at roughly 50% - 20% = 30%
-    // At 0° it's at 50% + 20% = 70%
-    // But the flying plane uses viewport percentages, so we need to account for that
-    // The orbit is centered on screen, radius ~200px on ~500px box = ~40% of box
-    // On viewport (1920px assumed), 200px = ~10% of width, center at 50%
-    // So: 180° → 50 - 10 = 40%, 0° → 50 + 10 = 60%
+    // Bezier curve to match orbit positions
+    // The orbit circle edge at 180° is at the left of the icon circle
+    // At 0° it's at the right of the icon circle
+    // Adjust to match visual orbit radius (roughly 20% from center)
     const bezierStart = { x: 30, y: 50 };  // Left side of orbit (180°)
-    const bezierControl = { x: 50, y: 25 }; // Arc above center
+    const bezierControl = { x: 50, y: 20 }; // Arc above center (higher arc)
     const bezierEnd = { x: 70, y: 50 };    // Right side of orbit (0°)
     
     const quadraticBezier = (t, p0, p1, p2) => {
