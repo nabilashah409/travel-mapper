@@ -624,7 +624,7 @@ const LandingPage = () => {
       } else if (!hasJoinedOrbit) {
         hasJoinedOrbit = true;
         
-        // Redistribute all 11 icons - icons at positions 1-10, plane joins at position 0
+        // Redistribute all 11 icons
         orbitIcons.forEach((icon, index) => {
           const newAngle = (index + 1) * angleStep;
           icon.style.transition = 'transform 0.3s ease-out';
