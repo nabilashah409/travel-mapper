@@ -306,6 +306,42 @@ const TravelAnimator = () => {
     setAnimationProgress(0);
   };
 
+  // Drag and drop handlers for reordering destinations
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+    e.target.style.opacity = '0.5';
+  };
+
+  const handleDragEnd = (e) => {
+    e.target.style.opacity = '1';
+    setDraggedIndex(null);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+    
+    const newDestinations = [...destinations];
+    const [draggedItem] = newDestinations.splice(draggedIndex, 1);
+    newDestinations.splice(dropIndex, 0, draggedItem);
+    
+    setDestinations(newDestinations);
+    setDraggedIndex(null);
+    
+    // Recalculate route with new order
+    if (newDestinations.length > 1) {
+      calculateRoute(newDestinations);
+    }
+  };
+
   // Get transport emoji for animated marker
   const getTransportEmoji = () => {
     const emojis = { flight: '✈️', car: '🚗', train: '🚂', walk: '🚶' };
