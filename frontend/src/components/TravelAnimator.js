@@ -642,23 +642,26 @@ const LandingPage = () => {
     };
   }, []);
 
-  // 10 regular icons + 1 plane = 11 total, evenly spaced at 32.727° apart
+  // 10 regular icons + 1 plane = 11 total
+  // Plane is fixed at 180° (true left), other icons distribute around it
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
   const totalIcons = 11;
   const angleStep = 360 / totalIcons; // ~32.727°
-  const planePosition = 6; // Plane takes position 6 (~196.4°, true left side)
-  const planeAngle = planePosition * angleStep;
+  const planeAngle = 180; // Plane at true left (180°)
 
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
       <div ref={containerRef} className="landing-content">
         <div className="bounding-box">
           <div className="circular-container" ref={iconsContainerRef}>
-            {/* Regular icons at all positions except position 6 (where plane starts) */}
+            {/* Regular icons distributed evenly, skipping 180° where plane is */}
             {circleIcons.map((icon, index) => {
-              // 10 icons fill positions 0,1,2,3,4,5,7,8,9,10 (skip 6 for plane)
+              // Calculate angle: start from 0°, but skip 180° (position 5.5 ≈ 180°)
+              // Use positions: 0, 1, 2, 3, 4, 5 → then skip 180° → 6, 7, 8, 9, 10
               let position = index;
-              if (index >= planePosition) position = index + 1; // Skip position 6 for plane
+              // Icons 0-4 take positions 0-4 (0° to ~131°)
+              // Icons 5-9 take positions 6-10 (196° to 327°) - skipping position 5.5 (180°)
+              if (index >= 5) position = index + 1;
               const iconAngle = position * angleStep;
               return (
                 <div 
@@ -674,11 +677,11 @@ const LandingPage = () => {
               );
             })}
             
-            {/* Plane at position 6 (~196.4°, true left side) */}
+            {/* Plane at 180° (true left side) */}
             <div 
               ref={planeRef}
               className="icon-orbit plane-icon"
-              style={{ '--angle': `${planeAngle}deg`, '--delay': '0.36s' }}
+              style={{ '--angle': `${planeAngle}deg`, '--delay': '0.3s' }}
             >
               ✈️
             </div>
