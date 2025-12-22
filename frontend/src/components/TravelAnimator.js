@@ -646,7 +646,7 @@ const LandingPage = () => {
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
   const totalIcons = 11;
   const angleStep = 360 / totalIcons; // ~32.727°
-  const planePosition = 5; // Plane takes position 5 (~163.6°, left side)
+  const planePosition = 6; // Plane takes position 6 (~196.4°, true left side)
   const planeAngle = planePosition * angleStep;
 
   return (
