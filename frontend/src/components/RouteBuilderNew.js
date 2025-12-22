@@ -327,67 +327,7 @@ const RouteBuilderNew = () => {
     animationRef.current = requestAnimationFrame(animate);
   };
 
-  const easeInOutCubic = (t) => {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  };
-
-  const animateMarker = (startTime) => {
-    const totalPoints = routePaths.reduce((sum, path) => sum + path.length, 0);
-    const animationDuration = 10000; // 10 seconds - faster and fun!
-    
-    const animate = () => {
-      const currentTime = Date.now();
-      const elapsed = currentTime - startTime;
-      
-      if (elapsed >= animationDuration) {
-        setIsAnimating(false);
-        setAnimationProgress(100);
-        return;
-      }
-
-      // Apply smooth easing
-      const linearProgress = elapsed / animationDuration;
-      const easedProgress = easeInOutCubic(linearProgress);
-      const progress = easedProgress * totalPoints;
-      
-      let currentPoint = 0;
-      
-      for (let i = 0; i < routePaths.length; i++) {
-        if (currentPoint + routePaths[i].length > progress) {
-          const pointInPath = progress - currentPoint;
-          const floorIndex = Math.floor(pointInPath);
-          const ceilIndex = Math.min(floorIndex + 1, routePaths[i].length - 1);
-          const fraction = pointInPath - floorIndex;
-          
-          // Smooth interpolation between points
-          const p1 = routePaths[i][floorIndex];
-          const p2 = routePaths[i][ceilIndex];
-          
-          if (p1 && p2) {
-            const interpolatedPosition = [
-              p1[0] + (p2[0] - p1[0]) * fraction,
-              p1[1] + (p2[1] - p1[1]) * fraction
-            ];
-            
-            setCurrentMarkerPosition(interpolatedPosition);
-            
-            // Calculate heading for rotation
-            if (floorIndex < routePaths[i].length - 1) {
-              const heading = calculateHeading(p1, p2);
-              setMarkerRotation(heading);
-            }
-          }
-          break;
-        }
-        currentPoint += routePaths[i].length;
-      }
-
-      setAnimationProgress(linearProgress * 100);
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-  };
+ 
 
   const pauseAnimation = () => {
     setIsAnimating(false);
