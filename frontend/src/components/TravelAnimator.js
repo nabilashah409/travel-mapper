@@ -317,18 +317,31 @@ const TravelAnimator = () => {
         
         <MapController destinations={destinations} defaultCenter={defaultCenter} />
         
-        {/* Route line - white dotted style like reference image */}
+        {/* Route line - dotted style like reference image */}
         {routePath.length > 1 && (
-          <Polyline
-            positions={routePath}
-            pathOptions={{
-              color: '#ffffff',
-              weight: 3,
-              opacity: 1,
-              dashArray: '8, 12',
-              lineCap: 'round',
-            }}
-          />
+          <>
+            {/* Shadow/glow effect */}
+            <Polyline
+              positions={routePath}
+              pathOptions={{
+                color: '#94a3b8',
+                weight: 5,
+                opacity: 0.4,
+                lineCap: 'round',
+              }}
+            />
+            {/* Main dotted line */}
+            <Polyline
+              positions={routePath}
+              pathOptions={{
+                color: '#475569',
+                weight: 2.5,
+                opacity: 0.9,
+                dashArray: '6, 10',
+                lineCap: 'round',
+              }}
+            />
+          </>
         )}
         
         {/* Destination markers - red pins like reference */}
