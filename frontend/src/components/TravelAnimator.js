@@ -529,14 +529,12 @@ const LandingPage = () => {
       return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
     };
     
-    // Get tangent angle for rotation (derivative of bezier)
-    // Note: In screen coordinates Y increases downward, so we negate dy
-    const getBezierAngle = (t) => {
-      const dx = 2 * (1 - t) * (bezierControl.x - bezierStart.x) + 2 * t * (bezierEnd.x - bezierControl.x);
-      const dy = 2 * (1 - t) * (bezierControl.y - bezierStart.y) + 2 * t * (bezierEnd.y - bezierControl.y);
-      // Negate dy because screen Y is inverted (down is positive)
-      return Math.atan2(-dy, dx) * (180 / Math.PI);
-    };
+    // Calculate overall direction from start to end for consistent plane orientation
+    // Instead of following exact tangent (which changes dramatically), use a fixed direction
+    const overallDirection = Math.atan2(
+      -(bezierEnd.y - bezierStart.y),  // Negate for screen coords
+      bezierEnd.x - bezierStart.x
+    ) * (180 / Math.PI);
     
     // Smooth easing function
     const easeInOutCubic = (t) => {
@@ -564,13 +562,16 @@ const LandingPage = () => {
       // Calculate position on bezier curve
       const x = quadraticBezier(easedProgress, bezierStart.x, bezierControl.x, bezierEnd.x);
       const y = quadraticBezier(easedProgress, bezierStart.y, bezierControl.y, bezierEnd.y);
-      const rotation = getBezierAngle(easedProgress);
+      
+      // Use consistent direction throughout (overall direction from start to end)
+      // This keeps the plane pointing in a natural travel direction
+      const rotation = overallDirection;
       
       // Scale - slightly larger in middle
       const scale = 0.7 + 0.5 * Math.sin(easedProgress * Math.PI);
       
       // Direct DOM manipulation for 60fps
-      // ✈️ emoji points NORTHEAST (~45°) by default, so subtract 45° from bezier tangent angle
+      // ✈️ emoji points NORTHEAST (~45°) by default, so subtract 45°
       const adjustedRotation = rotation - 45;
       plane.style.left = `${x}%`;
       plane.style.top = `${y}%`;
