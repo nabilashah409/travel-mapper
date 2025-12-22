@@ -400,69 +400,83 @@ const TravelAnimator = () => {
 
   return (
     <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
-      {/* Map */}
-      <MapContainer
-        center={defaultCenter}
-        zoom={4}
-        style={{ height: '100%', width: '100%' }}
-        zoomControl={false}
-        ref={(map) => { if (map) mapRef.current = map; }}
-      >
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-        />
-        
-        <MapController destinations={destinations} defaultCenter={defaultCenter} />
-        
-        {/* Route line - dotted style like reference image */}
-        {routePath.length > 1 && (
-          <>
-            {/* Shadow/glow effect */}
-            <Polyline
-              positions={routePath}
-              pathOptions={{
-                color: '#94a3b8',
-                weight: 5,
-                opacity: 0.4,
-                lineCap: 'round',
-              }}
-            />
-            {/* Main dotted line */}
-            <Polyline
-              positions={routePath}
-              pathOptions={{
-                color: '#475569',
-                weight: 2.5,
-                opacity: 0.9,
-                dashArray: '6, 10',
-                lineCap: 'round',
-              }}
-            />
-          </>
-        )}
-        
-        {/* Destination markers - red pins like reference */}
-        {destinations.map((dest, index) => (
-          <Marker
-            key={dest.id}
-            position={[dest.lat, dest.lng]}
-            icon={L.divIcon({
-              className: 'custom-marker',
-              html: `<div style="
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
-                background: #ef4444;
-                border: 3px solid white;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-              "></div>`,
-              iconSize: [24, 24],
-              iconAnchor: [12, 12],
-            })}
+      {/* Map with pastel overlay */}
+      <div className="absolute inset-0" style={{ 
+        filter: 'saturate(0.7) brightness(1.05) sepia(0.15)',
+      }}>
+        <MapContainer
+          center={defaultCenter}
+          zoom={4}
+          style={{ height: '100%', width: '100%' }}
+          zoomControl={false}
+          ref={(map) => { if (map) mapRef.current = map; }}
+        >
+          <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+            className="pastel-map"
           />
-        ))}
-      </MapContainer>
+          
+          <MapController destinations={destinations} defaultCenter={defaultCenter} />
+          
+          {/* Route line - dotted style with pastel colors */}
+          {routePath.length > 1 && (
+            <>
+              {/* Shadow/glow effect */}
+              <Polyline
+                positions={routePath}
+                pathOptions={{
+                  color: '#f9a8d4',
+                  weight: 6,
+                  opacity: 0.4,
+                  lineCap: 'round',
+                }}
+              />
+              {/* Main dotted line */}
+              <Polyline
+                positions={routePath}
+                pathOptions={{
+                  color: '#ec4899',
+                  weight: 2.5,
+                  opacity: 0.9,
+                  dashArray: '6, 10',
+                  lineCap: 'round',
+                }}
+              />
+            </>
+          )}
+          
+          {/* Destination markers - pastel pink pins */}
+          {destinations.map((dest, index) => (
+            <Marker
+              key={dest.id}
+              position={[dest.lat, dest.lng]}
+              icon={L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50%;
+                  background: linear-gradient(135deg, #f472b6, #fb923c);
+                  border: 3px solid white;
+                  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                "></div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12],
+              })}
+            />
+          ))}
+        </MapContainer>
+      </div>
+      
+      {/* Pastel gradient overlay on top of map */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{ 
+          background: 'linear-gradient(135deg, rgba(255,245,247,0.3) 0%, rgba(254,243,199,0.2) 50%, rgba(224,242,254,0.3) 100%)',
+          mixBlendMode: 'overlay'
+        }}
+      />
 
       {/* Floating search box with dropdown */}
       <div className="absolute top-4 left-4 right-4 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 z-[1000]">
