@@ -571,9 +571,9 @@ const LandingPage = () => {
       const scale = 0.7 + 0.5 * Math.sin(easedProgress * Math.PI);
       
       // Direct DOM manipulation for 60fps
-      // ✈️ emoji points at ~45° (upper-right) by default
-      // CSS rotate is clockwise, so to point at angle θ: rotation = θ - 45
-      const adjustedRotation = angle - 45;
+      // ✈️ emoji nose points at ~315° (-45°) by default (upper-right)
+      // To align NOSE with route direction: rotation = angle + 45
+      const adjustedRotation = angle + 45;
       plane.style.left = `${x}%`;
       plane.style.top = `${y}%`;
       // Use translate to center the plane on the path point, then rotate
