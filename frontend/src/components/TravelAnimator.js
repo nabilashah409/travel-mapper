@@ -535,8 +535,8 @@ const LandingPage = () => {
     // The plane orbits in an ellipse that goes behind and in front of the content
     const orbitCenterX = 50;  // Center of screen
     const orbitCenterY = 50;
-    const orbitRadiusX = 35;  // Horizontal radius (wider)
-    const orbitRadiusY = 12;  // Vertical radius (flatter ellipse for 3D effect)
+    const orbitRadiusX = 45;  // Horizontal radius (wider, further from icons)
+    const orbitRadiusY = 18;  // Vertical radius (flatter ellipse for 3D effect)
     const startAngle = 180;   // Start from left (behind)
     const endAngle = 540;     // Full orbit + half (1.5 rotations for dramatic effect)
     
