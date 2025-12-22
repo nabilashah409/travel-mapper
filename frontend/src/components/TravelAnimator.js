@@ -118,31 +118,41 @@ const TravelAnimator = () => {
     setIsSearching(false);
   };
 
-  // Create curved path for all routes - matches landing page curve dimensions
-  // Landing page curve: control point is ~22% of horizontal span above the midline
+  // Curved path: offset perpendicular to the start->end line (not just latitude)
   const createCurvedPath = (start, end) => {
     const points = [];
     const numPoints = 100;
-    
-    // Calculate distance between points
-    const latDiff = Math.abs(end.lat - start.lat);
-    const lngDiff = Math.abs(end.lng - start.lng);
-    const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
-    
-    // Arc height: ~22% of distance (same ratio as landing page: 20/90 ≈ 0.22)
-    // This creates a gentle arc, not too curvy
-    const arcHeight = distance * 0.22;
+
+    const dLat = end.lat - start.lat;
+    const dLng = end.lng - start.lng;
+
+    const distance = Math.hypot(dLat, dLng);
+
+    // "capped" gentle arc (tweak maxArc to reduce curve)
+    const maxArc = 0.12;                 // <-- adjust (smaller = flatter)
+    const arcHeight = Math.min(distance * 0.22, maxArc);
+
+    // Perpendicular unit vector to the segment (dLat, dLng)
+    const len = distance || 1;
+    let pLat = -dLng / len;
+    let pLng =  dLat / len;
+
+    // Optional: force a consistent "upward" bend (pick one)
+    // if (pLat < 0) { pLat *= -1; pLng *= -1; }  // bends to +lat side
 
     for (let i = 0; i <= numPoints; i++) {
       const t = i / numPoints;
-      const lat = start.lat + (end.lat - start.lat) * t;
-      const lng = start.lng + (end.lng - start.lng) * t;
-      
-      // Sine curve for smooth arc (peaks at middle, t=0.5)
-      const arcOffset = Math.sin(t * Math.PI) * arcHeight;
-      
-      points.push([lat + arcOffset, lng]);
+
+      // point on straight line
+      const lat0 = start.lat + dLat * t;
+      const lng0 = start.lng + dLng * t;
+
+      // smooth arc: 0 at ends, peak at middle
+      const arcOffset = Math.sin(Math.PI * t) * arcHeight;
+
+      points.push([lat0 + pLat * arcOffset, lng0 + pLng * arcOffset]);
     }
+
     return points;
   };
 
