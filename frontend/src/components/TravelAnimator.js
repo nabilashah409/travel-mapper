@@ -623,6 +623,7 @@ const LandingPage = () => {
         
         plane.style.left = `${x}%`;
         plane.style.top = `${y}%`;
+        plane.style.opacity = '1';
         plane.style.transform = `translate(-50%, -50%) rotate(${adjustedRotation}deg) scale(${scale})`;
         
         animationId = requestAnimationFrame(animate);
