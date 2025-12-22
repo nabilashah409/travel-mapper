@@ -517,32 +517,31 @@ const LandingPage = () => {
   const containerRef = useRef(null);
   
   useEffect(() => {
-    // Play swoosh sound when plane flies
-    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSl+zPLTgjMGHGS56+CZSwkPVanm7qxfHAU7ldjzzn0pBSh6y/HTgjMGHGS56+CZSwkPVanm7qxfHAU7ldj');
-    audio.volume = 0.3;
-    audio.play().catch(() => {});
-    
-    // Smooth plane animation using Quadratic Bezier curve + lerp + requestAnimationFrame
     const plane = planeRef.current;
     if (!plane) return;
     
-    // Wait for icons to gather first
-    const planeDelay = 800;
-    const duration = 3150; // 10% faster (was 3500)
+    // Timeline:
+    // 0-800ms: Plane gathers in with other icons (CSS animation handles this)
+    // 800-900ms: Small pause while in orbit
+    // 900ms+: Plane flies across the title
+    // After flight: Plane returns to orbit position
     
-    // Quadratic Bezier curve - simple arc matching the visible SVG path
-    // Left to right with gentle upward arc - plane always moves rightward
+    const gatherDuration = 800;
+    const orbitPause = 100;
+    const flightDuration = 2800; // Slightly faster flight
+    const planeStartAngle = 180; // Plane starts at 180° position (left side)
+    const orbitRadius = 40; // vmin percentage for orbit
+    
+    // Bezier curve for flight across title
     const bezierStart = { x: 5, y: 55 };
-    const bezierControl = { x: 50, y: 35 }; // Gentle upward arc
+    const bezierControl = { x: 50, y: 35 };
     const bezierEnd = { x: 95, y: 55 };
     
-    // Quadratic Bezier function: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
     const quadraticBezier = (t, p0, p1, p2) => {
       const oneMinusT = 1 - t;
       return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
     };
     
-    // Smooth easing function
     const easeInOutCubic = (t) => {
       return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     };
@@ -554,55 +553,60 @@ const LandingPage = () => {
       if (!startTime) startTime = timestamp;
       const elapsed = timestamp - startTime;
       
-      if (elapsed < planeDelay) {
-        // Wait for icons to gather
-        plane.style.opacity = '0';
+      // Phase 1: Gathering (handled by CSS, plane hidden)
+      if (elapsed < gatherDuration) {
         animationId = requestAnimationFrame(animate);
         return;
       }
       
-      const flightElapsed = elapsed - planeDelay;
-      const progress = Math.min(flightElapsed / duration, 1);
-      const easedProgress = easeInOutCubic(progress);
+      // Phase 2: Brief orbit pause
+      if (elapsed < gatherDuration + orbitPause) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
       
-      // Calculate current position on bezier curve
-      const x = quadraticBezier(easedProgress, bezierStart.x, bezierControl.x, bezierEnd.x);
-      const y = quadraticBezier(easedProgress, bezierStart.y, bezierControl.y, bezierEnd.y);
-      
-      // Calculate next position (look ahead) - same technique as map animation
-      const lookAhead = Math.min(easedProgress + 0.05, 1);
-      const nextX = quadraticBezier(lookAhead, bezierStart.x, bezierControl.x, bezierEnd.x);
-      const nextY = quadraticBezier(lookAhead, bezierStart.y, bezierControl.y, bezierEnd.y);
-      
-      // Calculate direction from current to next point (like map's currentPoint to nextPoint)
-      const dx = nextX - x;
-      const dy = nextY - y;
-      // Calculate angle - in screen coords Y increases downward
-      // atan2(dy, dx) gives angle where 0° = right, positive = clockwise (down)
-      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-      
-      // Scale - slightly larger in middle
-      const scale = 0.7 + 0.5 * Math.sin(easedProgress * Math.PI);
-      
-      // Direct DOM manipulation for 60fps
-      // ✈️ emoji nose points at ~315° (-45°) by default (upper-right)
-      // To align NOSE with route direction: rotation = angle + 45
-      const adjustedRotation = angle + 45;
-      plane.style.left = `${x}%`;
-      plane.style.top = `${y}%`;
-      // Use translate to center the plane on the path point, then rotate
-      plane.style.transform = `translate(-50%, -50%) rotate(${adjustedRotation}deg) scale(${scale})`;
-      
-      // Fade in/out
-      let opacity = 1;
-      if (progress < 0.15) opacity = progress / 0.15;
-      else if (progress > 0.85) opacity = (1 - progress) / 0.15;
-      plane.style.opacity = opacity;
+      // Phase 3: Flight across title
+      const flightElapsed = elapsed - gatherDuration - orbitPause;
+      const progress = Math.min(flightElapsed / flightDuration, 1);
       
       if (progress < 1) {
+        const easedProgress = easeInOutCubic(progress);
+        
+        // Calculate position on bezier curve
+        const x = quadraticBezier(easedProgress, bezierStart.x, bezierControl.x, bezierEnd.x);
+        const y = quadraticBezier(easedProgress, bezierStart.y, bezierControl.y, bezierEnd.y);
+        
+        // Calculate direction
+        const lookAhead = Math.min(easedProgress + 0.05, 1);
+        const nextX = quadraticBezier(lookAhead, bezierStart.x, bezierControl.x, bezierEnd.x);
+        const nextY = quadraticBezier(lookAhead, bezierStart.y, bezierControl.y, bezierEnd.y);
+        const dx = nextX - x;
+        const dy = nextY - y;
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        const adjustedRotation = angle + 45;
+        
+        const scale = 0.8 + 0.4 * Math.sin(easedProgress * Math.PI);
+        
+        plane.style.left = `${x}%`;
+        plane.style.top = `${y}%`;
+        plane.style.transform = `translate(-50%, -50%) rotate(${adjustedRotation}deg) scale(${scale})`;
+        plane.style.opacity = '1';
+        plane.classList.add('flying');
+        
         animationId = requestAnimationFrame(animate);
+      } else {
+        // Phase 4: Return to orbit - snap back to orbit position on right side
+        plane.classList.remove('flying');
+        plane.classList.add('orbiting');
       }
     };
+    
+    // Play swoosh sound when flight starts
+    setTimeout(() => {
+      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSl+zPLTgjMGHGS56+CZSwkPVanm7qxfHAU7ldjzzn0pBSh6y/HTgjMGHGS56+CZSwkPVanm7qxfHAU7ldj');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    }, gatherDuration + orbitPause);
     
     animationId = requestAnimationFrame(animate);
     
@@ -611,21 +615,8 @@ const LandingPage = () => {
     };
   }, []);
 
-  // Icons for the circle
+  // Icons for the circle (plane will be separate with special animation)
   const circleIcons = ['🚗', '🚶', '🧳', '🎫', '🗺️', '🚂', '🎒', '🏖️', '🏔️', '🚢'];
-
-  // Generate SVG path for the flight curve (simple arc, consistent direction)
-  const generateFlightPath = () => {
-    // Simple curve: left to right with gentle upward arc - no direction flip
-    const startX = 5;
-    const startY = 55;
-    const controlX = 50;
-    const controlY = 35; // Gentle upward arc
-    const endX = 95;
-    const endY = 55;
-    
-    return `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
-  };
 
   return (
     <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
@@ -633,21 +624,7 @@ const LandingPage = () => {
       <div ref={containerRef} className="landing-content">
         {/* Bounding box for circle and plane */}
         <div className="bounding-box">
-          {/* Flight path - invisible (plane follows this path) */}
-          <svg 
-            className="flight-path-svg"
-            viewBox="0 0 100 100" 
-            preserveAspectRatio="none"
-          >
-            <path
-              d={generateFlightPath()}
-              fill="none"
-              stroke="transparent"
-              strokeWidth="0"
-            />
-          </svg>
-
-          {/* Circular rotating icons - animate in from outside */}
+          {/* Circular rotating icons */}
           <div className="circular-container">
             {circleIcons.map((icon, index) => (
               <div 
@@ -661,18 +638,19 @@ const LandingPage = () => {
                 {icon}
               </div>
             ))}
-          </div>
-          
-          {/* Flying plane - inside bounding box */}
-          <div 
-            ref={planeRef}
-            className="plane-element"
-          >
-            ✈️
+            
+            {/* Plane icon - starts in circle, flies across, returns to orbit */}
+            <div 
+              ref={planeRef}
+              className="plane-in-circle"
+              style={{ '--angle': '180deg', '--delay': '0.4s' }}
+            >
+              ✈️
+            </div>
           </div>
         </div>
         
-        {/* Title centered - no box, just text */}
+        {/* Title centered */}
         <div className="title-overlay">
           <h1 className="title-text">
             Travel Animator
@@ -687,7 +665,7 @@ const LandingPage = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          animation: scrollUp 0.8s ease-in-out 3.95s forwards;
+          animation: scrollUp 0.8s ease-in-out 3.7s forwards;
         }
         
         .bounding-box {
@@ -698,16 +676,6 @@ const LandingPage = () => {
           max-height: 500px;
           min-width: 300px;
           min-height: 300px;
-        }
-
-        .flight-path-svg {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 5;
-          pointer-events: none;
         }
         
         .title-overlay {
@@ -759,6 +727,30 @@ const LandingPage = () => {
           opacity: 0;
         }
 
+        .plane-in-circle {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+          transform-origin: center;
+          animation: gatherIn 0.8s ease-out var(--delay) forwards;
+          opacity: 0;
+          z-index: 15;
+        }
+        
+        .plane-in-circle.flying {
+          animation: none;
+          /* Position controlled by JS */
+        }
+        
+        .plane-in-circle.orbiting {
+          animation: orbit 10s linear infinite;
+          opacity: 1;
+          left: 50%;
+          top: 50%;
+          transform: rotate(0deg) translateX(min(40vmin, 200px)) rotate(0deg);
+        }
+
         @keyframes gatherIn {
           0% {
             opacity: 0;
@@ -791,16 +783,6 @@ const LandingPage = () => {
               translateX(min(40vmin, 200px)) 
               rotate(calc(-1 * (var(--angle) + 360deg)));
           }
-        }
-
-        .plane-element {
-          position: absolute;
-          font-size: clamp(2.5rem, 7vw, 4.5rem);
-          filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
-          z-index: 20;
-          will-change: transform, left, top, opacity;
-          pointer-events: none;
-          opacity: 0;
         }
 
         @keyframes scrollUp {
