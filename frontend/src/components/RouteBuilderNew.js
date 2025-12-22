@@ -90,6 +90,12 @@ const RouteBuilderNew = () => {
     setDestinations(destinations.filter(d => d.id !== id));
     setRoutePaths([]);
     setCurrentMarkerPosition(null);
+    
+    // Remove animated marker when route is cleared
+    if (markerRef.current && mapRef.current) {
+      mapRef.current.removeLayer(markerRef.current);
+      markerRef.current = null;
+    }
   };
 
   const calculateRoute = () => {
