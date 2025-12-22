@@ -472,51 +472,73 @@ const RouteBuilderNew = () => {
             </div>
           </div>
 
-          {/* Action Buttons - Mobile optimized */}
+          {/* Action Buttons - Compact */}
           {destinations.length < 2 ? (
             <Button
               disabled
-              className="w-full h-12 text-base"
+              className="w-full h-11 text-sm"
               style={{ backgroundColor: '#93c5fd', color: '#fff', touchAction: 'manipulation' }}
             >
-              Add at least 2 destinations
+              Add 2+ destinations
             </Button>
           ) : !routePaths.length ? (
-            <Button
-              onClick={calculateRoute}
-              className="w-full h-12 text-base"
-              style={{ backgroundColor: '#3b82f6', touchAction: 'manipulation' }}
-            >
-              Generate Route
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              {!isAnimating ? (
-                <Button
-                  onClick={startAnimation}
-                  className="flex-1 h-12 text-base"
-                  style={{ backgroundColor: '#3b82f6', touchAction: 'manipulation' }}
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  Play Animation
-                </Button>
-              ) : (
-                <Button
-                  onClick={pauseAnimation}
-                  className="flex-1 h-12 text-base"
-                  style={{ backgroundColor: '#ef4444', touchAction: 'manipulation' }}
-                >
-                  <Pause className="w-5 h-5 mr-2" />
-                  Pause
-                </Button>
-              )}
+            <div className="space-y-2">
               <Button
                 onClick={calculateRoute}
+                className="w-full h-11 text-sm"
+                style={{ backgroundColor: '#3b82f6', touchAction: 'manipulation' }}
+              >
+                Generate Route
+              </Button>
+              {/* View Map button on mobile */}
+              <Button
+                onClick={() => setIsSidebarOpen(false)}
                 variant="outline"
-                className="h-12 px-4"
+                className="w-full h-11 text-sm md:hidden"
                 style={{ touchAction: 'manipulation' }}
               >
-                Recalculate
+                View Map
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                {!isAnimating ? (
+                  <Button
+                    onClick={startAnimation}
+                    className="flex-1 h-11 text-sm"
+                    style={{ backgroundColor: '#3b82f6', touchAction: 'manipulation' }}
+                  >
+                    <Play className="w-4 h-4 mr-1" />
+                    Play
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={pauseAnimation}
+                    className="flex-1 h-11 text-sm"
+                    style={{ backgroundColor: '#ef4444', touchAction: 'manipulation' }}
+                  >
+                    <Pause className="w-4 h-4 mr-1" />
+                    Pause
+                  </Button>
+                )}
+                <Button
+                  onClick={calculateRoute}
+                  variant="outline"
+                  className="h-11 px-3 text-sm"
+                  style={{ touchAction: 'manipulation' }}
+                >
+                  Recalc
+                </Button>
+              </div>
+              {/* View Map button on mobile */}
+              <Button
+                onClick={() => setIsSidebarOpen(false)}
+                variant="outline"
+                className="w-full h-11 text-sm md:hidden"
+                style={{ touchAction: 'manipulation' }}
+              >
+                View Map
               </Button>
             </div>
           )}
