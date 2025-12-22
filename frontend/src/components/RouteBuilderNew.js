@@ -606,6 +606,11 @@ const RouteBuilderNew = () => {
           style={{ height: '100%', width: '100%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
           zoomControl={true}
           scrollWheelZoom={true}
+          ref={(map) => {
+            if (map) {
+              mapRef.current = map;
+            }
+          }}
         >
           {/* Fun colorful map tiles */}
           <TileLayer
