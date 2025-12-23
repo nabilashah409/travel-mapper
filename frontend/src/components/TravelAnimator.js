@@ -1027,13 +1027,15 @@ const TravelAnimator = () => {
         </div>
       )}
 
-      {/* Floating destination list */}
+      {/* Floating destination list - Cartoon style */}
       {destinations.length > 0 && (
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[1000] max-w-md w-full px-4">
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-4 border border-pink-100">
+          <div className="bg-white rounded-2xl shadow-2xl p-4 border-4 border-amber-400" style={{ boxShadow: '0 8px 25px rgba(0,0,0,0.2)' }}>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-gray-700">Your Journey</h3>
-              <span className="text-xs text-gray-500">{destinations.length} stops</span>
+              <h3 className="text-base font-black text-gray-800 flex items-center gap-2">
+                <span>🗺️</span> Your Journey
+              </h3>
+              <span className="text-sm font-bold text-amber-600 bg-amber-100 px-3 py-1 rounded-full">{destinations.length} stops</span>
             </div>
             <div className="space-y-2 max-h-40 overflow-y-auto">
               {destinations.map((dest, index) => (
@@ -1044,25 +1046,25 @@ const TravelAnimator = () => {
                   onDragEnd={handleDragEnd}
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDrop={(e) => handleDrop(e, index)}
-                  className={`flex items-center gap-2 p-2 bg-white rounded-xl hover:bg-pink-50 transition-all cursor-grab active:cursor-grabbing ${
+                  className={`flex items-center gap-3 p-3 bg-gradient-to-r from-amber-50 to-white rounded-xl hover:from-amber-100 transition-all cursor-grab active:cursor-grabbing border-2 border-amber-200 ${
                     draggedIndex === index ? 'opacity-50 scale-95' : ''
-                  } ${draggedIndex !== null && draggedIndex !== index ? 'border-2 border-dashed border-pink-300' : ''}`}
+                  } ${draggedIndex !== null && draggedIndex !== index ? 'border-2 border-dashed border-red-400' : ''}`}
                 >
-                  <GripVertical className="w-4 h-4 text-gray-400" />
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 text-white flex items-center justify-center text-xs font-bold">
+                  <GripVertical className="w-5 h-5 text-amber-400" />
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white flex items-center justify-center text-sm font-black shadow-lg">
                     {index + 1}
                   </div>
-                  <span className="flex-1 text-sm text-gray-700 truncate">{dest.name}</span>
+                  <span className="flex-1 text-sm font-bold text-gray-800 truncate">{dest.name}</span>
                   <button
                     onClick={() => removeDestination(dest.id)}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
+                    className="text-gray-400 hover:text-red-500 transition-colors hover:scale-110"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-gray-400 mt-2 text-center">Drag to reorder destinations</p>
+            <p className="text-xs text-gray-500 mt-3 text-center font-medium">✋ Drag to reorder destinations</p>
           </div>
         </div>
       )}
