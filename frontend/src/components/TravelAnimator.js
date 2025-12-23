@@ -750,28 +750,29 @@ const TravelAnimator = () => {
                     transform: translateX(-50%);
                   ">
                     <div style="
-                      background: white;
-                      padding: 4px 10px;
-                      border-radius: 12px;
-                      font-size: 12px;
-                      font-weight: 600;
-                      color: #1f2937;
+                      background: linear-gradient(135deg, #fce7f3, #fdf2f8);
+                      padding: 6px 14px;
+                      border-radius: 20px;
+                      font-size: 13px;
+                      font-weight: 700;
+                      color: #9d174d;
                       white-space: nowrap;
-                      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                      margin-bottom: 4px;
-                      border: 2px solid #ec4899;
+                      box-shadow: 0 4px 12px rgba(236,72,153,0.25);
+                      margin-bottom: 6px;
+                      border: 2px solid #f9a8d4;
+                      letter-spacing: 0.5px;
                     ">${dest.name}</div>
                     <div style="
-                      width: 16px;
-                      height: 16px;
+                      width: 14px;
+                      height: 14px;
                       border-radius: 50%;
-                      background: linear-gradient(135deg, #ec4899, #f97316);
+                      background: linear-gradient(135deg, #ec4899, #db2777);
                       border: 3px solid white;
-                      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                      box-shadow: 0 3px 8px rgba(219,39,119,0.4);
                     "></div>
                   </div>`,
-                  iconSize: [100, 50],
-                  iconAnchor: [50, 50],
+                  iconSize: [150, 60],
+                  iconAnchor: [75, 60],
                 })}
               />
             );
