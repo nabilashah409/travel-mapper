@@ -852,21 +852,25 @@ const TravelAnimator = () => {
         </MapContainer>
       </div>
       
-      {/* Soft pastel overlay to give stylized look */}
-      <div 
-        className="absolute inset-0 pointer-events-none"
-        style={{ 
-          background: 'linear-gradient(180deg, rgba(232,244,248,0.3) 0%, rgba(245,240,230,0.2) 50%, rgba(230,242,230,0.3) 100%)',
-        }}
-      />
+      {/* Decorative corner elements for cartoon feel */}
+      <div className="absolute top-4 right-4 pointer-events-none z-[500] hidden md:block">
+        <div className="text-5xl animate-pulse">☀️</div>
+      </div>
+      <div className="absolute bottom-4 left-4 pointer-events-none z-[500] hidden md:block">
+        <div className="text-3xl">🌴</div>
+      </div>
 
-      {/* CSS for stylized map */}
+      {/* CSS for illustrated map */}
       <style jsx>{`
-        .stylized-map-container :global(.leaflet-tile-pane) {
-          filter: saturate(0.3) brightness(1.1) contrast(0.9);
+        .illustrated-map-container :global(.leaflet-tile-pane) {
+          filter: saturate(1.3) brightness(1.05) contrast(1.1);
         }
-        .stylized-map-container :global(.leaflet-container) {
-          background: #e8f4f8;
+        .illustrated-map-container :global(.leaflet-container) {
+          background: linear-gradient(135deg, #87CEEB, #98D8AA);
+        }
+        .illustrated-map-container :global(.leaflet-marker-icon) {
+          background: transparent !important;
+          border: none !important;
         }
       `}</style>
 
