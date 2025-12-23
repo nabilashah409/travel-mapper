@@ -425,8 +425,8 @@ const TravelAnimator = () => {
     else if (distance < 15) baseZoom = 5;     // Multi-state
     else baseZoom = 4;                         // Cross-country/Intercontinental
     
-    // Apply responsive offset, ensure zoom stays in reasonable range (4-10)
-    return Math.max(3, baseZoom + zoomOffset);
+    // Apply responsive offset, clamp between 4 and 10 to prevent over-zoom
+    return Math.min(10, Math.max(4, baseZoom + zoomOffset));
   };
 
   // Start route animation with dynamic segment-based zoom
