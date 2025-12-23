@@ -375,16 +375,16 @@ const TravelAnimator = () => {
     if (width < 480) {
       // Mobile small
       return { 
-        zoomOffset: -2,      // Reduce zoom to show more area
-        padding: [30, 30],   // Less padding on small screens
-        markerSize: 36,      // Smaller marker
-        fontSize: 24         // Smaller emoji
+        zoomOffset: -1,
+        padding: [40, 40],
+        markerSize: 36,
+        fontSize: 24
       };
     } else if (width < 768) {
       // Mobile/Tablet
       return { 
-        zoomOffset: -1,      // Slightly reduce zoom
-        padding: [50, 50],   // Medium padding
+        zoomOffset: 0,
+        padding: [50, 50],
         markerSize: 42,
         fontSize: 28
       };
@@ -406,7 +406,8 @@ const TravelAnimator = () => {
     };
   };
 
-  // Calculate optimal zoom for a specific segment between two destinations
+  // Calculate optimal zoom for a specific segment - LESS AGGRESSIVE
+  // Cap zoom to prevent over-zooming which causes lag and route breaking
   const getSegmentZoom = (start, end) => {
     const distance = Math.sqrt(
       Math.pow(end.lat - start.lat, 2) + Math.pow(end.lng - start.lng, 2)
@@ -414,20 +415,17 @@ const TravelAnimator = () => {
     
     const { zoomOffset } = getResponsiveValues();
     
-    // Base zoom levels - adjusted by screen size offset
+    // REDUCED zoom levels - cap at 10 max to prevent lag
     let baseZoom;
-    if (distance < 0.1) baseZoom = 15;       // Very close (~10km)
-    else if (distance < 0.3) baseZoom = 14;  // Same city (~30km)
-    else if (distance < 0.5) baseZoom = 13;  // Nearby (~50km)
-    else if (distance < 1) baseZoom = 12;    // ~100km
-    else if (distance < 2) baseZoom = 11;    // ~200km
-    else if (distance < 4) baseZoom = 10;    // ~400km
-    else if (distance < 8) baseZoom = 8;     // ~800km
-    else if (distance < 15) baseZoom = 6;    // Multi-state
-    else if (distance < 30) baseZoom = 5;    // Cross-country
-    else baseZoom = 4;                        // Intercontinental
+    if (distance < 0.5) baseZoom = 10;        // Close destinations - cap at 10
+    else if (distance < 1) baseZoom = 9;      // ~100km
+    else if (distance < 2) baseZoom = 8;      // ~200km
+    else if (distance < 4) baseZoom = 7;      // ~400km
+    else if (distance < 8) baseZoom = 6;      // ~800km
+    else if (distance < 15) baseZoom = 5;     // Multi-state
+    else baseZoom = 4;                         // Cross-country/Intercontinental
     
-    // Apply responsive offset, but ensure minimum zoom of 3
+    // Apply responsive offset, ensure zoom stays in reasonable range (4-10)
     return Math.max(3, baseZoom + zoomOffset);
   };
 
