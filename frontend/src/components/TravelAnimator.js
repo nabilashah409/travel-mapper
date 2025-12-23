@@ -960,8 +960,11 @@ const TravelAnimator = () => {
                   onClick={() => selectDestination(result)}
                   className="w-full px-5 py-4 text-left hover:bg-amber-50 transition-colors border-b-2 border-amber-100 last:border-b-0 flex items-center gap-3"
                 >
-                  <div className="font-medium text-gray-800">{result.name}</div>
-                  <div className="text-xs text-gray-500 truncate">{result.display_name}</div>
+                  <span className="text-xl">📍</span>
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-800">{result.name}</div>
+                    <div className="text-xs text-gray-500 truncate">{result.display_name}</div>
+                  </div>
                 </button>
               ))}
             </div>
@@ -969,9 +972,9 @@ const TravelAnimator = () => {
         </div>
       </div>
 
-      {/* Transport selector */}
-      <div className="absolute top-16 md:top-6 right-4 z-[1000]">
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-1.5 md:p-2 flex gap-0.5 md:gap-1 border border-pink-100">
+      {/* Transport selector - Cartoon style */}
+      <div className="absolute top-20 md:top-6 right-4 z-[1000]">
+        <div className="bg-white rounded-2xl shadow-2xl p-2 md:p-3 flex gap-1 md:gap-2 border-4 border-amber-400" style={{ boxShadow: '0 8px 25px rgba(0,0,0,0.2)' }}>
           {transportModes.map((mode) => (
             <button
               key={mode.id}
@@ -979,11 +982,12 @@ const TravelAnimator = () => {
                 setSelectedTransport(mode.id);
                 if (destinations.length > 1) calculateRoute(destinations);
               }}
-              className={`w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-base md:text-lg transition-all ${
+              className={`w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-xl md:text-2xl transition-all ${
                 selectedTransport === mode.id 
-                  ? 'bg-gradient-to-r from-pink-500 to-orange-400 scale-110' 
-                  : 'hover:bg-pink-50'
+                  ? 'bg-gradient-to-r from-red-500 to-red-600 scale-110 shadow-lg' 
+                  : 'hover:bg-amber-100'
               }`}
+              style={selectedTransport === mode.id ? { boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)' } : {}}
             >
               {mode.label}
             </button>
@@ -991,30 +995,34 @@ const TravelAnimator = () => {
         </div>
       </div>
 
-      {/* Play/Pause button */}
+      {/* Play/Pause button - Cartoon style */}
       {destinations.length >= 2 && (
-        <div className="absolute top-28 md:top-20 right-4 z-[1000]">
+        <div className="absolute top-36 md:top-24 right-4 z-[1000]">
           <button
             onClick={isAnimating ? pauseAnimation : startAnimation}
-            className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110 ${
+            className={`w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 border-4 ${
               isAnimating 
-                ? 'bg-red-500 text-white' 
-                : 'bg-gradient-to-r from-pink-500 to-orange-400 text-white'
+                ? 'bg-white border-red-500 text-red-500' 
+                : 'bg-gradient-to-r from-green-500 to-green-600 border-green-600 text-white'
             }`}
+            style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.3)' }}
           >
-            {isAnimating ? <Pause className="w-5 h-5 md:w-6 md:h-6" /> : <Play className="w-5 h-5 md:w-6 md:h-6 ml-0.5" />}
+            {isAnimating ? <Pause className="w-6 h-6 md:w-7 md:h-7" /> : <Play className="w-6 h-6 md:w-7 md:h-7 ml-0.5" />}
           </button>
         </div>
       )}
 
-      {/* Progress bar */}
+      {/* Progress bar - Cartoon style */}
       {animationProgress > 0 && (
-        <div className="absolute top-44 md:top-36 right-4 z-[1000] w-12 md:w-14">
-          <div className="bg-white/90 rounded-full h-2 overflow-hidden shadow">
+        <div className="absolute top-52 md:top-44 right-4 z-[1000] w-14 md:w-16">
+          <div className="bg-white rounded-full h-3 overflow-hidden shadow-lg border-2 border-amber-400">
             <div 
-              className="h-full bg-gradient-to-r from-pink-500 to-orange-400 transition-all"
+              className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all"
               style={{ width: `${animationProgress}%` }}
             />
+          </div>
+          <div className="text-center text-xs font-bold text-white mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+            {Math.round(animationProgress)}%
           </div>
         </div>
       )}
