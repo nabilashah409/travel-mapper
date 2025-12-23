@@ -461,10 +461,11 @@ const TravelAnimator = () => {
     ]);
     const firstSegmentZoom = getSegmentZoom(destinations[0], destinations[1]);
     
-    mapRef.current.flyToBounds(firstSegmentBounds, {
+    // Use fitBounds instead of flyToBounds for initial view (no animation = no lag)
+    mapRef.current.fitBounds(firstSegmentBounds, {
       padding: responsive.padding,
       maxZoom: firstSegmentZoom,
-      duration: 0.8
+      animate: false
     });
 
     // Create animated marker with responsive size
@@ -485,8 +486,8 @@ const TravelAnimator = () => {
 
     markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
     
-    // Animation duration scales with number of segments (3 seconds per segment)
-    const durationPerSegment = 3000;
+    // Animation duration scales with number of segments (4 seconds per segment for smoother feel)
+    const durationPerSegment = 4000;
     const totalDuration = totalSegments * durationPerSegment;
     const startTime = Date.now();
     
@@ -497,13 +498,13 @@ const TravelAnimator = () => {
       if (progress >= 1) {
         setIsAnimating(false);
         setAnimationProgress(100);
-        // At the end, fit all destinations for overview with responsive padding
+        // At the end, fit all destinations for overview (no animation)
         const allBounds = L.latLngBounds(destinations.map(d => [d.lat, d.lng]));
         const endResponsive = getResponsiveValues();
-        mapRef.current.flyToBounds(allBounds, { 
+        mapRef.current.fitBounds(allBounds, { 
           padding: endResponsive.padding, 
-          maxZoom: Math.max(8, 10 + endResponsive.zoomOffset), 
-          duration: 1 
+          maxZoom: 8,
+          animate: false
         });
         return;
       }
