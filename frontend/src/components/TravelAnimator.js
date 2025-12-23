@@ -729,7 +729,7 @@ const TravelAnimator = () => {
             </>
           )}
           
-          {/* Destination markers - only show visited destinations with name labels */}
+          {/* Destination markers - Illustrated style with red pin and yellow banner */}
           {destinations.map((dest, index) => {
             // Only show marker if destination has been visited during animation
             // This creates a progressive reveal effect
@@ -742,37 +742,100 @@ const TravelAnimator = () => {
                 key={dest.id}
                 position={[dest.lat, dest.lng]}
                 icon={L.divIcon({
-                  className: 'custom-marker-with-label',
-                  html: `<div style="
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    transform: translateX(-50%);
-                  ">
-                    <div style="
-                      background: linear-gradient(135deg, #fce7f3, #fdf2f8);
-                      padding: 6px 14px;
-                      border-radius: 20px;
-                      font-size: 13px;
-                      font-weight: 700;
-                      color: #9d174d;
+                  className: 'illustrated-marker',
+                  html: `<div class="marker-container">
+                    <!-- Red location pin -->
+                    <div class="pin-wrapper">
+                      <svg width="50" height="65" viewBox="0 0 50 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Pin shadow -->
+                        <ellipse cx="25" cy="62" rx="12" ry="3" fill="rgba(0,0,0,0.2)"/>
+                        <!-- Pin body -->
+                        <path d="M25 0C11.2 0 0 11.2 0 25C0 43.75 25 60 25 60C25 60 50 43.75 50 25C50 11.2 38.8 0 25 0Z" fill="url(#pinGradient)"/>
+                        <!-- Pin highlight -->
+                        <path d="M25 5C14 5 5 14 5 25C5 25 5 26 5.5 28C6 26 8 15 25 10C28 9 30 10 30 10C26 7 25 5 25 5Z" fill="rgba(255,255,255,0.3)"/>
+                        <!-- Inner white circle -->
+                        <circle cx="25" cy="22" r="12" fill="white"/>
+                        <!-- Inner circle border -->
+                        <circle cx="25" cy="22" r="10" fill="url(#innerGradient)"/>
+                        <defs>
+                          <linearGradient id="pinGradient" x1="0" y1="0" x2="50" y2="60" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#ef4444"/>
+                            <stop offset="50%" stop-color="#dc2626"/>
+                            <stop offset="100%" stop-color="#b91c1c"/>
+                          </linearGradient>
+                          <linearGradient id="innerGradient" x1="15" y1="12" x2="35" y2="32" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#fef2f2"/>
+                            <stop offset="100%" stop-color="#fee2e2"/>
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                    <!-- Yellow banner with destination name -->
+                    <div class="banner-wrapper">
+                      <svg width="140" height="40" viewBox="0 0 140 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Banner shadow -->
+                        <path d="M10 22C10 18 14 15 20 15H120C126 15 130 18 130 22V32C130 36 126 39 120 39H20C14 39 10 36 10 32V22Z" fill="rgba(0,0,0,0.15)" transform="translate(2, 2)"/>
+                        <!-- Banner main body -->
+                        <path d="M10 20C10 16 14 13 20 13H120C126 13 130 16 130 20V30C130 34 126 37 120 37H20C14 37 10 34 10 30V20Z" fill="url(#bannerGradient)"/>
+                        <!-- Banner fold left -->
+                        <path d="M0 18L10 15V25L0 28V18Z" fill="#d97706"/>
+                        <!-- Banner fold right -->
+                        <path d="M140 18L130 15V25L140 28V18Z" fill="#d97706"/>
+                        <!-- Banner top highlight -->
+                        <path d="M10 20C10 16 14 13 20 13H120C126 13 130 16 130 17V18C130 16 126 15 120 15H20C14 15 10 16 10 18V20Z" fill="rgba(255,255,255,0.4)"/>
+                        <defs>
+                          <linearGradient id="bannerGradient" x1="10" y1="13" x2="10" y2="37" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#fbbf24"/>
+                            <stop offset="50%" stop-color="#f59e0b"/>
+                            <stop offset="100%" stop-color="#d97706"/>
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <span class="banner-text">${dest.name.toUpperCase()}</span>
+                    </div>
+                  </div>
+                  <style>
+                    .marker-container {
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      animation: markerBounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                    }
+                    .pin-wrapper {
+                      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+                      animation: pinFloat 3s ease-in-out infinite;
+                    }
+                    .banner-wrapper {
+                      position: relative;
+                      margin-top: -8px;
+                      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+                    }
+                    .banner-text {
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%);
+                      font-family: 'Arial Black', 'Helvetica Bold', sans-serif;
+                      font-size: 12px;
+                      font-weight: 900;
+                      color: #1e3a5f;
+                      text-shadow: 0 1px 0 rgba(255,255,255,0.5);
                       white-space: nowrap;
-                      box-shadow: 0 4px 12px rgba(236,72,153,0.25);
-                      margin-bottom: 6px;
-                      border: 2px solid #f9a8d4;
-                      letter-spacing: 0.5px;
-                    ">${dest.name}</div>
-                    <div style="
-                      width: 14px;
-                      height: 14px;
-                      border-radius: 50%;
-                      background: linear-gradient(135deg, #ec4899, #db2777);
-                      border: 3px solid white;
-                      box-shadow: 0 3px 8px rgba(219,39,119,0.4);
-                    "></div>
-                  </div>`,
-                  iconSize: [150, 60],
-                  iconAnchor: [75, 60],
+                      letter-spacing: 1px;
+                      padding-top: 4px;
+                    }
+                    @keyframes markerBounceIn {
+                      0% { transform: scale(0) translateY(-20px); opacity: 0; }
+                      50% { transform: scale(1.2) translateY(0); }
+                      100% { transform: scale(1) translateY(0); opacity: 1; }
+                    }
+                    @keyframes pinFloat {
+                      0%, 100% { transform: translateY(0); }
+                      50% { transform: translateY(-5px); }
+                    }
+                  </style>`,
+                  iconSize: [140, 105],
+                  iconAnchor: [70, 65],
                 })}
               />
             );
