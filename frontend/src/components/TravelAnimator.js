@@ -573,9 +573,10 @@ const TravelAnimator = () => {
           });
         }
         
-        // Update rotation - ✈️ emoji points NORTHEAST (~45°) by default
+        // Update rotation based on transport type
         const heading = calculateHeading(currentPoint, nextPoint);
-        const adjustedRotation = heading - 45;
+        const rotationOffset = getTransportRotationOffset();
+        const adjustedRotation = heading + rotationOffset;
         
         // Get responsive marker size for rotation update
         const markerResponsive = getResponsiveValues();
