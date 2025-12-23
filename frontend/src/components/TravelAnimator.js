@@ -12,7 +12,8 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// Map Controller component to handle zoom/pan - fits all destinations with margin
+// Map Controller component to handle zoom/pan when NOT animating
+// During animation, the startAnimation function handles zoom dynamically per segment
 const MapController = ({ destinations, defaultCenter, isAnimating }) => {
   const map = useMap();
   
@@ -32,7 +33,6 @@ const MapController = ({ destinations, defaultCenter, isAnimating }) => {
     }
     
     // More aggressive zoom levels for close destinations
-    // 1 degree ≈ 111 km, so we want to zoom in much more for nearby places
     if (minDistance < 0.3) return 14;       // Same city/very close (~30km)
     if (minDistance < 0.5) return 13;       // Nearby suburbs (~50km)
     if (minDistance < 1) return 12;         // Same metro area (~100km)
@@ -43,7 +43,12 @@ const MapController = ({ destinations, defaultCenter, isAnimating }) => {
     return 5;                                // Cross-country
   };
   
+  // Only adjust zoom when destinations change AND we're NOT animating
+  // This prevents interfering with the dynamic segment-based zoom during animation
   useEffect(() => {
+    // Skip if animation is in progress - let startAnimation handle zoom
+    if (isAnimating) return;
+    
     if (destinations.length === 0) {
       map.flyTo(defaultCenter, 4, { duration: 1 });
     } else if (destinations.length === 1) {
@@ -58,27 +63,10 @@ const MapController = ({ destinations, defaultCenter, isAnimating }) => {
         padding: [100, 100],
         duration: 1.5,
         maxZoom: optimalZoom,
-        minZoom: optimalZoom > 8 ? optimalZoom - 2 : 4  // Allow some flexibility but stay zoomed in
+        minZoom: optimalZoom > 8 ? optimalZoom - 2 : 4
       });
     }
-  }, [destinations, map, defaultCenter]);
-  
-  // Keep all destinations visible during animation
-  useEffect(() => {
-    if (isAnimating && destinations.length > 1) {
-      const bounds = L.latLngBounds(
-        destinations.map(d => [d.lat, d.lng])
-      );
-      const optimalZoom = calculateOptimalZoom(destinations);
-      
-      map.fitBounds(bounds, {
-        padding: [100, 100],
-        maxZoom: optimalZoom,
-        minZoom: optimalZoom > 8 ? optimalZoom - 2 : 4,
-        animate: false
-      });
-    }
-  }, [isAnimating, destinations, map]);
+  }, [destinations, map, defaultCenter, isAnimating]);
   
   return null;
 };
