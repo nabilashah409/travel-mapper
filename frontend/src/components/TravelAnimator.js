@@ -388,9 +388,29 @@ const TravelAnimator = () => {
     return 5;
   };
 
-  // Start route animation
+  // Calculate optimal zoom for a specific segment between two destinations
+  const getSegmentZoom = (start, end) => {
+    const distance = Math.sqrt(
+      Math.pow(end.lat - start.lat, 2) + Math.pow(end.lng - start.lng, 2)
+    );
+    
+    // Calculate zoom based on segment distance
+    // Ensures route is always clearly visible (at least ~1 inch on screen)
+    if (distance < 0.1) return 15;       // Very close (~10km)
+    if (distance < 0.3) return 14;       // Same city (~30km)
+    if (distance < 0.5) return 13;       // Nearby (~50km)
+    if (distance < 1) return 12;         // ~100km
+    if (distance < 2) return 11;         // ~200km
+    if (distance < 4) return 10;         // ~400km
+    if (distance < 8) return 8;          // ~800km
+    if (distance < 15) return 6;         // Multi-state
+    if (distance < 30) return 5;         // Cross-country
+    return 4;                             // Intercontinental
+  };
+
+  // Start route animation with dynamic segment-based zoom
   const startAnimation = () => {
-    if (routePath.length < 2) {
+    if (routePath.length < 2 || destinations.length < 2) {
       return;
     }
 
@@ -402,15 +422,25 @@ const TravelAnimator = () => {
       mapRef.current.removeLayer(markerRef.current);
     }
 
-    // Fit all destinations with optimal zoom
-    const bounds = L.latLngBounds(routePath);
-    const optimalZoom = getAnimationZoom();
-    mapRef.current.fitBounds(bounds, {
-      padding: [150, 150],
-      maxZoom: optimalZoom,
-      minZoom: 4,
-      animate: true,
-      duration: 0.5
+    // Calculate segment boundaries (which route path index corresponds to each destination)
+    // Each segment has ~100 points (from createCurvedPath)
+    const pointsPerSegment = 101; // 0-100 inclusive
+    const totalSegments = destinations.length - 1;
+    
+    // Track current segment for zoom transitions
+    let currentSegmentIndex = -1;
+
+    // Initial zoom: fit the FIRST segment only (not all destinations)
+    const firstSegmentBounds = L.latLngBounds([
+      [destinations[0].lat, destinations[0].lng],
+      [destinations[1].lat, destinations[1].lng]
+    ]);
+    const firstSegmentZoom = getSegmentZoom(destinations[0], destinations[1]);
+    
+    mapRef.current.flyToBounds(firstSegmentBounds, {
+      padding: [80, 80],
+      maxZoom: firstSegmentZoom,
+      duration: 0.8
     });
 
     // Create animated marker
@@ -431,44 +461,68 @@ const TravelAnimator = () => {
 
     markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
     
-    // Animation loop - keep all destinations visible, don't follow the icon
-    const duration = 8000; // 8 seconds
+    // Animation duration scales with number of segments (3 seconds per segment)
+    const durationPerSegment = 3000;
+    const totalDuration = totalSegments * durationPerSegment;
     const startTime = Date.now();
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+      const progress = Math.min(elapsed / totalDuration, 1);
       
       if (progress >= 1) {
         setIsAnimating(false);
         setAnimationProgress(100);
-        // Fit bounds again at the end
-        mapRef.current.fitBounds(bounds, { padding: [100, 100], maxZoom: 10 });
+        // At the end, fit all destinations for overview
+        const allBounds = L.latLngBounds(destinations.map(d => [d.lat, d.lng]));
+        mapRef.current.flyToBounds(allBounds, { padding: [100, 100], maxZoom: 10, duration: 1 });
         return;
       }
 
-      const totalPoints = routePath.length;
-      const targetIndex = Math.floor(progress * (totalPoints - 1));
-      const nextIndex = Math.min(targetIndex + 1, totalPoints - 1);
-      const segmentProgress = (progress * (totalPoints - 1)) - targetIndex;
+      // Calculate which segment we're in and the progress within that segment
+      const segmentIndex = Math.min(Math.floor(progress * totalSegments), totalSegments - 1);
+      const segmentProgress = (progress * totalSegments) - segmentIndex;
+      
+      // Calculate the route path index
+      const segmentStartIndex = segmentIndex * pointsPerSegment;
+      const localIndex = Math.floor(segmentProgress * (pointsPerSegment - 1));
+      const targetIndex = segmentStartIndex + localIndex;
+      const nextIndex = Math.min(targetIndex + 1, routePath.length - 1);
+      const microProgress = (segmentProgress * (pointsPerSegment - 1)) - localIndex;
       
       const currentPoint = routePath[targetIndex];
       const nextPoint = routePath[nextIndex];
       
       if (currentPoint && nextPoint && markerRef.current && mapRef.current) {
-        const lat = lerp(currentPoint[0], nextPoint[0], segmentProgress);
-        const lng = lerp(currentPoint[1], nextPoint[1], segmentProgress);
+        const lat = lerp(currentPoint[0], nextPoint[0], microProgress);
+        const lng = lerp(currentPoint[1], nextPoint[1], microProgress);
         
-        // Update marker position directly (no React re-render)
+        // Update marker position
         markerRef.current.setLatLng([lat, lng]);
         
-        // Don't pan to follow the icon - keep all destinations visible
-        // Only pan if the icon goes off screen
-        const mapBounds = mapRef.current.getBounds();
-        if (!mapBounds.contains([lat, lng])) {
-          // If icon is outside view, gently expand to include it
-          const newBounds = mapBounds.extend([lat, lng]);
-          mapRef.current.fitBounds(newBounds, { animate: false, padding: [50, 50] });
+        // DYNAMIC ZOOM: When entering a new segment, smoothly zoom to fit just that segment
+        if (segmentIndex !== currentSegmentIndex) {
+          currentSegmentIndex = segmentIndex;
+          
+          const segmentStart = destinations[segmentIndex];
+          const segmentEnd = destinations[segmentIndex + 1];
+          
+          // Create bounds for just this segment
+          const segmentBounds = L.latLngBounds([
+            [segmentStart.lat, segmentStart.lng],
+            [segmentEnd.lat, segmentEnd.lng]
+          ]);
+          
+          // Calculate optimal zoom for this specific segment
+          const segmentZoom = getSegmentZoom(segmentStart, segmentEnd);
+          
+          // Smoothly transition to the new segment view
+          mapRef.current.flyToBounds(segmentBounds, {
+            padding: [80, 80],
+            maxZoom: segmentZoom,
+            duration: 0.8,
+            easeLinearity: 0.5
+          });
         }
         
         // Update rotation - ✈️ emoji points NORTHEAST (~45°) by default
