@@ -428,6 +428,9 @@ const TravelAnimator = () => {
       mapRef.current.removeLayer(markerRef.current);
     }
 
+    // Get responsive values for current screen size
+    const responsive = getResponsiveValues();
+
     // Calculate segment boundaries (which route path index corresponds to each destination)
     // Each segment has ~100 points (from createCurvedPath)
     const pointsPerSegment = 101; // 0-100 inclusive
@@ -444,25 +447,25 @@ const TravelAnimator = () => {
     const firstSegmentZoom = getSegmentZoom(destinations[0], destinations[1]);
     
     mapRef.current.flyToBounds(firstSegmentBounds, {
-      padding: [80, 80],
+      padding: responsive.padding,
       maxZoom: firstSegmentZoom,
       duration: 0.8
     });
 
-    // Create animated marker
+    // Create animated marker with responsive size
     const customIcon = L.divIcon({
       className: 'animated-transport-marker',
       html: `<div style="
-        width: 50px;
-        height: 50px;
+        width: ${responsive.markerSize}px;
+        height: ${responsive.markerSize}px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 32px;
+        font-size: ${responsive.fontSize}px;
         filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
       ">${getTransportEmoji()}</div>`,
-      iconSize: [50, 50],
-      iconAnchor: [25, 25],
+      iconSize: [responsive.markerSize, responsive.markerSize],
+      iconAnchor: [responsive.markerSize / 2, responsive.markerSize / 2],
     });
 
     markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
