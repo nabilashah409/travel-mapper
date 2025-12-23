@@ -662,30 +662,66 @@ const TravelAnimator = () => {
           
           <MapController destinations={destinations} defaultCenter={defaultCenter} isAnimating={isAnimating} />
           
-          {/* Route line - dotted style with pastel colors */}
+          {/* Route line - show progressively during animation based on visited destinations */}
           {routePath.length > 1 && (
             <>
-              {/* Shadow/glow effect */}
-              <Polyline
-                positions={routePath}
-                pathOptions={{
-                  color: '#ffffff',
-                  weight: 8,
-                  opacity: 0.9,
-                  lineCap: 'round',
-                }}
-              />
-              {/* Main dotted line */}
-              <Polyline
-                positions={routePath}
-                pathOptions={{
-                  color: '#e11d48',
-                  weight: 3,
-                  opacity: 1,
-                  dashArray: '8, 12',
-                  lineCap: 'round',
-                }}
-              />
+              {/* Calculate how much of the route to show based on animation progress */}
+              {(() => {
+                // If not animating, show full route
+                if (!isAnimating) {
+                  return (
+                    <>
+                      <Polyline
+                        positions={routePath}
+                        pathOptions={{
+                          color: '#ffffff',
+                          weight: 8,
+                          opacity: 0.9,
+                          lineCap: 'round',
+                        }}
+                      />
+                      <Polyline
+                        positions={routePath}
+                        pathOptions={{
+                          color: '#e11d48',
+                          weight: 3,
+                          opacity: 1,
+                          dashArray: '8, 12',
+                          lineCap: 'round',
+                        }}
+                      />
+                    </>
+                  );
+                }
+                
+                // During animation, show route up to current progress
+                const pointsToShow = Math.max(2, Math.floor((animationProgress / 100) * routePath.length) + 10);
+                const visiblePath = routePath.slice(0, Math.min(pointsToShow, routePath.length));
+                
+                return (
+                  <>
+                    <Polyline
+                      positions={visiblePath}
+                      pathOptions={{
+                        color: '#ffffff',
+                        weight: 8,
+                        opacity: 0.9,
+                        lineCap: 'round',
+                      }}
+                    />
+                    <Polyline
+                      positions={visiblePath}
+                      pathOptions={{
+                        color: '#e11d48',
+                        weight: 3,
+                        opacity: 1,
+                        dashArray: '8, 12',
+                        lineCap: 'round',
+                      }}
+                    />
+                  </>
+                );
+              })()}
             </>
           )}
           
