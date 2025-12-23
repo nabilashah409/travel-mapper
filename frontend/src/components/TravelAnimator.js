@@ -642,11 +642,9 @@ const TravelAnimator = () => {
   }
 
   return (
-    <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff5f7 0%, #fef3c7 50%, #e0f2fe 100%)' }}>
-      {/* Map container with warm tint */}
-      <div className="absolute inset-0 pastel-map-container" style={{
-        filter: 'sepia(0.15) saturate(1.1) hue-rotate(-5deg)',
-      }}>
+    <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #e8f4f8 0%, #f5f0e6 50%, #e6f2e6 100%)' }}>
+      {/* Map container with stylized look */}
+      <div className="absolute inset-0 stylized-map-container">
         <MapContainer
           center={defaultCenter}
           zoom={4}
@@ -654,10 +652,10 @@ const TravelAnimator = () => {
           zoomControl={false}
           ref={(map) => { if (map) mapRef.current = map; }}
         >
-          {/* OpenStreetMap with nice blue water */}
+          {/* Stamen Toner Lite - Clean, stylized map with minimal detail */}
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
           />
           
           <MapController destinations={destinations} defaultCenter={defaultCenter} isAnimating={isAnimating} />
