@@ -456,6 +456,9 @@ const TravelAnimator = () => {
       mapRef.current.removeLayer(markerRef.current);
     }
 
+    // Reset visited destinations and mark first one as visited (starting point)
+    setVisitedDestinations([destinations[0].id]);
+
     // Get responsive values for current screen size
     const responsive = getResponsiveValues();
 
@@ -464,8 +467,9 @@ const TravelAnimator = () => {
     const pointsPerSegment = 101; // 0-100 inclusive
     const totalSegments = destinations.length - 1;
     
-    // Track current segment for zoom transitions
+    // Track current segment for zoom transitions and visited destinations
     let currentSegmentIndex = -1;
+    let visitedIds = [destinations[0].id]; // Start with first destination visited
 
     // Initial zoom: fit the FIRST segment only (not all destinations)
     const firstSegmentBounds = L.latLngBounds([
