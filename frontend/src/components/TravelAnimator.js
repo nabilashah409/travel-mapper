@@ -704,15 +704,10 @@ const TravelAnimator = () => {
           zoomControl={false}
           ref={(map) => { if (map) mapRef.current = map; }}
         >
-          {/* Stamen Watercolor - Beautiful illustrated/painted map style */}
+          {/* CARTO Voyager - Colorful, illustrated-style map */}
           <TileLayer
-            url="https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg"
-            attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://stamen.com/">Stamen Design</a>'
-          />
-          {/* Add labels on top */}
-          <TileLayer
-            url="https://tiles.stadiamaps.com/tiles/stamen_terrain_labels/{z}/{x}/{y}{r}.png"
-            attribution=''
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
           />
           
           <MapController destinations={destinations} defaultCenter={defaultCenter} isAnimating={isAnimating} />
