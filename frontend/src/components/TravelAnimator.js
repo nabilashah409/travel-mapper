@@ -518,6 +518,8 @@ const TravelAnimator = () => {
       if (progress >= 1) {
         setIsAnimating(false);
         setAnimationProgress(100);
+        // Mark all destinations as visited at the end
+        setVisitedDestinations(destinations.map(d => d.id));
         // At the end, fit all destinations for overview (no animation)
         const allBounds = L.latLngBounds(destinations.map(d => [d.lat, d.lng]));
         const endResponsive = getResponsiveValues();
@@ -551,12 +553,19 @@ const TravelAnimator = () => {
         markerRef.current.setLatLng([lat, lng]);
         
         // DYNAMIC ZOOM: When entering a new segment, adjust view to fit that segment
-        // Use fitBounds with no animation to avoid lag and route breaking
+        // Also mark the destination we just reached as visited
         if (segmentIndex !== currentSegmentIndex) {
           currentSegmentIndex = segmentIndex;
           
           const segmentStart = destinations[segmentIndex];
           const segmentEnd = destinations[segmentIndex + 1];
+          
+          // Mark the destination we're traveling TO as visited when we reach ~90% of segment
+          // But mark the START of current segment immediately
+          if (!visitedIds.includes(segmentStart.id)) {
+            visitedIds = [...visitedIds, segmentStart.id];
+            setVisitedDestinations([...visitedIds]);
+          }
           
           // Create bounds for just this segment
           const segmentBounds = L.latLngBounds([
@@ -576,6 +585,15 @@ const TravelAnimator = () => {
             maxZoom: segmentZoom,
             animate: false
           });
+        }
+        
+        // Mark destination as visited when transport is about to arrive (85% through segment)
+        if (segmentProgress > 0.85) {
+          const nextDest = destinations[segmentIndex + 1];
+          if (nextDest && !visitedIds.includes(nextDest.id)) {
+            visitedIds = [...visitedIds, nextDest.id];
+            setVisitedDestinations([...visitedIds]);
+          }
         }
         
         // Update rotation based on transport type
