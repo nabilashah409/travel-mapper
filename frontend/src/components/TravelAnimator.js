@@ -351,24 +351,67 @@ const TravelAnimator = () => {
   // Linear interpolation
   const lerp = (start, end, t) => start + (end - start) * t;
 
+  // Get responsive values based on screen width
+  const getResponsiveValues = () => {
+    const width = window.innerWidth;
+    
+    if (width < 480) {
+      // Mobile small
+      return { 
+        zoomOffset: -2,      // Reduce zoom to show more area
+        padding: [30, 30],   // Less padding on small screens
+        markerSize: 36,      // Smaller marker
+        fontSize: 24         // Smaller emoji
+      };
+    } else if (width < 768) {
+      // Mobile/Tablet
+      return { 
+        zoomOffset: -1,      // Slightly reduce zoom
+        padding: [50, 50],   // Medium padding
+        markerSize: 42,
+        fontSize: 28
+      };
+    } else if (width < 1024) {
+      // Tablet/Small desktop
+      return { 
+        zoomOffset: 0,
+        padding: [60, 60],
+        markerSize: 46,
+        fontSize: 30
+      };
+    }
+    // Desktop
+    return { 
+      zoomOffset: 0,
+      padding: [80, 80],
+      markerSize: 50,
+      fontSize: 32
+    };
+  };
+
   // Calculate optimal zoom for a specific segment between two destinations
   const getSegmentZoom = (start, end) => {
     const distance = Math.sqrt(
       Math.pow(end.lat - start.lat, 2) + Math.pow(end.lng - start.lng, 2)
     );
     
-    // Calculate zoom based on segment distance
-    // Ensures route is always clearly visible (at least ~1 inch on screen)
-    if (distance < 0.1) return 15;       // Very close (~10km)
-    if (distance < 0.3) return 14;       // Same city (~30km)
-    if (distance < 0.5) return 13;       // Nearby (~50km)
-    if (distance < 1) return 12;         // ~100km
-    if (distance < 2) return 11;         // ~200km
-    if (distance < 4) return 10;         // ~400km
-    if (distance < 8) return 8;          // ~800km
-    if (distance < 15) return 6;         // Multi-state
-    if (distance < 30) return 5;         // Cross-country
-    return 4;                             // Intercontinental
+    const { zoomOffset } = getResponsiveValues();
+    
+    // Base zoom levels - adjusted by screen size offset
+    let baseZoom;
+    if (distance < 0.1) baseZoom = 15;       // Very close (~10km)
+    else if (distance < 0.3) baseZoom = 14;  // Same city (~30km)
+    else if (distance < 0.5) baseZoom = 13;  // Nearby (~50km)
+    else if (distance < 1) baseZoom = 12;    // ~100km
+    else if (distance < 2) baseZoom = 11;    // ~200km
+    else if (distance < 4) baseZoom = 10;    // ~400km
+    else if (distance < 8) baseZoom = 8;     // ~800km
+    else if (distance < 15) baseZoom = 6;    // Multi-state
+    else if (distance < 30) baseZoom = 5;    // Cross-country
+    else baseZoom = 4;                        // Intercontinental
+    
+    // Apply responsive offset, but ensure minimum zoom of 3
+    return Math.max(3, baseZoom + zoomOffset);
   };
 
   // Start route animation with dynamic segment-based zoom
