@@ -773,13 +773,23 @@ const TravelAnimator = () => {
         </MapContainer>
       </div>
       
-      {/* Warm pink overlay for land */}
+      {/* Soft pastel overlay to give stylized look */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{ 
-          background: 'linear-gradient(135deg, rgba(255,182,193,0.12) 0%, rgba(255,218,185,0.1) 50%, rgba(255,228,225,0.12) 100%)',
+          background: 'linear-gradient(180deg, rgba(232,244,248,0.3) 0%, rgba(245,240,230,0.2) 50%, rgba(230,242,230,0.3) 100%)',
         }}
       />
+
+      {/* CSS for stylized map */}
+      <style jsx>{`
+        .stylized-map-container :global(.leaflet-tile-pane) {
+          filter: saturate(0.3) brightness(1.1) contrast(0.9);
+        }
+        .stylized-map-container :global(.leaflet-container) {
+          background: #e8f4f8;
+        }
+      `}</style>
 
       {/* Floating search box with dropdown */}
       <div className="absolute top-4 left-4 right-4 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 z-[1000]">
