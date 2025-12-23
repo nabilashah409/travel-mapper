@@ -648,9 +648,9 @@ const TravelAnimator = () => {
   }
 
   return (
-    <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #e8f4f8 0%, #f5f0e6 50%, #e6f2e6 100%)' }}>
-      {/* Map container with stylized look */}
-      <div className="absolute inset-0 stylized-map-container">
+    <div className="h-screen w-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #87CEEB 0%, #98D8AA 50%, #4AA8D8 100%)' }}>
+      {/* Map container with illustrated/cartoon look */}
+      <div className="absolute inset-0 illustrated-map-container">
         <MapContainer
           center={defaultCenter}
           zoom={4}
@@ -658,15 +658,20 @@ const TravelAnimator = () => {
           zoomControl={false}
           ref={(map) => { if (map) mapRef.current = map; }}
         >
-          {/* Stamen Toner Lite - Clean, stylized map with minimal detail */}
+          {/* Stamen Watercolor - Beautiful illustrated/painted map style */}
           <TileLayer
-            url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg"
+            attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://stamen.com/">Stamen Design</a>'
+          />
+          {/* Add labels on top */}
+          <TileLayer
+            url="https://tiles.stadiamaps.com/tiles/stamen_terrain_labels/{z}/{x}/{y}{r}.png"
+            attribution=''
           />
           
           <MapController destinations={destinations} defaultCenter={defaultCenter} isAnimating={isAnimating} />
           
-          {/* Route line - show progressively during animation */}
+          {/* Route line - white dashed line like cartoon travel routes */}
           {routePath.length > 1 && visitedDestinations.length > 0 && (
             <>
               {/* Calculate how much of the route to show based on animation progress */}
@@ -675,22 +680,24 @@ const TravelAnimator = () => {
                 if (!isAnimating && visitedDestinations.length === destinations.length) {
                   return (
                     <>
+                      {/* Shadow/glow effect */}
+                      <Polyline
+                        positions={routePath}
+                        pathOptions={{
+                          color: 'rgba(0,0,0,0.3)',
+                          weight: 10,
+                          opacity: 0.5,
+                          lineCap: 'round',
+                        }}
+                      />
+                      {/* White dashed route line */}
                       <Polyline
                         positions={routePath}
                         pathOptions={{
                           color: '#ffffff',
-                          weight: 8,
-                          opacity: 0.9,
-                          lineCap: 'round',
-                        }}
-                      />
-                      <Polyline
-                        positions={routePath}
-                        pathOptions={{
-                          color: '#e11d48',
-                          weight: 3,
+                          weight: 6,
                           opacity: 1,
-                          dashArray: '8, 12',
+                          dashArray: '15, 20',
                           lineCap: 'round',
                         }}
                       />
@@ -704,22 +711,24 @@ const TravelAnimator = () => {
                 
                 return (
                   <>
+                    {/* Shadow/glow effect */}
+                    <Polyline
+                      positions={visiblePath}
+                      pathOptions={{
+                        color: 'rgba(0,0,0,0.3)',
+                        weight: 10,
+                        opacity: 0.5,
+                        lineCap: 'round',
+                      }}
+                    />
+                    {/* White dashed route line */}
                     <Polyline
                       positions={visiblePath}
                       pathOptions={{
                         color: '#ffffff',
-                        weight: 8,
-                        opacity: 0.9,
-                        lineCap: 'round',
-                      }}
-                    />
-                    <Polyline
-                      positions={visiblePath}
-                      pathOptions={{
-                        color: '#e11d48',
-                        weight: 3,
+                        weight: 6,
                         opacity: 1,
-                        dashArray: '8, 12',
+                        dashArray: '15, 20',
                         lineCap: 'round',
                       }}
                     />
