@@ -225,6 +225,7 @@ const TravelAnimator = () => {
   };
 
   // Curved path: offset perpendicular to the start->end line (not just latitude)
+  // First and last points are EXACTLY at the destination coordinates
   const createCurvedPath = (start, end) => {
     const points = [];
     const numPoints = 100;
@@ -235,8 +236,8 @@ const TravelAnimator = () => {
     const distance = Math.hypot(dLat, dLng);
 
     // "capped" gentle arc (tweak maxArc to reduce curve)
-    const maxArc = 0.12;                 // <-- adjust (smaller = flatter)
-    const arcHeight = Math.min(distance * 0.22, maxArc);
+    const maxArc = 0.08;                 // Reduced for subtler curve
+    const arcHeight = Math.min(distance * 0.15, maxArc);
 
     // Perpendicular unit vector to the segment (dLat, dLng)
     const len = distance || 1;
@@ -257,10 +258,15 @@ const TravelAnimator = () => {
       const lng0 = start.lng + dLng * t;
 
       // smooth arc: 0 at ends, peak at middle
+      // Use sin curve that's exactly 0 at t=0 and t=1
       const arcOffset = Math.sin(Math.PI * t) * arcHeight;
 
       points.push([lat0 + pLat * arcOffset, lng0 + pLng * arcOffset]);
     }
+
+    // Ensure first and last points are EXACTLY at destination coordinates
+    points[0] = [start.lat, start.lng];
+    points[numPoints] = [end.lat, end.lng];
 
     return points;
   };
