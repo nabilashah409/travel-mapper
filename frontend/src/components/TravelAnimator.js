@@ -727,11 +727,11 @@ const TravelAnimator = () => {
           
           {/* Destination markers - only show visited destinations with name labels */}
           {destinations.map((dest, index) => {
-            // Only show marker if destination has been visited (or if not animating, show all)
+            // Only show marker if destination has been visited during animation
+            // This creates a progressive reveal effect
             const isVisited = visitedDestinations.includes(dest.id);
-            const showMarker = !isAnimating || isVisited;
             
-            if (!showMarker) return null;
+            if (!isVisited) return null;
             
             return (
               <Marker
