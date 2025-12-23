@@ -482,9 +482,14 @@ const TravelAnimator = () => {
       if (progress >= 1) {
         setIsAnimating(false);
         setAnimationProgress(100);
-        // At the end, fit all destinations for overview
+        // At the end, fit all destinations for overview with responsive padding
         const allBounds = L.latLngBounds(destinations.map(d => [d.lat, d.lng]));
-        mapRef.current.flyToBounds(allBounds, { padding: [100, 100], maxZoom: 10, duration: 1 });
+        const endResponsive = getResponsiveValues();
+        mapRef.current.flyToBounds(allBounds, { 
+          padding: endResponsive.padding, 
+          maxZoom: Math.max(8, 10 + endResponsive.zoomOffset), 
+          duration: 1 
+        });
         return;
       }
 
@@ -522,12 +527,15 @@ const TravelAnimator = () => {
             [segmentEnd.lat, segmentEnd.lng]
           ]);
           
-          // Calculate optimal zoom for this specific segment
+          // Calculate optimal zoom for this specific segment (already responsive)
           const segmentZoom = getSegmentZoom(segmentStart, segmentEnd);
+          
+          // Get current responsive values for padding
+          const currentResponsive = getResponsiveValues();
           
           // Smoothly transition to the new segment view
           mapRef.current.flyToBounds(segmentBounds, {
-            padding: [80, 80],
+            padding: currentResponsive.padding,
             maxZoom: segmentZoom,
             duration: 0.8,
             easeLinearity: 0.5
@@ -537,6 +545,9 @@ const TravelAnimator = () => {
         // Update rotation - ✈️ emoji points NORTHEAST (~45°) by default
         const heading = calculateHeading(currentPoint, nextPoint);
         const adjustedRotation = heading - 45;
+        
+        // Get responsive marker size for rotation update
+        const markerResponsive = getResponsiveValues();
         const rotatedIcon = L.divIcon({
           className: 'animated-transport-marker',
           html: `<div style="
