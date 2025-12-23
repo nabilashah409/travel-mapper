@@ -551,17 +551,17 @@ const TravelAnimator = () => {
         const rotatedIcon = L.divIcon({
           className: 'animated-transport-marker',
           html: `<div style="
-            width: 50px;
-            height: 50px;
+            width: ${markerResponsive.markerSize}px;
+            height: ${markerResponsive.markerSize}px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: ${markerResponsive.fontSize}px;
             transform: rotate(${adjustedRotation}deg);
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
           ">${getTransportEmoji()}</div>`,
-          iconSize: [50, 50],
-          iconAnchor: [25, 25],
+          iconSize: [markerResponsive.markerSize, markerResponsive.markerSize],
+          iconAnchor: [markerResponsive.markerSize / 2, markerResponsive.markerSize / 2],
         });
         markerRef.current.setIcon(rotatedIcon);
         
