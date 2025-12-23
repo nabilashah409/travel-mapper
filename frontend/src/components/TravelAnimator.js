@@ -901,10 +901,10 @@ const TravelAnimator = () => {
         <div className="text-3xl">🌴</div>
       </div>
 
-      {/* CSS for illustrated map */}
+      {/* CSS for illustrated map - make it more colorful and vibrant */}
       <style jsx>{`
         .illustrated-map-container :global(.leaflet-tile-pane) {
-          filter: saturate(1.3) brightness(1.05) contrast(1.1);
+          filter: saturate(1.5) brightness(1.1) contrast(1.05) hue-rotate(5deg);
         }
         .illustrated-map-container :global(.leaflet-container) {
           background: linear-gradient(135deg, #87CEEB, #98D8AA);
@@ -912,6 +912,12 @@ const TravelAnimator = () => {
         .illustrated-map-container :global(.leaflet-marker-icon) {
           background: transparent !important;
           border: none !important;
+        }
+        .illustrated-map-container :global(.leaflet-control-attribution) {
+          background: rgba(255,255,255,0.8) !important;
+          border-radius: 8px !important;
+          padding: 4px 8px !important;
+          font-size: 10px !important;
         }
       `}</style>
 
