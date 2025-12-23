@@ -351,31 +351,6 @@ const TravelAnimator = () => {
   // Linear interpolation
   const lerp = (start, end, t) => start + (end - start) * t;
 
-  // Calculate optimal zoom for animation based on destination distances
-  const getAnimationZoom = () => {
-    if (destinations.length < 2) return 10;
-    
-    let minDistance = Infinity;
-    for (let i = 0; i < destinations.length - 1; i++) {
-      const d1 = destinations[i];
-      const d2 = destinations[i + 1];
-      const distance = Math.sqrt(
-        Math.pow(d2.lat - d1.lat, 2) + Math.pow(d2.lng - d1.lng, 2)
-      );
-      minDistance = Math.min(minDistance, distance);
-    }
-    
-    // More aggressive zoom for close destinations
-    if (minDistance < 0.3) return 14;
-    if (minDistance < 0.5) return 13;
-    if (minDistance < 1) return 12;
-    if (minDistance < 2) return 11;
-    if (minDistance < 4) return 10;
-    if (minDistance < 8) return 8;
-    if (minDistance < 15) return 6;
-    return 5;
-  };
-
   // Calculate optimal zoom for a specific segment between two destinations
   const getSegmentZoom = (start, end) => {
     const distance = Math.sqrt(
