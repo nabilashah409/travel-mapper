@@ -348,6 +348,22 @@ const TravelAnimator = () => {
     return emojis[selectedTransport] || '✈️';
   };
 
+  // Get rotation offset for each transport type (emojis point in different directions)
+  const getTransportRotationOffset = () => {
+    // ✈️ plane points northeast (~45°), so subtract 45 to align with heading
+    // 🚗 car points right (0°), so no offset needed
+    // 🚂 train points right (0°), so no offset needed  
+    // 🚶 walk points right/forward (0°), so no offset needed
+    const offsets = { flight: -45, car: 0, train: 0, walk: 0 };
+    return offsets[selectedTransport] || 0;
+  };
+
+  // Get animation speed multiplier based on transport (slower for walk, faster for flight)
+  const getTransportSpeedMultiplier = () => {
+    const speeds = { flight: 1, car: 1.5, train: 1.3, walk: 2.5 };
+    return speeds[selectedTransport] || 1;
+  };
+
   // Calculate heading between two points
   const calculateHeading = (from, to) => {
     const lat1 = from[0] * Math.PI / 180;
