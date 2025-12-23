@@ -662,13 +662,13 @@ const TravelAnimator = () => {
           
           <MapController destinations={destinations} defaultCenter={defaultCenter} isAnimating={isAnimating} />
           
-          {/* Route line - show progressively during animation based on visited destinations */}
-          {routePath.length > 1 && (
+          {/* Route line - show progressively during animation */}
+          {routePath.length > 1 && visitedDestinations.length > 0 && (
             <>
               {/* Calculate how much of the route to show based on animation progress */}
               {(() => {
-                // If not animating, show full route
-                if (!isAnimating) {
+                // If animation finished (all destinations visited), show full route
+                if (!isAnimating && visitedDestinations.length === destinations.length) {
                   return (
                     <>
                       <Polyline
