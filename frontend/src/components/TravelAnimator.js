@@ -17,20 +17,18 @@ L.Icon.Default.mergeOptions({
 const MapController = ({ destinations, defaultCenter, isAnimating }) => {
   const map = useMap();
   
-  // Get responsive padding and zoom offset based on screen width
+  // Get responsive padding based on screen width
   const getMapControllerResponsive = () => {
     const width = window.innerWidth;
-    if (width < 480) return { padding: [30, 30], zoomOffset: -2 };
-    if (width < 768) return { padding: [50, 50], zoomOffset: -1 };
-    if (width < 1024) return { padding: [60, 60], zoomOffset: 0 };
-    return { padding: [100, 100], zoomOffset: 0 };
+    if (width < 480) return { padding: [40, 40] };
+    if (width < 768) return { padding: [50, 50] };
+    if (width < 1024) return { padding: [60, 60] };
+    return { padding: [80, 80] };
   };
   
-  // Calculate optimal zoom to ensure good visual distance between destinations
+  // Calculate optimal zoom - LESS AGGRESSIVE, cap at 10
   const calculateOptimalZoom = (destinations) => {
-    if (destinations.length < 2) return 10;
-    
-    const { zoomOffset } = getMapControllerResponsive();
+    if (destinations.length < 2) return 8;
     
     // Find minimum distance between consecutive destinations (in degrees)
     let minDistance = Infinity;
@@ -43,19 +41,18 @@ const MapController = ({ destinations, defaultCenter, isAnimating }) => {
       minDistance = Math.min(minDistance, distance);
     }
     
-    // Base zoom levels for close destinations
+    // Reduced zoom levels - cap at 10 max
     let baseZoom;
-    if (minDistance < 0.3) baseZoom = 14;       // Same city/very close (~30km)
-    else if (minDistance < 0.5) baseZoom = 13;  // Nearby suburbs (~50km)
-    else if (minDistance < 1) baseZoom = 12;    // Same metro area (~100km)
-    else if (minDistance < 2) baseZoom = 11;    // Nearby cities (~200km)
-    else if (minDistance < 4) baseZoom = 10;    // Regional (~400km)
-    else if (minDistance < 8) baseZoom = 8;     // State level (~800km)
-    else if (minDistance < 15) baseZoom = 6;    // Multi-state
-    else baseZoom = 5;                           // Cross-country
+    if (minDistance < 0.5) baseZoom = 10;      // Close destinations
+    else if (minDistance < 1) baseZoom = 9;    // ~100km
+    else if (minDistance < 2) baseZoom = 8;    // ~200km
+    else if (minDistance < 4) baseZoom = 7;    // ~400km
+    else if (minDistance < 8) baseZoom = 6;    // ~800km
+    else if (minDistance < 15) baseZoom = 5;   // Multi-state
+    else baseZoom = 4;                          // Cross-country
     
-    // Apply responsive offset
-    return Math.max(3, baseZoom + zoomOffset);
+    // Clamp between 4 and 10
+    return Math.min(10, Math.max(4, baseZoom));
   };
   
   // Only adjust zoom when destinations change AND we're NOT animating
@@ -64,12 +61,12 @@ const MapController = ({ destinations, defaultCenter, isAnimating }) => {
     // Skip if animation is in progress - let startAnimation handle zoom
     if (isAnimating) return;
     
-    const { padding, zoomOffset } = getMapControllerResponsive();
+    const { padding } = getMapControllerResponsive();
     
     if (destinations.length === 0) {
-      map.flyTo(defaultCenter, Math.max(3, 4 + zoomOffset), { duration: 1 });
+      map.flyTo(defaultCenter, 4, { duration: 1 });
     } else if (destinations.length === 1) {
-      map.flyTo([destinations[0].lat, destinations[0].lng], Math.max(6, 10 + zoomOffset), { duration: 1.5 });
+      map.flyTo([destinations[0].lat, destinations[0].lng], 8, { duration: 1 });
     } else {
       const bounds = L.latLngBounds(
         destinations.map(d => [d.lat, d.lng])
@@ -78,9 +75,8 @@ const MapController = ({ destinations, defaultCenter, isAnimating }) => {
       
       map.flyToBounds(bounds, {
         padding: padding,
-        duration: 1.5,
-        maxZoom: optimalZoom,
-        minZoom: optimalZoom > 8 ? optimalZoom - 2 : 3
+        duration: 1,
+        maxZoom: optimalZoom
       });
     }
   }, [destinations, map, defaultCenter, isAnimating]);
