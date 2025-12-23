@@ -96,6 +96,7 @@ const TravelAnimator = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationProgress, setAnimationProgress] = useState(0);
   const [draggedIndex, setDraggedIndex] = useState(null);
+  const [visitedDestinations, setVisitedDestinations] = useState([]); // Track which destinations have been reached
   const markerRef = useRef(null);
   const mapRef = useRef(null);
   const animationRef = useRef(null);
