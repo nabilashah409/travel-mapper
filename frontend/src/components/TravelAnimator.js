@@ -491,20 +491,45 @@ const TravelAnimator = () => {
       animate: false
     });
 
-    // Create animated marker with responsive size
-    const customIcon = L.divIcon({
-      className: 'animated-transport-marker',
-      html: `<div style="
-        width: ${responsive.markerSize}px;
-        height: ${responsive.markerSize}px;
+    // Create animated marker with cartoon plane style
+    const getCartoonPlaneIcon = (rotation) => {
+      return `<div style="
+        width: 60px;
+        height: 60px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: ${responsive.fontSize}px;
-        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-      ">${getTransportEmoji()}</div>`,
-      iconSize: [responsive.markerSize, responsive.markerSize],
-      iconAnchor: [responsive.markerSize / 2, responsive.markerSize / 2],
+        transform: rotate(${rotation}deg);
+        filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4));
+      ">
+        <svg width="55" height="55" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Plane body -->
+          <ellipse cx="50" cy="50" rx="45" ry="18" fill="white" stroke="#1e3a5f" stroke-width="2"/>
+          <!-- Plane nose -->
+          <path d="M90 50 L100 48 L100 52 Z" fill="white" stroke="#1e3a5f" stroke-width="1"/>
+          <!-- Windows -->
+          <circle cx="35" cy="50" r="4" fill="#87CEEB" stroke="#1e3a5f" stroke-width="1"/>
+          <circle cx="50" cy="50" r="4" fill="#87CEEB" stroke="#1e3a5f" stroke-width="1"/>
+          <circle cx="65" cy="50" r="4" fill="#87CEEB" stroke="#1e3a5f" stroke-width="1"/>
+          <!-- Wing top -->
+          <path d="M40 32 L60 32 L55 45 L45 45 Z" fill="#dc2626" stroke="#1e3a5f" stroke-width="1"/>
+          <!-- Wing bottom -->
+          <path d="M40 68 L60 68 L55 55 L45 55 Z" fill="#dc2626" stroke="#1e3a5f" stroke-width="1"/>
+          <!-- Tail -->
+          <path d="M10 50 L5 35 L15 45 Z" fill="#1e3a5f"/>
+          <path d="M10 50 L5 65 L15 55 Z" fill="#1e3a5f"/>
+          <!-- Engine -->
+          <ellipse cx="45" cy="32" rx="5" ry="3" fill="#4a5568"/>
+          <ellipse cx="45" cy="68" rx="5" ry="3" fill="#4a5568"/>
+        </svg>
+      </div>`;
+    };
+
+    const customIcon = L.divIcon({
+      className: 'animated-transport-marker cartoon-plane',
+      html: getCartoonPlaneIcon(0),
+      iconSize: [60, 60],
+      iconAnchor: [30, 30],
     });
 
     markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
