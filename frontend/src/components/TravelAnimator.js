@@ -498,8 +498,11 @@ const TravelAnimator = () => {
 
     markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
     
-    // Animation duration scales with number of segments (4 seconds per segment for smoother feel)
-    const durationPerSegment = 4000;
+    // Animation duration scales with transport type and number of segments
+    // Base: 4 seconds per segment, adjusted by transport speed
+    const baseDurationPerSegment = 4000;
+    const speedMultiplier = getTransportSpeedMultiplier();
+    const durationPerSegment = baseDurationPerSegment * speedMultiplier;
     const totalDuration = totalSegments * durationPerSegment;
     const startTime = Date.now();
     
