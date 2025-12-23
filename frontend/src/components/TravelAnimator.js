@@ -530,7 +530,8 @@ const TravelAnimator = () => {
         // Update marker position
         markerRef.current.setLatLng([lat, lng]);
         
-        // DYNAMIC ZOOM: When entering a new segment, smoothly zoom to fit just that segment
+        // DYNAMIC ZOOM: When entering a new segment, adjust view to fit that segment
+        // Use fitBounds with no animation to avoid lag and route breaking
         if (segmentIndex !== currentSegmentIndex) {
           currentSegmentIndex = segmentIndex;
           
@@ -543,18 +544,17 @@ const TravelAnimator = () => {
             [segmentEnd.lat, segmentEnd.lng]
           ]);
           
-          // Calculate optimal zoom for this specific segment (already responsive)
+          // Calculate optimal zoom for this specific segment
           const segmentZoom = getSegmentZoom(segmentStart, segmentEnd);
           
           // Get current responsive values for padding
           const currentResponsive = getResponsiveValues();
           
-          // Smoothly transition to the new segment view
-          mapRef.current.flyToBounds(segmentBounds, {
+          // Use fitBounds without animation to prevent lag/route breaking
+          mapRef.current.fitBounds(segmentBounds, {
             padding: currentResponsive.padding,
             maxZoom: segmentZoom,
-            duration: 0.8,
-            easeLinearity: 0.5
+            animate: false
           });
         }
         
