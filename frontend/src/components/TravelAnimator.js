@@ -667,26 +667,53 @@ const TravelAnimator = () => {
             </>
           )}
           
-          {/* Destination markers - pastel pink pins */}
-          {destinations.map((dest, index) => (
-            <Marker
-              key={dest.id}
-              position={[dest.lat, dest.lng]}
-              icon={L.divIcon({
-                className: 'custom-marker',
-                html: `<div style="
-                  width: 28px;
-                  height: 28px;
-                  border-radius: 50%;
-                  background: linear-gradient(135deg, #ec4899, #f97316);
-                  border: 4px solid white;
-                  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-                "></div>`,
-                iconSize: [28, 28],
-                iconAnchor: [14, 14],
-              })}
-            />
-          ))}
+          {/* Destination markers - only show visited destinations with name labels */}
+          {destinations.map((dest, index) => {
+            // Only show marker if destination has been visited (or if not animating, show all)
+            const isVisited = visitedDestinations.includes(dest.id);
+            const showMarker = !isAnimating || isVisited;
+            
+            if (!showMarker) return null;
+            
+            return (
+              <Marker
+                key={dest.id}
+                position={[dest.lat, dest.lng]}
+                icon={L.divIcon({
+                  className: 'custom-marker-with-label',
+                  html: `<div style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    transform: translateX(-50%);
+                  ">
+                    <div style="
+                      background: white;
+                      padding: 4px 10px;
+                      border-radius: 12px;
+                      font-size: 12px;
+                      font-weight: 600;
+                      color: #1f2937;
+                      white-space: nowrap;
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                      margin-bottom: 4px;
+                      border: 2px solid #ec4899;
+                    ">${dest.name}</div>
+                    <div style="
+                      width: 16px;
+                      height: 16px;
+                      border-radius: 50%;
+                      background: linear-gradient(135deg, #ec4899, #f97316);
+                      border: 3px solid white;
+                      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                    "></div>
+                  </div>`,
+                  iconSize: [100, 50],
+                  iconAnchor: [50, 50],
+                })}
+              />
+            );
+          })}
         </MapContainer>
       </div>
       
