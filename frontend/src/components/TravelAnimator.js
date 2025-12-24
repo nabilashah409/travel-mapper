@@ -232,11 +232,6 @@ const TravelAnimator = () => {
     setSearchQuery('');
     setSearchResults([]);
     setShowDropdown(false);
-    
-    // Calculate route path
-    if (updatedDestinations.length > 1) {
-      calculateRoute(updatedDestinations);
-    }
   };
 
   const addDestination = async () => {
