@@ -281,7 +281,7 @@ const TravelAnimator = () => {
   const calculateRoute = async (dests) => {
     if (dests.length < 2) return;
     
-    // For car and walk, use OSRM road routing
+    // For car and walk, ONLY use OSRM road routing - never fallback to curved paths
     if (selectedTransport === 'car' || selectedTransport === 'walk') {
       try {
         // Build coordinates string for OSRM
@@ -293,31 +293,32 @@ const TravelAnimator = () => {
           `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson`
         );
         
-        if (response.ok) {
-          const data = await response.json();
-          if (data.routes && data.routes[0]) {
-            // Convert GeoJSON coordinates to Leaflet format [lat, lng]
-            const roadPath = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
-            setRoutePath(roadPath);
-            return;
-          } else if (data.code === 'NoRoute') {
-            // No valid route found (e.g., destinations separated by water)
-            // Show alert and don't set a route - prevents going through water
-            alert('No valid route found! The destinations may be separated by water or impassable terrain. Try using flight mode instead.');
-            setRoutePath([]);
-            return;
-          }
+        const data = await response.json();
+        
+        // Check if we got a valid route
+        if (data.code === 'Ok' && data.routes && data.routes[0]) {
+          // Convert GeoJSON coordinates to Leaflet format [lat, lng]
+          const roadPath = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+          setRoutePath(roadPath);
+          return;
         }
+        
+        // No valid route found (water crossing, different continents, etc.)
+        const transportName = selectedTransport === 'car' ? 'drive' : 'walk';
+        alert(`Cannot ${transportName} between these destinations! They may be separated by water or on different continents. Use flight mode instead.`);
+        setRoutePath([]);
+        return;
+        
       } catch (error) {
         console.log('Road routing failed:', error);
-        // For car/walk, don't fallback - show error instead
-        alert('Could not calculate road route. Try using flight mode for this journey.');
+        const transportName = selectedTransport === 'car' ? 'driving' : 'walking';
+        alert(`Could not calculate ${transportName} route. Try using flight mode.`);
         setRoutePath([]);
         return;
       }
     }
     
-    // For flight mode only, use curved path
+    // For FLIGHT mode only, use curved path
     let allPoints = [];
     
     for (let i = 0; i < dests.length - 1; i++) {
