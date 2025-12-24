@@ -96,23 +96,39 @@ const TravelAnimator = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationProgress, setAnimationProgress] = useState(0);
   const [draggedIndex, setDraggedIndex] = useState(null);
-  const [visitedDestinations, setVisitedDestinations] = useState([]); // Track which destinations have been reached
+  const [visitedDestinations, setVisitedDestinations] = useState([]);
+  const [customIcon, setCustomIcon] = useState(null);
   const markerRef = useRef(null);
   const mapRef = useRef(null);
   const animationRef = useRef(null);
   const searchTimeoutRef = useRef(null);
+  const fileInputRef = useRef(null);
   
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   
   // Default center (USA)
   const defaultCenter = [39.8283, -98.5795];
 
-  // Transport modes (removed train)
+  // Transport modes
   const transportModes = [
-    { id: 'flight', icon: Plane, label: '✈️' },
-    { id: 'car', icon: Car, label: '🚗' },
-    { id: 'walk', icon: Footprints, label: '🚶‍♀️' },
+    { id: 'flight', label: '✈️' },
+    { id: 'car', label: '🚗' },
+    { id: 'walk', label: '🚶‍♀️' },
+    { id: 'custom', label: '📷' },
   ];
+
+  // Handle custom icon upload
+  const handleIconUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setCustomIcon(event.target.result);
+        setSelectedTransport('custom');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Start animation after component mounts
   useEffect(() => {
