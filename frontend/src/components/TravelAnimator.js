@@ -158,8 +158,10 @@ const TravelAnimator = () => {
 
   // Recalculate route when transport mode or destinations change
   useEffect(() => {
+    // Clear route immediately
+    setRoutePath([]);
+    
     if (destinations.length < 2) {
-      setRoutePath([]);
       return;
     }
     
@@ -181,15 +183,12 @@ const TravelAnimator = () => {
               Math.pow(roadPath[0][1] - destinations[0].lng, 2)
             );
             if (startDist > 0.5) {
-              setRoutePath([]);
-              return;
+              return; // Route doesn't start at origin
             }
             setRoutePath(roadPath);
-            return;
           }
-          setRoutePath([]);
         } catch {
-          setRoutePath([]);
+          // No route available
         }
         return;
       }
