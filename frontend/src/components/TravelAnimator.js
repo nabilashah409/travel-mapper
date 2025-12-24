@@ -300,14 +300,24 @@ const TravelAnimator = () => {
             const roadPath = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
             setRoutePath(roadPath);
             return;
+          } else if (data.code === 'NoRoute') {
+            // No valid route found (e.g., destinations separated by water)
+            // Show alert and don't set a route - prevents going through water
+            alert('No valid route found! The destinations may be separated by water or impassable terrain. Try using flight mode instead.');
+            setRoutePath([]);
+            return;
           }
         }
       } catch (error) {
-        console.log('Road routing failed, falling back to curved path:', error);
+        console.log('Road routing failed:', error);
+        // For car/walk, don't fallback - show error instead
+        alert('Could not calculate road route. Try using flight mode for this journey.');
+        setRoutePath([]);
+        return;
       }
     }
     
-    // For flight (or if road routing fails), use curved path
+    // For flight mode only, use curved path
     let allPoints = [];
     
     for (let i = 0; i < dests.length - 1; i++) {
