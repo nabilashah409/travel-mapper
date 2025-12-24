@@ -500,64 +500,7 @@ const TravelAnimator = () => {
     return Math.min(10, Math.max(4, baseZoom + zoomOffset));
   };
 
-  // Calculate cumulative distances along the route path for constant-speed animation
-  const calculateCumulativeDistances = (path) => {
-    const distances = [0];
-    for (let i = 1; i < path.length; i++) {
-      const prev = path[i - 1];
-      const curr = path[i];
-      // Use Haversine-like distance for more accuracy
-      const dLat = curr[0] - prev[0];
-      const dLng = curr[1] - prev[1];
-      // Approximate distance (good enough for animation purposes)
-      const dist = Math.sqrt(dLat * dLat + dLng * dLng);
-      distances.push(distances[i - 1] + dist);
-    }
-    return distances;
-  };
-
-  // Find the position along the route at a given distance using binary search
-  const getPositionAtDistance = (path, distances, targetDistance) => {
-    const totalDistance = distances[distances.length - 1];
-    
-    // Clamp target distance
-    if (targetDistance <= 0) return { point: path[0], index: 0, nextIndex: 1 };
-    if (targetDistance >= totalDistance) {
-      return { point: path[path.length - 1], index: path.length - 2, nextIndex: path.length - 1 };
-    }
-    
-    // Binary search to find the segment containing targetDistance
-    let low = 0;
-    let high = distances.length - 1;
-    while (low < high - 1) {
-      const mid = Math.floor((low + high) / 2);
-      if (distances[mid] <= targetDistance) {
-        low = mid;
-      } else {
-        high = mid;
-      }
-    }
-    
-    // Interpolate within the segment
-    const segmentStart = distances[low];
-    const segmentEnd = distances[high];
-    const segmentLength = segmentEnd - segmentStart;
-    const t = segmentLength > 0 ? (targetDistance - segmentStart) / segmentLength : 0;
-    
-    const p1 = path[low];
-    const p2 = path[high];
-    
-    return {
-      point: [
-        lerp(p1[0], p2[0], t),
-        lerp(p1[1], p2[1], t)
-      ],
-      index: low,
-      nextIndex: high
-    };
-  };
-
-  // Start route animation with constant speed along the entire route
+  // Start route animation - smooth movement with constant speed and proper heading
   const startAnimation = () => {
     if (routePath.length < 2 || destinations.length < 2) {
       return;
@@ -577,14 +520,22 @@ const TravelAnimator = () => {
     // Get responsive values for current screen size
     const responsive = getResponsiveValues();
 
-    // Pre-calculate cumulative distances for constant-speed animation
-    const cumulativeDistances = calculateCumulativeDistances(routePath);
-    const totalRouteDistance = cumulativeDistances[cumulativeDistances.length - 1];
+    // Pre-calculate cumulative distances along the route for constant-speed animation
+    const distances = [0];
+    for (let i = 1; i < routePath.length; i++) {
+      const prev = routePath[i - 1];
+      const curr = routePath[i];
+      const dLat = curr[0] - prev[0];
+      const dLng = curr[1] - prev[1];
+      const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+      distances.push(distances[i - 1] + dist);
+    }
+    const totalRouteDistance = distances[distances.length - 1];
 
     // Track visited destinations
     let visitedIds = [destinations[0].id];
 
-    // Initial zoom: fit the FIRST segment only (not all destinations)
+    // Initial zoom: fit the route
     const firstSegmentBounds = L.latLngBounds([
       [destinations[0].lat, destinations[0].lng],
       [destinations[1].lat, destinations[1].lng]
@@ -615,16 +566,13 @@ const TravelAnimator = () => {
 
     markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
     
-    // Animation duration based on total route distance and transport speed
-    // Use a base duration that scales with route complexity
+    // Animation duration - constant for all routes, adjusted by transport speed
     const speedMultiplier = getTransportSpeedMultiplier();
-    const baseDuration = 4000; // Base 4 seconds for short routes
-    const distanceFactor = Math.max(1, totalRouteDistance * 100); // Scale with distance
-    const totalDuration = Math.min(baseDuration * speedMultiplier * Math.sqrt(distanceFactor), 15000); // Cap at 15s
+    const totalDuration = 6000 * speedMultiplier; // 6 seconds base, multiplied by speed factor
     
     const startTime = Date.now();
-    let lastHeading = 0; // Store last valid heading for smooth rotation
-    let lastSegmentIndex = -1; // Track which destination segment we're in
+    let lastHeading = 0;
+    let lastSegmentIndex = -1;
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -633,14 +581,15 @@ const TravelAnimator = () => {
       if (progress >= 1) {
         setIsAnimating(false);
         setAnimationProgress(100);
-        // Mark all destinations as visited at the end
         setVisitedDestinations(destinations.map(d => d.id));
         
-        // Ensure car stops exactly at the final destination
+        // Ensure icon stops exactly at final destination
         const finalPoint = routePath[routePath.length - 1];
-        markerRef.current.setLatLng(finalPoint);
+        if (markerRef.current) {
+          markerRef.current.setLatLng(finalPoint);
+        }
         
-        // At the end, fit all destinations for overview
+        // Zoom out to show all destinations
         const allBounds = L.latLngBounds(destinations.map(d => [d.lat, d.lng]));
         const endResponsive = getResponsiveValues();
         mapRef.current.fitBounds(allBounds, { 
@@ -654,22 +603,36 @@ const TravelAnimator = () => {
       // Calculate current distance traveled (constant speed)
       const currentDistance = progress * totalRouteDistance;
       
-      // Get interpolated position along the route
-      const { point: currentPosition, index, nextIndex } = getPositionAtDistance(
-        routePath, 
-        cumulativeDistances, 
-        currentDistance
-      );
+      // Find position along route using binary search
+      let low = 0;
+      let high = distances.length - 1;
+      while (low < high - 1) {
+        const mid = Math.floor((low + high) / 2);
+        if (distances[mid] <= currentDistance) {
+          low = mid;
+        } else {
+          high = mid;
+        }
+      }
+      
+      // Interpolate between points for smooth movement
+      const segmentStart = distances[low];
+      const segmentEnd = distances[high];
+      const segmentLength = segmentEnd - segmentStart;
+      const t = segmentLength > 0 ? (currentDistance - segmentStart) / segmentLength : 0;
+      
+      const p1 = routePath[low];
+      const p2 = routePath[Math.min(high, routePath.length - 1)];
+      
+      // Interpolated position
+      const lat = lerp(p1[0], p2[0], t);
+      const lng = lerp(p1[1], p2[1], t);
       
       if (markerRef.current && mapRef.current) {
-        // Update marker position - smooth interpolated position
-        markerRef.current.setLatLng(currentPosition);
+        // Update marker position
+        markerRef.current.setLatLng([lat, lng]);
         
-        // Calculate heading from current segment direction
-        const p1 = routePath[index];
-        const p2 = routePath[Math.min(nextIndex, routePath.length - 1)];
-        
-        // Only update heading if we have distinct points
+        // Calculate heading from route tangent (current segment direction)
         if (p1[0] !== p2[0] || p1[1] !== p2[1]) {
           lastHeading = calculateHeading(p1, p2);
         }
@@ -691,49 +654,32 @@ const TravelAnimator = () => {
             font-size: ${markerResponsive.fontSize}px;
             transform: rotate(${adjustedRotation}deg);
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-            transition: transform 0.1s ease-out;
           ">${getTransportEmoji()}</div>`,
           iconSize: [markerResponsive.markerSize, markerResponsive.markerSize],
           iconAnchor: [markerResponsive.markerSize / 2, markerResponsive.markerSize / 2],
         });
         markerRef.current.setIcon(rotatedIcon);
         
-        // Check which destination segment we're approaching/passing
-        // Find nearest destination based on current position
-        let currentSegment = 0;
-        for (let i = 1; i < destinations.length; i++) {
-          const destDist = Math.sqrt(
-            Math.pow(currentPosition[0] - destinations[i].lat, 2) +
-            Math.pow(currentPosition[1] - destinations[i].lng, 2)
-          );
-          const prevDestDist = Math.sqrt(
-            Math.pow(currentPosition[0] - destinations[i - 1].lat, 2) +
-            Math.pow(currentPosition[1] - destinations[i - 1].lng, 2)
-          );
-          if (prevDestDist < destDist * 0.3) { // Past the previous destination
-            currentSegment = i;
-          }
-        }
-        
-        // Update zoom when entering a new segment
-        if (currentSegment !== lastSegmentIndex && currentSegment < destinations.length - 1) {
-          lastSegmentIndex = currentSegment;
+        // Check for segment transitions to update zoom
+        const segmentIndex = Math.floor(progress * (destinations.length - 1));
+        if (segmentIndex !== lastSegmentIndex && segmentIndex < destinations.length - 1) {
+          lastSegmentIndex = segmentIndex;
           
-          const segmentStart = destinations[currentSegment];
-          const segmentEnd = destinations[currentSegment + 1];
+          const segmentStartDest = destinations[segmentIndex];
+          const segmentEndDest = destinations[segmentIndex + 1];
           
-          // Mark visited destinations
-          if (!visitedIds.includes(segmentStart.id)) {
-            visitedIds = [...visitedIds, segmentStart.id];
+          // Mark visited destination
+          if (!visitedIds.includes(segmentStartDest.id)) {
+            visitedIds = [...visitedIds, segmentStartDest.id];
             setVisitedDestinations([...visitedIds]);
           }
           
           // Adjust zoom to fit current segment
           const segmentBounds = L.latLngBounds([
-            [segmentStart.lat, segmentStart.lng],
-            [segmentEnd.lat, segmentEnd.lng]
+            [segmentStartDest.lat, segmentStartDest.lng],
+            [segmentEndDest.lat, segmentEndDest.lng]
           ]);
-          const segmentZoom = getSegmentZoom(segmentStart, segmentEnd);
+          const segmentZoom = getSegmentZoom(segmentStartDest, segmentEndDest);
           const currentResponsive = getResponsiveValues();
           
           mapRef.current.fitBounds(segmentBounds, {
@@ -743,14 +689,13 @@ const TravelAnimator = () => {
           });
         }
         
-        // Mark destination as visited when close to it
+        // Mark destination as visited when close
         for (let i = 0; i < destinations.length; i++) {
           const dest = destinations[i];
           const distToDest = Math.sqrt(
-            Math.pow(currentPosition[0] - dest.lat, 2) +
-            Math.pow(currentPosition[1] - dest.lng, 2)
+            Math.pow(lat - dest.lat, 2) + Math.pow(lng - dest.lng, 2)
           );
-          if (distToDest < 0.01 && !visitedIds.includes(dest.id)) { // Close enough
+          if (distToDest < 0.02 && !visitedIds.includes(dest.id)) {
             visitedIds = [...visitedIds, dest.id];
             setVisitedDestinations([...visitedIds]);
           }
