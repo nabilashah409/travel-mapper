@@ -384,16 +384,16 @@ const TravelAnimator = () => {
 
   // Get transport emoji for animated marker
   const getTransportEmoji = () => {
-    const emojis = { flight: '✈️', car: '🚗', walk: '🚶' };
+    const emojis = { flight: '✈️', car: '🚗', walk: '🚶‍♀️' };
     return emojis[selectedTransport] || '✈️';
   };
 
   // Get rotation offset for each transport type (emojis point in different directions)
   const getTransportRotationOffset = () => {
     // ✈️ plane points northeast (~45°), so subtract 45 to align with heading
-    // 🚗 car emoji faces right but we need it to face direction of travel, so -90
-    // 🚶 walk emoji faces right but we need it to face direction of travel, so -90
-    const offsets = { flight: -45, car: -90, walk: -90 };
+    // 🚗 car emoji faces left in most renders, add 90 to face forward direction
+    // 🚶‍♀️ woman walks facing right, subtract 90 to face direction of travel
+    const offsets = { flight: -45, car: 90, walk: -90 };
     return offsets[selectedTransport] || 0;
   };
 
