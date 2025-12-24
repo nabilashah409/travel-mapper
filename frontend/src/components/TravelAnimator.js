@@ -393,26 +393,40 @@ const TravelAnimator = () => {
     }
   };
 
-  // Get transport emoji for animated marker
-  const getTransportEmoji = () => {
-    const emojis = { flight: '✈️', car: '🚗', walk: '🚶‍♀️' };
+  // Get transport icon HTML - aerial view for car
+  const getTransportIcon = () => {
+    if (selectedTransport === 'car') {
+      // Top-down/aerial view car using simple HTML
+      return `<div style="
+        width: 24px;
+        height: 32px;
+        background: #dc2626;
+        border-radius: 6px 6px 4px 4px;
+        position: relative;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      ">
+        <div style="
+          position: absolute;
+          top: 4px;
+          left: 3px;
+          right: 3px;
+          height: 8px;
+          background: #87CEEB;
+          border-radius: 3px 3px 0 0;
+        "></div>
+      </div>`;
+    }
+    // Emoji for other transport types
+    const emojis = { flight: '✈️', walk: '🚶‍♀️' };
     return emojis[selectedTransport] || '✈️';
   };
 
-  // Get rotation offset for each transport type (emojis point in different directions)
+  // Get rotation offset for each transport type
   const getTransportRotationOffset = () => {
-    // At 0° CSS rotation, emoji default orientations:
-    // ✈️ plane: faces NORTHEAST (~45°)
-    // 🚗 car: faces RIGHT (east, ~90°) 
-    // 🚶‍♀️ woman: faces RIGHT (east, ~90°)
-    // 
-    // Heading: 0°=North, 90°=East, 180°=South, 270°=West
-    // To align emoji with heading: rotation = heading - defaultDirection
-    // 
-    // For car facing right (90°): rotation = heading - 90
-    // For woman facing right (90°): rotation = heading - 90
-    // For plane facing northeast (45°): rotation = heading - 45
-    const offsets = { flight: -45, car: -90, walk: -90 };
+    // Top-down car points UP at 0°, so offset is 0
+    // Plane emoji faces northeast (~45°), so offset is -45
+    // Walking woman faces right (~90°), so offset is -90
+    const offsets = { flight: -45, car: 0, walk: -90 };
     return offsets[selectedTransport] || 0;
   };
 
