@@ -506,12 +506,19 @@ const TravelAnimator = () => {
       return;
     }
 
+    // Cancel any existing animation first
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+
     setIsAnimating(true);
     setAnimationProgress(0);
     
     // Remove existing marker
     if (markerRef.current && mapRef.current) {
       mapRef.current.removeLayer(markerRef.current);
+      markerRef.current = null;
     }
 
     // Reset visited destinations and mark first one as visited (starting point)
@@ -528,6 +535,16 @@ const TravelAnimator = () => {
       const dLat = curr[0] - prev[0];
       const dLng = curr[1] - prev[1];
       const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+      distances.push(distances[i - 1] + dist);
+    }
+    const totalRouteDistance = distances[distances.length - 1];
+    
+    // Guard against zero-length routes
+    if (totalRouteDistance === 0) {
+      console.log('Route has zero distance, cannot animate');
+      setIsAnimating(false);
+      return;
+    }
       distances.push(distances[i - 1] + dist);
     }
     const totalRouteDistance = distances[distances.length - 1];
