@@ -682,7 +682,7 @@ const TravelAnimator = () => {
             font-size: ${markerResponsive.fontSize}px;
             transform: rotate(${adjustedRotation}deg);
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-          ">${getTransportEmoji()}</div>`,
+          ">${getTransportIcon()}</div>`,
           iconSize: [markerResponsive.markerSize, markerResponsive.markerSize],
           iconAnchor: [markerResponsive.markerSize / 2, markerResponsive.markerSize / 2],
         });
