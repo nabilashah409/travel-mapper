@@ -202,11 +202,54 @@ const TravelAnimator = () => {
     setRoutePath(allPoints);
   };
 
-  // Recalculate route when transport mode changes
+  // Recalculate route when transport mode or destinations change
   useEffect(() => {
-    if (destinations.length > 1) {
-      calculateRoute(destinations, selectedTransport);
+    if (destinations.length < 2) {
+      setRoutePath([]);
+      return;
     }
+    
+    const updateRoute = async () => {
+      // Car/Walk: OSRM road routing
+      if (selectedTransport === 'car' || selectedTransport === 'walk') {
+        try {
+          const coords = destinations.map(d => `${d.lng},${d.lat}`).join(';');
+          const profile = selectedTransport === 'car' ? 'driving' : 'foot';
+          const response = await fetch(
+            `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson`
+          );
+          const data = await response.json();
+          
+          if (data.code === 'Ok' && data.routes && data.routes[0]) {
+            const roadPath = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            const startDist = Math.sqrt(
+              Math.pow(roadPath[0][0] - destinations[0].lat, 2) + 
+              Math.pow(roadPath[0][1] - destinations[0].lng, 2)
+            );
+            if (startDist > 0.5) {
+              setRoutePath([]);
+              return;
+            }
+            setRoutePath(roadPath);
+            return;
+          }
+          setRoutePath([]);
+        } catch {
+          setRoutePath([]);
+        }
+        return;
+      }
+      
+      // Flight & Custom: curved path
+      let allPoints = [];
+      for (let i = 0; i < destinations.length - 1; i++) {
+        const curvedPath = createCurvedPath(destinations[i], destinations[i + 1]);
+        allPoints = [...allPoints, ...curvedPath];
+      }
+      setRoutePath(allPoints);
+    };
+    
+    updateRoute();
   }, [selectedTransport, destinations]);
 
   // Cleanup animation on unmount
