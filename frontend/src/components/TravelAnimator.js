@@ -967,7 +967,13 @@ const TravelAnimator = () => {
           {transportModes.map((mode) => (
             <button
               key={mode.id}
-              onClick={() => setSelectedTransport(mode.id)}
+              onClick={() => {
+                if (mode.id === 'custom') {
+                  fileInputRef.current?.click();
+                } else {
+                  setSelectedTransport(mode.id);
+                }
+              }}
               className={`w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-xl md:text-2xl transition-all ${
                 selectedTransport === mode.id 
                   ? 'bg-gradient-to-r from-red-500 to-red-600 scale-110 shadow-lg' 
@@ -975,9 +981,18 @@ const TravelAnimator = () => {
               }`}
               style={selectedTransport === mode.id ? { boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)' } : {}}
             >
-              {mode.label}
+              {mode.id === 'custom' && customIcon ? (
+                <img src={customIcon} alt="custom" className="w-6 h-6 object-contain" />
+              ) : mode.label}
             </button>
           ))}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleIconUpload}
+            className="hidden"
+          />
         </div>
       </div>
 
