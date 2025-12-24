@@ -384,7 +384,7 @@ const TravelAnimator = () => {
 
   // Get transport emoji for animated marker
   const getTransportEmoji = () => {
-    const emojis = { flight: '✈️', car: '🚗', train: '🚂', walk: '🚶' };
+    const emojis = { flight: '✈️', car: '🚗', walk: '🚶' };
     return emojis[selectedTransport] || '✈️';
   };
 
