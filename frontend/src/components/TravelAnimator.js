@@ -117,14 +117,32 @@ const TravelAnimator = () => {
     { id: 'custom', label: '📷' },
   ];
 
-  // Handle custom icon upload
+  // Handle custom icon upload - remove white background
   const handleIconUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setCustomIcon(event.target.result);
-        setSelectedTransport('custom');
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+          // Make white/near-white pixels transparent
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i] > 240 && data[i+1] > 240 && data[i+2] > 240) {
+              data[i+3] = 0; // Set alpha to 0
+            }
+          }
+          ctx.putImageData(imageData, 0, 0);
+          setCustomIcon(canvas.toDataURL('image/png'));
+          setSelectedTransport('custom');
+        };
+        img.src = event.target.result;
       };
       reader.readAsDataURL(file);
     }
