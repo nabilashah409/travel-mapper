@@ -386,8 +386,11 @@ const TravelAnimator = () => {
     }
   };
 
-  // Get transport icon HTML - aerial view for car and walk
+  // Get transport icon HTML
   const getTransportIcon = () => {
+    if (selectedTransport === 'custom' && customIcon) {
+      return `<img src="${customIcon}" style="width:32px;height:32px;object-fit:contain;"/>`;
+    }
     if (selectedTransport === 'car') {
       return `<svg width="20" height="36" viewBox="0 0 20 36" style="display:block;">
         <rect x="1" y="2" width="18" height="32" rx="5" fill="#2563eb"/>
@@ -401,7 +404,6 @@ const TravelAnimator = () => {
       </svg>`;
     }
     if (selectedTransport === 'walk') {
-      // Top-down walking person
       return `<svg width="24" height="32" viewBox="0 0 24 32" style="display:block;">
         <circle cx="12" cy="5" r="4" fill="#8B4513"/>
         <ellipse cx="12" cy="16" rx="6" ry="8" fill="#ec4899"/>
@@ -414,9 +416,9 @@ const TravelAnimator = () => {
     return '✈️';
   };
 
-  // Get rotation offset - car and walk point UP at 0°
+  // Get rotation offset
   const getTransportRotationOffset = () => {
-    const offsets = { flight: -45, car: 0, walk: 0 };
+    const offsets = { flight: -45, car: 0, walk: 0, custom: 0 };
     return offsets[selectedTransport] || 0;
   };
 
