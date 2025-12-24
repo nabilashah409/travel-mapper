@@ -422,7 +422,7 @@ const TravelAnimator = () => {
     
     // Recalculate route with new order
     if (newDestinations.length > 1) {
-      calculateRoute(newDestinations);
+      calculateRoute(newDestinations, selectedTransport);
     }
   };
 
