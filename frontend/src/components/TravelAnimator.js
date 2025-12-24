@@ -923,7 +923,7 @@ const TravelAnimator = () => {
             <span className="text-2xl">🔍</span>
             <input
               type="text"
-              placeholder="Where to next? ✈️"
+              placeholder="Where to next?"
               value={searchQuery}
               onChange={handleSearchInput}
               onKeyPress={(e) => e.key === 'Enter' && addDestination()}
