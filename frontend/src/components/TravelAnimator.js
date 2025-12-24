@@ -122,6 +122,13 @@ const TravelAnimator = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Recalculate route when transport mode changes
+  useEffect(() => {
+    if (destinations.length > 1) {
+      calculateRoute(destinations);
+    }
+  }, [selectedTransport]);
+
   // Cleanup animation on unmount
   useEffect(() => {
     return () => {
