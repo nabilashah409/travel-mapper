@@ -491,9 +491,6 @@ const TravelAnimator = () => {
       animate: false
     });
 
-    // Get responsive values for current screen size
-    const responsive = getResponsiveValues();
-
     // Create animated marker with emoji transport icon
     const customIcon = L.divIcon({
       className: 'animated-transport-marker',
