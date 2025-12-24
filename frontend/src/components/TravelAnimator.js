@@ -370,10 +370,9 @@ const TravelAnimator = () => {
     }
   };
 
-  // Get transport icon HTML - aerial view for car
+  // Get transport icon HTML - aerial view for car and walk
   const getTransportIcon = () => {
     if (selectedTransport === 'car') {
-      // Realistic top-down car SVG - centered
       return `<svg width="20" height="36" viewBox="0 0 20 36" style="display:block;">
         <rect x="1" y="2" width="18" height="32" rx="5" fill="#2563eb"/>
         <rect x="2" y="5" width="16" height="8" rx="2" fill="#1e3a5f"/>
@@ -385,16 +384,23 @@ const TravelAnimator = () => {
         <circle cx="16" cy="30" r="1.5" fill="#ef4444"/>
       </svg>`;
     }
-    const emojis = { flight: '✈️', walk: '🚶‍♀️' };
-    return emojis[selectedTransport] || '✈️';
+    if (selectedTransport === 'walk') {
+      // Top-down walking person
+      return `<svg width="24" height="32" viewBox="0 0 24 32" style="display:block;">
+        <circle cx="12" cy="5" r="4" fill="#8B4513"/>
+        <ellipse cx="12" cy="16" rx="6" ry="8" fill="#ec4899"/>
+        <ellipse cx="6" cy="12" rx="2" ry="4" fill="#fcd5ce" transform="rotate(-30 6 12)"/>
+        <ellipse cx="18" cy="12" rx="2" ry="4" fill="#fcd5ce" transform="rotate(30 18 12)"/>
+        <ellipse cx="8" cy="27" rx="2" ry="5" fill="#60a5fa"/>
+        <ellipse cx="16" cy="27" rx="2" ry="5" fill="#60a5fa"/>
+      </svg>`;
+    }
+    return '✈️';
   };
 
-  // Get rotation offset for each transport type
+  // Get rotation offset - car and walk point UP at 0°
   const getTransportRotationOffset = () => {
-    // Top-down car points UP at 0°, so offset is 0
-    // Plane emoji faces northeast (~45°), so offset is -45
-    // Walking woman faces right (~90°), so offset is -90
-    const offsets = { flight: -45, car: 0, walk: -90 };
+    const offsets = { flight: -45, car: 0, walk: 0 };
     return offsets[selectedTransport] || 0;
   };
 
