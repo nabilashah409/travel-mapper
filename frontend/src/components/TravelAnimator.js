@@ -156,52 +156,6 @@ const TravelAnimator = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Calculate route based on transport mode
-  const calculateRoute = async (dests, transport) => {
-    if (dests.length < 2) return;
-    
-    // Car/Walk: use OSRM road routing - NO fallback
-    if (transport === 'car' || transport === 'walk') {
-      try {
-        const coords = dests.map(d => `${d.lng},${d.lat}`).join(';');
-        const profile = transport === 'car' ? 'driving' : 'foot';
-        const response = await fetch(
-          `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson`
-        );
-        const data = await response.json();
-        
-        if (data.code === 'Ok' && data.routes && data.routes[0]) {
-          const roadPath = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
-          // Verify route starts near first destination (within ~50km)
-          const startDist = Math.sqrt(
-            Math.pow(roadPath[0][0] - dests[0].lat, 2) + 
-            Math.pow(roadPath[0][1] - dests[0].lng, 2)
-          );
-          if (startDist > 0.5) {
-            // Route doesn't start at origin - no valid road connection
-            setRoutePath([]);
-            return;
-          }
-          setRoutePath(roadPath);
-          return;
-        }
-        setRoutePath([]);
-        return;
-      } catch (error) {
-        setRoutePath([]);
-        return;
-      }
-    }
-    
-    // Flight & Custom: use curved path
-    let allPoints = [];
-    for (let i = 0; i < dests.length - 1; i++) {
-      const curvedPath = createCurvedPath(dests[i], dests[i + 1]);
-      allPoints = [...allPoints, ...curvedPath];
-    }
-    setRoutePath(allPoints);
-  };
-
   // Recalculate route when transport mode or destinations change
   useEffect(() => {
     if (destinations.length < 2) {
