@@ -576,7 +576,7 @@ const TravelAnimator = () => {
       animate: false
     });
 
-    // Create animated marker with emoji transport icon
+    // Create animated marker with transport icon
     const customIcon = L.divIcon({
       className: 'animated-transport-marker',
       html: `<div style="
@@ -587,7 +587,7 @@ const TravelAnimator = () => {
         justify-content: center;
         font-size: ${responsive.fontSize}px;
         filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-      ">${getTransportEmoji()}</div>`,
+      ">${getTransportIcon()}</div>`,
       iconSize: [responsive.markerSize, responsive.markerSize],
       iconAnchor: [responsive.markerSize / 2, responsive.markerSize / 2],
     });
