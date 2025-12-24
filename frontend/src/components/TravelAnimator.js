@@ -172,10 +172,19 @@ const TravelAnimator = () => {
         
         if (data.code === 'Ok' && data.routes && data.routes[0]) {
           const roadPath = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+          // Verify route starts near first destination (within ~50km)
+          const startDist = Math.sqrt(
+            Math.pow(roadPath[0][0] - dests[0].lat, 2) + 
+            Math.pow(roadPath[0][1] - dests[0].lng, 2)
+          );
+          if (startDist > 0.5) {
+            // Route doesn't start at origin - no valid road connection
+            setRoutePath([]);
+            return;
+          }
           setRoutePath(roadPath);
           return;
         }
-        // No route - stop here, don't animate
         setRoutePath([]);
         return;
       } catch (error) {
