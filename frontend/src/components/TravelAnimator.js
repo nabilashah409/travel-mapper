@@ -464,16 +464,16 @@ const TravelAnimator = () => {
       return { 
         zoomOffset: 0,
         padding: [60, 60],
-        markerSize: 46,
-        fontSize: 30
+        markerSize: 56,
+        fontSize: 36
       };
     }
     // Desktop
     return { 
       zoomOffset: 0,
       padding: [80, 80],
-      markerSize: 50,
-      fontSize: 32
+      markerSize: 60,
+      fontSize: 40
     };
   };
 
