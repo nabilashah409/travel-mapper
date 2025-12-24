@@ -780,13 +780,8 @@ const TravelAnimator = () => {
           )}
           
           {/* Destination markers - Illustrated style with red pin and yellow banner */}
+          {/* Show markers immediately when destinations are added */}
           {destinations.map((dest, index) => {
-            // Only show marker if destination has been visited during animation
-            // This creates a progressive reveal effect
-            const isVisited = visitedDestinations.includes(dest.id);
-            
-            if (!isVisited) return null;
-            
             return (
               <Marker
                 key={dest.id}
