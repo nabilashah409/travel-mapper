@@ -383,7 +383,7 @@ const TravelAnimator = () => {
     }
     
     if (updated.length > 1) {
-      calculateRoute(updated);
+      calculateRoute(updated, selectedTransport);
     } else {
       setRoutePath([]);
     }
