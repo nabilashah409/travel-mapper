@@ -679,20 +679,20 @@ const TravelAnimator = () => {
                       <Polyline
                         positions={routePath}
                         pathOptions={{
-                          color: 'rgba(0,0,0,0.3)',
-                          weight: 10,
-                          opacity: 0.5,
+                          color: 'rgba(0,0,0,0.2)',
+                          weight: 8,
+                          opacity: 0.4,
                           lineCap: 'round',
                         }}
                       />
-                      {/* White dashed route line */}
+                      {/* Red dashed route line */}
                       <Polyline
                         positions={routePath}
                         pathOptions={{
-                          color: '#ffffff',
-                          weight: 6,
-                          opacity: 1,
-                          dashArray: '15, 20',
+                          color: '#ef4444',
+                          weight: 4,
+                          opacity: 0.9,
+                          dashArray: '12, 16',
                           lineCap: 'round',
                         }}
                       />
