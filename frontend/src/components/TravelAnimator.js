@@ -418,7 +418,8 @@ const TravelAnimator = () => {
 
   // Get animation speed multiplier based on transport (slower for walk, faster for flight)
   const getTransportSpeedMultiplier = () => {
-    const speeds = { flight: 0.7, car: 1.2, walk: 2.0 };
+    // Slower speeds for better visibility (higher = slower)
+    const speeds = { flight: 1.0, car: 1.8, walk: 2.5 };
     return speeds[selectedTransport] || 1;
   };
 
