@@ -602,20 +602,11 @@ const TravelAnimator = () => {
         setAnimationProgress(100);
         setVisitedDestinations(destinations.map(d => d.id));
         
-        // Ensure icon stops exactly at final destination
+        // Stop at final destination - no zoom change
         const finalPoint = routePath[routePath.length - 1];
         if (markerRef.current) {
           markerRef.current.setLatLng(finalPoint);
         }
-        
-        // Zoom out to show all destinations
-        const allBounds = L.latLngBounds(destinations.map(d => [d.lat, d.lng]));
-        const endResponsive = getResponsiveValues();
-        mapRef.current.fitBounds(allBounds, { 
-          padding: endResponsive.padding, 
-          maxZoom: 8,
-          animate: false
-        });
         return;
       }
 
