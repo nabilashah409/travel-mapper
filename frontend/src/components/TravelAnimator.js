@@ -528,6 +528,17 @@ const TravelAnimator = () => {
       return;
     }
 
+    // For car/walk, verify route starts at first destination (not in ocean)
+    if (selectedTransport === 'car' || selectedTransport === 'walk') {
+      const startDist = Math.sqrt(
+        Math.pow(routePath[0][0] - destinations[0].lat, 2) + 
+        Math.pow(routePath[0][1] - destinations[0].lng, 2)
+      );
+      if (startDist > 0.5) {
+        return; // No valid road route
+      }
+    }
+
     // Cancel any existing animation first
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
