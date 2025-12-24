@@ -950,10 +950,7 @@ const TravelAnimator = () => {
           {transportModes.map((mode) => (
             <button
               key={mode.id}
-              onClick={() => {
-                setSelectedTransport(mode.id);
-                if (destinations.length > 1) calculateRoute(destinations);
-              }}
+              onClick={() => setSelectedTransport(mode.id)}
               className={`w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-xl md:text-2xl transition-all ${
                 selectedTransport === mode.id 
                   ? 'bg-gradient-to-r from-red-500 to-red-600 scale-110 shadow-lg' 
