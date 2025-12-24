@@ -167,7 +167,7 @@ const TravelAnimator = () => {
       }
     }
     
-    // Flight: use curved path
+    // Flight & Custom: use curved path
     let allPoints = [];
     for (let i = 0; i < dests.length - 1; i++) {
       const curvedPath = createCurvedPath(dests[i], dests[i + 1]);
