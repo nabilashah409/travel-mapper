@@ -396,15 +396,16 @@ const TravelAnimator = () => {
   // Get transport icon HTML - aerial view for car
   const getTransportIcon = () => {
     if (selectedTransport === 'car') {
-      // Top-down/aerial view car - like reference image
-      return `<svg width="28" height="40" viewBox="0 0 28 40">
-        <rect x="2" y="4" width="24" height="32" rx="8" fill="#e63946"/>
-        <rect x="4" y="8" width="20" height="10" rx="3" fill="#1d3557"/>
-        <rect x="4" y="26" width="20" height="6" rx="2" fill="#1d3557"/>
-        <rect x="0" y="10" width="4" height="6" rx="1" fill="#333"/>
-        <rect x="24" y="10" width="4" height="6" rx="1" fill="#333"/>
-        <rect x="0" y="24" width="4" height="6" rx="1" fill="#333"/>
-        <rect x="24" y="24" width="4" height="6" rx="1" fill="#333"/>
+      // Realistic top-down car SVG
+      return `<svg width="20" height="36" viewBox="0 0 20 36">
+        <rect x="1" y="2" width="18" height="32" rx="5" fill="#2563eb"/>
+        <rect x="2" y="5" width="16" height="8" rx="2" fill="#1e3a5f"/>
+        <rect x="2" y="23" width="16" height="8" rx="2" fill="#1e3a5f"/>
+        <rect x="3" y="14" width="14" height="8" rx="1" fill="#93c5fd"/>
+        <circle cx="4" cy="6" r="1.5" fill="#fbbf24"/>
+        <circle cx="16" cy="6" r="1.5" fill="#fbbf24"/>
+        <circle cx="4" cy="30" r="1.5" fill="#ef4444"/>
+        <circle cx="16" cy="30" r="1.5" fill="#ef4444"/>
       </svg>`;
     }
     const emojis = { flight: '✈️', walk: '🚶‍♀️' };
