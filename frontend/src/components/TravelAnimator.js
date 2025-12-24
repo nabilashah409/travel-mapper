@@ -111,7 +111,7 @@ const TravelAnimator = () => {
   const transportModes = [
     { id: 'flight', icon: Plane, label: '✈️' },
     { id: 'car', icon: Car, label: '🚗' },
-    { id: 'walk', icon: Footprints, label: '🚶' },
+    { id: 'walk', icon: Footprints, label: '🚶‍♀️' },
   ];
 
   // Start animation after component mounts
