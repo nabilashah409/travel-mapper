@@ -373,8 +373,8 @@ const TravelAnimator = () => {
   // Get transport icon HTML - aerial view for car
   const getTransportIcon = () => {
     if (selectedTransport === 'car') {
-      // Realistic top-down car SVG
-      return `<svg width="20" height="36" viewBox="0 0 20 36">
+      // Realistic top-down car SVG - centered
+      return `<svg width="20" height="36" viewBox="0 0 20 36" style="display:block;">
         <rect x="1" y="2" width="18" height="32" rx="5" fill="#2563eb"/>
         <rect x="2" y="5" width="16" height="8" rx="2" fill="#1e3a5f"/>
         <rect x="2" y="23" width="16" height="8" rx="2" fill="#1e3a5f"/>
