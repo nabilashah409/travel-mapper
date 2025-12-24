@@ -612,9 +612,11 @@ const TravelAnimator = () => {
 
     markerRef.current = L.marker(routePath[0], { icon: customIcon }).addTo(mapRef.current);
     
-    // Animation duration - constant for all routes, adjusted by transport speed
+    // Animation duration scales with route distance for smooth movement
     const speedMultiplier = getTransportSpeedMultiplier();
-    const totalDuration = 6000 * speedMultiplier; // 6 seconds base, multiplied by speed factor
+    const baseDuration = 8000; // 8 seconds minimum
+    const distanceScale = Math.min(totalRouteDistance * 500, 20000); // Scale with distance, max 20s extra
+    const totalDuration = (baseDuration + distanceScale) * speedMultiplier;
     
     const startTime = Date.now();
     let lastHeading = 0;
