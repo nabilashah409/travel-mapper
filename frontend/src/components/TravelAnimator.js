@@ -783,23 +783,6 @@ const TravelAnimator = () => {
                   iconSize: [80, 52],
                   iconAnchor: [40, 34],
                 })}
-                      position: absolute;
-                      top: 50%;
-                      left: 50%;
-                      transform: translate(-50%, -50%);
-                      font-family: 'Arial Black', 'Helvetica Bold', sans-serif;
-                      font-size: 9px;
-                      font-weight: 900;
-                      color: #1e3a5f;
-                      text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-                      white-space: nowrap;
-                      letter-spacing: 0.5px;
-                      padding-top: 2px;
-                    }
-                  </style>`,
-                  iconSize: [100, 64],
-                  iconAnchor: [50, 40],
-                })}
               />
             );
           })}
