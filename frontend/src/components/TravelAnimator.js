@@ -736,16 +736,14 @@ const TravelAnimator = () => {
           
           <MapController destinations={destinations} defaultCenter={defaultCenter} isAnimating={isAnimating} />
           
-          {/* Route line - white dashed line like cartoon travel routes */}
+          {/* Route line - trail behind the transport */}
           {routePath.length > 1 && visitedDestinations.length > 0 && (
             <>
-              {/* Calculate how much of the route to show based on animation progress */}
               {(() => {
-                // If animation finished (all destinations visited), show full route
+                // After animation, show full route
                 if (!isAnimating && visitedDestinations.length === destinations.length) {
                   return (
                     <>
-                      {/* Shadow/glow effect */}
                       <Polyline
                         positions={routePath}
                         pathOptions={{
@@ -755,7 +753,6 @@ const TravelAnimator = () => {
                           lineCap: 'round',
                         }}
                       />
-                      {/* Red dashed route line */}
                       <Polyline
                         positions={routePath}
                         pathOptions={{
@@ -770,18 +767,15 @@ const TravelAnimator = () => {
                   );
                 }
                 
-                // During animation, show route BEHIND the plane (subtract points instead of add)
-                // This creates a "trail" effect where the route line follows the plane
-                const currentPointIndex = Math.floor((animationProgress / 100) * routePath.length);
-                const trailLength = Math.min(currentPointIndex, routePath.length);
-                const visiblePath = routePath.slice(0, trailLength);
+                // During animation - trail BEHIND (use progress - small offset)
+                const trailProgress = Math.max(0, animationProgress - 2) / 100;
+                const trailIndex = Math.floor(trailProgress * routePath.length);
+                const visiblePath = routePath.slice(0, Math.max(2, trailIndex));
                 
-                // Only show if we have at least 2 points
                 if (visiblePath.length < 2) return null;
                 
                 return (
                   <>
-                    {/* Shadow/glow effect */}
                     <Polyline
                       positions={visiblePath}
                       pathOptions={{
@@ -791,7 +785,6 @@ const TravelAnimator = () => {
                         lineCap: 'round',
                       }}
                     />
-                    {/* Red/orange dashed route line */}
                     <Polyline
                       positions={visiblePath}
                       pathOptions={{
