@@ -365,9 +365,7 @@ const TravelAnimator = () => {
       markerRef.current = null;
     }
     
-    if (updated.length > 1) {
-      calculateRoute(updated, selectedTransport);
-    } else {
+    if (updated.length <= 1) {
       setRoutePath([]);
     }
     setAnimationProgress(0);
