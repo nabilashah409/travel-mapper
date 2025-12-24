@@ -270,17 +270,44 @@ const TravelAnimator = () => {
     return points;
   };
 
-  // Calculate route based on destinations - always curved
-  const calculateRoute = (dests) => {
+  // Calculate route based on destinations - curved for flight, road routes for car/walk
+  const calculateRoute = async (dests) => {
     if (dests.length < 2) return;
     
+    // For car and walk, use OSRM road routing
+    if (selectedTransport === 'car' || selectedTransport === 'walk') {
+      try {
+        // Build coordinates string for OSRM
+        const coords = dests.map(d => `${d.lng},${d.lat}`).join(';');
+        const profile = selectedTransport === 'car' ? 'driving' : 'foot';
+        
+        // Use OSRM public demo server for routing
+        const response = await fetch(
+          `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.routes && data.routes[0]) {
+            // Convert GeoJSON coordinates to Leaflet format [lat, lng]
+            const roadPath = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            setRoutePath(roadPath);
+            return;
+          }
+        }
+      } catch (error) {
+        console.log('Road routing failed, falling back to curved path:', error);
+      }
+    }
+    
+    // For flight (or if road routing fails), use curved path
     let allPoints = [];
     
     for (let i = 0; i < dests.length - 1; i++) {
       const start = dests[i];
       const end = dests[i + 1];
       
-      // Always use curved path for visual appeal
+      // Use curved path for flights
       const curvedPath = createCurvedPath(start, end);
       allPoints = [...allPoints, ...curvedPath];
     }
