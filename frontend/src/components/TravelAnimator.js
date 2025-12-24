@@ -389,7 +389,7 @@ const TravelAnimator = () => {
   // Get transport icon HTML
   const getTransportIcon = () => {
     if (selectedTransport === 'custom' && customIcon) {
-      return `<img src="${customIcon}" style="width:32px;height:32px;object-fit:contain;"/>`;
+      return `<img src="${customIcon}" style="width:32px;height:32px;object-fit:contain;mix-blend-mode:multiply;"/>`;
     }
     if (selectedTransport === 'car') {
       return `<svg width="20" height="36" viewBox="0 0 20 36" style="display:block;">
