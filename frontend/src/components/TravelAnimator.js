@@ -122,12 +122,50 @@ const TravelAnimator = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Calculate route based on transport mode
+  const calculateRoute = async (dests, transport) => {
+    if (dests.length < 2) return;
+    
+    // Car/Walk: use OSRM road routing
+    if (transport === 'car' || transport === 'walk') {
+      try {
+        const coords = dests.map(d => `${d.lng},${d.lat}`).join(';');
+        const profile = transport === 'car' ? 'driving' : 'foot';
+        const response = await fetch(
+          `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson`
+        );
+        const data = await response.json();
+        
+        if (data.code === 'Ok' && data.routes && data.routes[0]) {
+          const roadPath = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+          setRoutePath(roadPath);
+          return;
+        }
+        alert(`Cannot ${transport} between these destinations! Use flight mode.`);
+        setRoutePath([]);
+        return;
+      } catch (error) {
+        alert(`Could not calculate route. Try flight mode.`);
+        setRoutePath([]);
+        return;
+      }
+    }
+    
+    // Flight: use curved path
+    let allPoints = [];
+    for (let i = 0; i < dests.length - 1; i++) {
+      const curvedPath = createCurvedPath(dests[i], dests[i + 1]);
+      allPoints = [...allPoints, ...curvedPath];
+    }
+    setRoutePath(allPoints);
+  };
+
   // Recalculate route when transport mode changes
   useEffect(() => {
     if (destinations.length > 1) {
-      calculateRoute(destinations);
+      calculateRoute(destinations, selectedTransport);
     }
-  }, [selectedTransport]);
+  }, [selectedTransport, destinations]);
 
   // Cleanup animation on unmount
   useEffect(() => {
