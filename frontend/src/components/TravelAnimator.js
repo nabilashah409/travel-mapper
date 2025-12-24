@@ -107,11 +107,10 @@ const TravelAnimator = () => {
   // Default center (USA)
   const defaultCenter = [39.8283, -98.5795];
 
-  // Transport modes
+  // Transport modes (removed train)
   const transportModes = [
     { id: 'flight', icon: Plane, label: '✈️' },
     { id: 'car', icon: Car, label: '🚗' },
-    { id: 'train', icon: Train, label: '🚂' },
     { id: 'walk', icon: Footprints, label: '🚶' },
   ];
 
