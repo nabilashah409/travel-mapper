@@ -650,9 +650,17 @@ const TravelAnimator = () => {
         // Update marker position
         markerRef.current.setLatLng([lat, lng]);
         
-        // Calculate heading from route tangent (current segment direction)
+        // Calculate smooth heading by looking ahead multiple points
+        const lookAhead = Math.min(10, routePath.length - low - 1);
+        const p2Index = Math.min(low + Math.max(1, lookAhead), routePath.length - 1);
+        const p2 = routePath[p2Index];
+        
         if (p1[0] !== p2[0] || p1[1] !== p2[1]) {
-          lastHeading = calculateHeading(p1, p2);
+          const newHeading = calculateHeading(p1, p2);
+          // Smooth transition between headings
+          const diff = newHeading - lastHeading;
+          const normalizedDiff = ((diff + 540) % 360) - 180;
+          lastHeading = lastHeading + normalizedDiff * 0.15;
         }
         
         // Apply rotation offset based on transport type
