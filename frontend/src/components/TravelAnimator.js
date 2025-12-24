@@ -400,11 +400,6 @@ const TravelAnimator = () => {
     
     setDestinations(newDestinations);
     setDraggedIndex(null);
-    
-    // Recalculate route with new order
-    if (newDestinations.length > 1) {
-      calculateRoute(newDestinations, selectedTransport);
-    }
   };
 
   // Get transport icon HTML
