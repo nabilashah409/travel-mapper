@@ -545,9 +545,6 @@ const TravelAnimator = () => {
       setIsAnimating(false);
       return;
     }
-      distances.push(distances[i - 1] + dist);
-    }
-    const totalRouteDistance = distances[distances.length - 1];
 
     // Track visited destinations
     let visitedIds = [destinations[0].id];
