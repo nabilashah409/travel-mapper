@@ -700,9 +700,14 @@ const TravelAnimator = () => {
                   );
                 }
                 
-                // During animation, show route up to current progress
-                const pointsToShow = Math.max(2, Math.floor((animationProgress / 100) * routePath.length) + 10);
-                const visiblePath = routePath.slice(0, Math.min(pointsToShow, routePath.length));
+                // During animation, show route BEHIND the plane (subtract points instead of add)
+                // This creates a "trail" effect where the route line follows the plane
+                const currentPointIndex = Math.floor((animationProgress / 100) * routePath.length);
+                const trailLength = Math.min(currentPointIndex, routePath.length);
+                const visiblePath = routePath.slice(0, trailLength);
+                
+                // Only show if we have at least 2 points
+                if (visiblePath.length < 2) return null;
                 
                 return (
                   <>
@@ -710,20 +715,20 @@ const TravelAnimator = () => {
                     <Polyline
                       positions={visiblePath}
                       pathOptions={{
-                        color: 'rgba(0,0,0,0.3)',
-                        weight: 10,
-                        opacity: 0.5,
+                        color: 'rgba(0,0,0,0.2)',
+                        weight: 8,
+                        opacity: 0.4,
                         lineCap: 'round',
                       }}
                     />
-                    {/* White dashed route line */}
+                    {/* Red/orange dashed route line */}
                     <Polyline
                       positions={visiblePath}
                       pathOptions={{
-                        color: '#ffffff',
-                        weight: 6,
-                        opacity: 1,
-                        dashArray: '15, 20',
+                        color: '#ef4444',
+                        weight: 4,
+                        opacity: 0.9,
+                        dashArray: '12, 16',
                         lineCap: 'round',
                       }}
                     />
