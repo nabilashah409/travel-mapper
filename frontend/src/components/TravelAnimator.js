@@ -401,10 +401,11 @@ const TravelAnimator = () => {
   // Get rotation offset for each transport type (emojis point in different directions)
   const getTransportRotationOffset = () => {
     // ✈️ plane points northeast (~45°), subtract 45 to align with heading
-    // 🚗 car emoji: most systems show car facing LEFT, so we need to add 180° and adjust
-    // The heading 0° = North, 90° = East, 180° = South, 270° = West
-    // Car facing left at 0 rotation, to face North needs +90°, to face East needs +180°
-    // 🚶‍♀️ woman walks facing RIGHT, subtract 90 to face direction of travel
+    // 🚗 car emoji: most systems show car facing LEFT, so add 180° to flip direction
+    // 🚶‍♀️ woman emoji faces RIGHT by default, so no offset needed for eastward movement
+    //      heading 0°=North, 90°=East; emoji at 0° faces right=East
+    //      to face North (heading=0), rotate -90°; to face East (heading=90), no rotation
+    //      Formula: rotation = heading - 90
     const offsets = { flight: -45, car: 180, walk: -90 };
     return offsets[selectedTransport] || 0;
   };
