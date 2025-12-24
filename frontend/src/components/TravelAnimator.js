@@ -310,62 +310,6 @@ const TravelAnimator = () => {
     return points;
   };
 
-  // Calculate route based on destinations - curved for flight, road routes for car/walk
-  const calculateRoute = async (dests) => {
-    if (dests.length < 2) return;
-    
-    // For car and walk, ONLY use OSRM road routing - never fallback to curved paths
-    if (selectedTransport === 'car' || selectedTransport === 'walk') {
-      try {
-        // Build coordinates string for OSRM
-        const coords = dests.map(d => `${d.lng},${d.lat}`).join(';');
-        const profile = selectedTransport === 'car' ? 'driving' : 'foot';
-        
-        // Use OSRM public demo server for routing
-        const response = await fetch(
-          `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson`
-        );
-        
-        const data = await response.json();
-        
-        // Check if we got a valid route
-        if (data.code === 'Ok' && data.routes && data.routes[0]) {
-          // Convert GeoJSON coordinates to Leaflet format [lat, lng]
-          const roadPath = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
-          setRoutePath(roadPath);
-          return;
-        }
-        
-        // No valid route found (water crossing, different continents, etc.)
-        const transportName = selectedTransport === 'car' ? 'drive' : 'walk';
-        alert(`Cannot ${transportName} between these destinations! They may be separated by water or on different continents. Use flight mode instead.`);
-        setRoutePath([]);
-        return;
-        
-      } catch (error) {
-        console.log('Road routing failed:', error);
-        const transportName = selectedTransport === 'car' ? 'driving' : 'walking';
-        alert(`Could not calculate ${transportName} route. Try using flight mode.`);
-        setRoutePath([]);
-        return;
-      }
-    }
-    
-    // For FLIGHT mode only, use curved path
-    let allPoints = [];
-    
-    for (let i = 0; i < dests.length - 1; i++) {
-      const start = dests[i];
-      const end = dests[i + 1];
-      
-      // Use curved path for flights
-      const curvedPath = createCurvedPath(start, end);
-      allPoints = [...allPoints, ...curvedPath];
-    }
-    
-    setRoutePath(allPoints);
-  };
-
   const removeDestination = (id) => {
     const updated = destinations.filter(d => d.id !== id);
     setDestinations(updated);
