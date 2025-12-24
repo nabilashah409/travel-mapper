@@ -160,7 +160,7 @@ const TravelAnimator = () => {
   const calculateRoute = async (dests, transport) => {
     if (dests.length < 2) return;
     
-    // Car/Walk: use OSRM road routing
+    // Car/Walk: use OSRM road routing - NO fallback
     if (transport === 'car' || transport === 'walk') {
       try {
         const coords = dests.map(d => `${d.lng},${d.lat}`).join(';');
@@ -175,11 +175,10 @@ const TravelAnimator = () => {
           setRoutePath(roadPath);
           return;
         }
-        alert(`Cannot ${transport} between these destinations! Use flight mode.`);
+        // No route - stop here, don't animate
         setRoutePath([]);
         return;
       } catch (error) {
-        alert(`Could not calculate route. Try flight mode.`);
         setRoutePath([]);
         return;
       }
