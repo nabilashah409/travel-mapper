@@ -733,7 +733,7 @@ const TravelAnimator = () => {
             </>
           )}
           
-          {/* Destination markers - Illustrated style with red pin and yellow banner */}
+          {/* Destination markers - Clean style with red pin and simple text label */}
           {/* Show markers immediately when destinations are added */}
           {destinations.map((dest, index) => {
             return (
@@ -743,55 +743,17 @@ const TravelAnimator = () => {
                 icon={L.divIcon({
                   className: `illustrated-marker marker-${dest.id}`,
                   html: `<div class="marker-container-${dest.id}">
-                    <!-- Red location pin - smaller size -->
+                    <!-- Red location pin -->
                     <div class="pin-wrapper-${dest.id}">
-                      <svg width="28" height="36" viewBox="0 0 50 65" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Pin shadow -->
-                        <ellipse cx="25" cy="62" rx="12" ry="3" fill="rgba(0,0,0,0.2)"/>
-                        <!-- Pin body -->
-                        <path d="M25 0C11.2 0 0 11.2 0 25C0 43.75 25 60 25 60C25 60 50 43.75 50 25C50 11.2 38.8 0 25 0Z" fill="url(#pinGradient-${dest.id})"/>
-                        <!-- Pin highlight -->
+                      <svg width="24" height="32" viewBox="0 0 50 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <ellipse cx="25" cy="62" rx="10" ry="3" fill="rgba(0,0,0,0.15)"/>
+                        <path d="M25 0C11.2 0 0 11.2 0 25C0 43.75 25 60 25 60C25 60 50 43.75 50 25C50 11.2 38.8 0 25 0Z" fill="#dc2626"/>
                         <path d="M25 5C14 5 5 14 5 25C5 25 5 26 5.5 28C6 26 8 15 25 10C28 9 30 10 30 10C26 7 25 5 25 5Z" fill="rgba(255,255,255,0.3)"/>
-                        <!-- Inner white circle -->
-                        <circle cx="25" cy="22" r="12" fill="white"/>
-                        <!-- Inner circle border -->
-                        <circle cx="25" cy="22" r="10" fill="url(#innerGradient-${dest.id})"/>
-                        <defs>
-                          <linearGradient id="pinGradient-${dest.id}" x1="0" y1="0" x2="50" y2="60" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#ef4444"/>
-                            <stop offset="50%" stop-color="#dc2626"/>
-                            <stop offset="100%" stop-color="#b91c1c"/>
-                          </linearGradient>
-                          <linearGradient id="innerGradient-${dest.id}" x1="15" y1="12" x2="35" y2="32" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#fef2f2"/>
-                            <stop offset="100%" stop-color="#fee2e2"/>
-                          </linearGradient>
-                        </defs>
+                        <circle cx="25" cy="22" r="10" fill="white"/>
                       </svg>
                     </div>
-                    <!-- Yellow banner with destination name - smaller -->
-                    <div class="banner-wrapper-${dest.id}">
-                      <svg width="100" height="28" viewBox="0 0 140 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Banner shadow -->
-                        <path d="M10 22C10 18 14 15 20 15H120C126 15 130 18 130 22V32C130 36 126 39 120 39H20C14 39 10 36 10 32V22Z" fill="rgba(0,0,0,0.15)" transform="translate(2, 2)"/>
-                        <!-- Banner main body -->
-                        <path d="M10 20C10 16 14 13 20 13H120C126 13 130 16 130 20V30C130 34 126 37 120 37H20C14 37 10 34 10 30V20Z" fill="url(#bannerGradient-${dest.id})"/>
-                        <!-- Banner fold left -->
-                        <path d="M0 18L10 15V25L0 28V18Z" fill="#d97706"/>
-                        <!-- Banner fold right -->
-                        <path d="M140 18L130 15V25L140 28V18Z" fill="#d97706"/>
-                        <!-- Banner top highlight -->
-                        <path d="M10 20C10 16 14 13 20 13H120C126 13 130 16 130 17V18C130 16 126 15 120 15H20C14 15 10 16 10 18V20Z" fill="rgba(255,255,255,0.4)"/>
-                        <defs>
-                          <linearGradient id="bannerGradient-${dest.id}" x1="10" y1="13" x2="10" y2="37" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#fbbf24"/>
-                            <stop offset="50%" stop-color="#f59e0b"/>
-                            <stop offset="100%" stop-color="#d97706"/>
-                          </linearGradient>
-                        </defs>
-                      </svg>
-                      <span class="banner-text-${dest.id}">${dest.name.toUpperCase()}</span>
-                    </div>
+                    <!-- Simple text label -->
+                    <span class="dest-label-${dest.id}">${dest.name}</span>
                   </div>
                   <style>
                     .marker-container-${dest.id} {
@@ -800,14 +762,27 @@ const TravelAnimator = () => {
                       align-items: center;
                     }
                     .pin-wrapper-${dest.id} {
-                      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
                     }
-                    .banner-wrapper-${dest.id} {
-                      position: relative;
-                      margin-top: -4px;
-                      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+                    .dest-label-${dest.id} {
+                      margin-top: 2px;
+                      font-family: 'Segoe UI', 'Arial', sans-serif;
+                      font-size: 11px;
+                      font-weight: 700;
+                      color: #1f2937;
+                      text-shadow: 
+                        -1px -1px 0 white,
+                        1px -1px 0 white,
+                        -1px 1px 0 white,
+                        1px 1px 0 white,
+                        0 0 4px white;
+                      white-space: nowrap;
+                      letter-spacing: 0.3px;
                     }
-                    .banner-text-${dest.id} {
+                  </style>`,
+                  iconSize: [80, 52],
+                  iconAnchor: [40, 34],
+                })}
                       position: absolute;
                       top: 50%;
                       left: 50%;
