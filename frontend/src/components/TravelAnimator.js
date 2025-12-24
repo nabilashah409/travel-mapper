@@ -448,16 +448,16 @@ const TravelAnimator = () => {
       return { 
         zoomOffset: -1,
         padding: [40, 40],
-        markerSize: 36,
-        fontSize: 24
+        markerSize: 48,
+        fontSize: 32
       };
     } else if (width < 768) {
       // Mobile/Tablet
       return { 
         zoomOffset: 0,
         padding: [50, 50],
-        markerSize: 42,
-        fontSize: 28
+        markerSize: 56,
+        fontSize: 36
       };
     } else if (width < 1024) {
       // Tablet/Small desktop
