@@ -396,27 +396,17 @@ const TravelAnimator = () => {
   // Get transport icon HTML - aerial view for car
   const getTransportIcon = () => {
     if (selectedTransport === 'car') {
-      // Top-down/aerial view car using simple HTML
-      return `<div style="
-        width: 24px;
-        height: 32px;
-        background: #dc2626;
-        border-radius: 6px 6px 4px 4px;
-        position: relative;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      ">
-        <div style="
-          position: absolute;
-          top: 4px;
-          left: 3px;
-          right: 3px;
-          height: 8px;
-          background: #87CEEB;
-          border-radius: 3px 3px 0 0;
-        "></div>
-      </div>`;
+      // Top-down/aerial view car - like reference image
+      return `<svg width="28" height="40" viewBox="0 0 28 40">
+        <rect x="2" y="4" width="24" height="32" rx="8" fill="#e63946"/>
+        <rect x="4" y="8" width="20" height="10" rx="3" fill="#1d3557"/>
+        <rect x="4" y="26" width="20" height="6" rx="2" fill="#1d3557"/>
+        <rect x="0" y="10" width="4" height="6" rx="1" fill="#333"/>
+        <rect x="24" y="10" width="4" height="6" rx="1" fill="#333"/>
+        <rect x="0" y="24" width="4" height="6" rx="1" fill="#333"/>
+        <rect x="24" y="24" width="4" height="6" rx="1" fill="#333"/>
+      </svg>`;
     }
-    // Emoji for other transport types
     const emojis = { flight: '✈️', walk: '🚶‍♀️' };
     return emojis[selectedTransport] || '✈️';
   };
